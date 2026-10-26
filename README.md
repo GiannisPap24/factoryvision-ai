@@ -21,6 +21,7 @@ Try the interface and synthetic workflow after installation—no dataset or mode
 - Six registered methods: four Cashew methods (autoencoder, spatial baseline, ResNet18 feature memory and student–teacher) and two experimental MetalParts methods.
 - With verified local artifacts: explicit CPU inference, aligned heatmaps, overlays, reconstructions where supported, model-specific scores and latency.
 - Batch inspection of up to 20 images, with validation, retained error rows and deterministic CSV/JSON research reports.
+- [Human Review V1](docs/milestone-5a-human-review.md): session-local observations on individual results, revision history and explicit JSON/CSV exports. Predictions remain unchanged; feedback is not verified ground truth.
 
 ## What you can run
 
@@ -29,6 +30,7 @@ Try the interface and synthetic workflow after installation—no dataset or mode
 | Overview and historical Research summaries | Real single-image inspection |
 | Model Catalog and downloadable model cards | Multi-model comparison and anomaly maps |
 | Synthetic Demo and its CSV/JSON examples | Batch inference and completed research reports |
+| Synthetic human-review practice, with null prediction fields | Human review of actual single-image and batch results |
 
 The public repository contains **no datasets, checkpoints or pretrained weights**. Unavailable models remain disabled; there are no fabricated predictions or automatic weight downloads. See [artifact prerequisites](docs/reproduction.md).
 
@@ -82,6 +84,8 @@ One Streamlit frontend calls reusable inference services. Immutable registries v
 
 Uploads stay in process memory and are not saved by the app. Clear them when finished; secure memory erasure is not claimed. Only upload permitted images. Input limits, session lifecycle and the limits of protected-test detection are documented in [architecture](docs/architecture.md), [inference](docs/inference.md) and [reporting](docs/reporting.md).
 
+Human reviews and notes also stay in the current session. Save a decision explicitly, then download its JSON/CSV if needed. Exports include all saved revisions and notes, so enter no private information. Changing inputs, models or categories clears associated reviews; no database, feedback upload or automatic training is involved. [Review lifecycle and privacy limits](docs/milestone-5a-human-review.md).
+
 ## Tests and CI
 
 The [verified hosted run for 8e8dade](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40380407763) passed **711 tests with 98.09% combined statement and branch coverage**, plus lint, lock/dependency checks, wheel/sdist inspection and fresh-install smoke checks. The badge above links to the current branch status. The percentage combines executed statements and branch outcomes; it is not the branch-only percentage. See [coverage interpretation](docs/ci.md#interpreting-coverage).
@@ -92,7 +96,7 @@ After the installation above (including development dependencies), run:
 .venv-31410/Scripts/python.exe scripts/ci_check.py --uv .tools/uv-0.13.5/uv.exe
 ```
 
-Default tests use fabricated data and require no private assets. See [CI details](docs/ci.md).
+Default tests use fabricated data and require no private assets. The local Human Review V1 candidate passes **797 tests (one Windows symlink-privilege skip)** with **98.18% combined coverage**; this is separate from the published baseline CI above. See the [5A verification record](docs/milestone-5a-human-review.md) and [CI details](docs/ci.md).
 
 ## Research results and limits
 

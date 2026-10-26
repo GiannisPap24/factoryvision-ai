@@ -13,6 +13,7 @@ separately prepared, verified research artifacts.
 | Explore methods and download validation-only examples | [Model Catalog and synthetic demo](model-catalog-demo.md) |
 | Understand real inference, upload validation and scores | [Inference contracts](inference.md) |
 | Inspect a completed batch and interpret CSV/JSON | [Research reporting](reporting.md) |
+| Record, revise and export session-local human observations | [Human Review V1](milestone-5a-human-review.md) |
 
 ## Understand and contribute to the code
 

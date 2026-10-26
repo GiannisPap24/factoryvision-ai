@@ -13,6 +13,8 @@ from factoryvision.inference.batch import BatchService
 from factoryvision.inference.metalparts import MetalPartsService
 from factoryvision.inference.metalparts_feature import MetalPartsFeatureService
 from factoryvision.inference.model_catalog import catalog_entries
+from factoryvision.inference.review import Decision
+from factoryvision.inference.review import json_bytes as review_json
 from factoryvision.inference.service import InspectionService
 
 assert "site-packages" in str(factoryvision.__file__)
@@ -55,10 +57,21 @@ assert not app.exception and app.error and app.table
 app.sidebar.radio[0].set_value("Synthetic demo").run()
 assert not app.exception and any(NOTICE in warning.value for warning in app.warning)
 next(button for button in app.button if button.label == "Generate synthetic demo").click().run()
-assert not app.exception and len(app.get("download_button")) == 2
+assert not app.exception and len(app.get("download_button")) == 4
 assert app.session_state["synthetic_demo"][2] == json_bytes(demo.report)
+app.selectbox(key="fv_review_demo_decision_0").set_value(Decision.NEEDS_FURTHER_REVIEW)
+app.text_area(key="fv_review_demo_note_0").set_value("Installed synthetic review")
+next(button for button in app.button if button.label == "Save human review").click().run()
+assert not app.exception
+reviews = app.session_state["fv_review_demo_bundle"].records
+assert reviews[0].decision == Decision.NEEDS_FURTHER_REVIEW
+assert reviews[0].evidence.score is None and reviews[1].history == ()
+assert review_json(reviews) == review_json(reviews)
 app.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
 assert "synthetic_demo" not in app.session_state
+assert "fv_review_demo_bundle" not in app.session_state
 app.sidebar.radio[0].set_value("Batch inspection").run()
 assert not app.exception and not app.get("download_button")
-print("PASS: installed six-model catalog, missing artifacts, explicit demo, exports and resets.")
+print(
+    "PASS: installed six-model catalog, missing artifacts, demo, human review, exports and resets."
+)

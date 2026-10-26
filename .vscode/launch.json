@@ -2,6 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "FactoryVision: debug human review",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_review.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
       "name": "FactoryVision: debug catalog and synthetic demo",
       "type": "debugpy",
       "request": "launch",

@@ -200,6 +200,9 @@ def inspect(engine, statuses, compare=False):
             for column, result in zip(st.columns(len(row)), row, strict=True):
                 with column:
                     show_result(result)
+        from factoryvision.app import review_ui
+
+        review_ui.render("single", results or None, "cashew")
 
 
 def render(engine, metal_engine=None):

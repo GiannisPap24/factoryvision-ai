@@ -32,10 +32,16 @@ provenance. No model is validated for consequential industrial quality decisions
 Source publication and successful hosted CI are complete. For the authorized 4F
 launch, GitHub private vulnerability reporting has been enabled and its public entry
 point verified. Safe issue templates and a [feedback process](community-feedback.md)
-support the initial community round. Reddit and LinkedIn announcements remain
-pending; no external-user acquisition or industrial validation is claimed.
+support the initial community round. Community announcements remain pending;
+no external-user acquisition or industrial validation is claimed.
 
-Later 5A–5F work is the planned sequence of human review, model registry,
+Milestone **5A — Human Review V1** is implemented and verified locally on the feature branch;
+publication remains pending separate diff/security review. See the
+[implementation and verification record](milestone-5a-human-review.md).
+It adds local observations, revisions and explicit exports without changing
+predictions, thresholds or research status.
+
+The next proposed milestone is **5B — Model Registry**. Later work covers
 robustness, performance, camera integration and pilot discovery. Each requires
 a separate scope, prerequisites and acceptance criteria. No production-readiness,
 independent target-domain reliability or automatic benchmark reopening is implied.

@@ -4,11 +4,12 @@ from dataclasses import asdict
 
 import streamlit as st
 
-from factoryvision.app import presentation
+from factoryvision.app import presentation, review_ui
 from factoryvision.demo import NOTICE, build_demo, csv_bytes, json_bytes
 
 
 def clear():
+    review_ui.clear("demo")
     st.session_state.pop("synthetic_demo", None)
 
 
@@ -69,3 +70,4 @@ def render():
         "These exports carry the synthetic warning and no model identity. They cannot "
         "be used as schema-v1 Quality Control Research Reports."
     )
+    review_ui.render("demo", demo.report)

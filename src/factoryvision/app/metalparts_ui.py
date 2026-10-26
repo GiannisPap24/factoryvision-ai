@@ -7,7 +7,7 @@ from importlib.resources import files
 import streamlit as st
 import torch
 
-from factoryvision.app import presentation
+from factoryvision.app import presentation, review_ui
 from factoryvision.data.metalparts import MetalPartsSource
 from factoryvision.inference.metalparts import DIAGNOSTIC_LABEL, MetalPartsService
 from factoryvision.inference.metalparts_feature import MetalPartsFeatureService
@@ -191,6 +191,7 @@ def inspect(engine, compare=False):
         if not st.session_state.get("metal_results"):
             st.subheader("Spatial evidence")
             st.info("No inspection yet. Run a permitted input to view native-resolution evidence.")
+        review_ui.render("single", st.session_state.get("metal_results"), "metalparts")
 
 
 def research(root):
