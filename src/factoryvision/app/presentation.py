@@ -56,6 +56,9 @@ def navigate(page):
 
 
 def clear_inspection():
+    from factoryvision.app import review_ui
+
+    review_ui.clear("single")
     for key in (
         "results",
         "request_identity",
@@ -179,6 +182,9 @@ def steps():
 def switch_category(category):
     if st.session_state.get("active_category") == category:
         return
+    from factoryvision.app import review_ui
+
+    review_ui.clear()
     st.session_state["batch_ack"] = False
     for key in (
         "results",

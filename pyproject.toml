@@ -61,6 +61,7 @@ packages = ["src/factoryvision"]
 include = [
   "/LICENSE",
   "/docs/README.md",
+  "/docs/milestone-5a-human-review.md",
   "/docs/community-feedback.md",
   "/SECURITY.md",
   "/docs/interface.md",

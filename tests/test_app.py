@@ -360,7 +360,9 @@ def test_batch_explicit_once_details_and_input_resets(app, monkeypatch):
     report = at.session_state["batch_report"]
     assert report.count("inspected") == 2 and report.count("rejected") == 1
     bundle = at.session_state["batch_exports"]
-    assert bundle.source is report and len(at.get("download_button")) == 2
+    assert bundle.source is report
+    assert len([b for b in at.get("download_button") if "Download research " in b.label]) == 2
+    assert len([b for b in at.get("download_button") if "human review" in b.label]) == 2
     assert bundle.report.summary.rejected == 1
     at.run().selectbox(key="batch_detail").set_value("Image 003").run()
     assert at.session_state["batch_exports"] is bundle
@@ -491,7 +493,9 @@ def test_fresh_catalog_and_demo_never_infer_or_mix_report_state(tmp_path, monkey
     assert not at.get("download_button") and any(x.value == NOTICE for x in at.warning)
     next(b for b in at.button if b.label == "Generate synthetic demo").click().run()
     bundle = at.session_state["synthetic_demo"]
-    assert not at.exception and len(at.get("download_button")) == 2
+    assert not at.exception
+    assert len([b for b in at.get("download_button") if "synthetic demo" in b.label]) == 2
+    assert len([b for b in at.get("download_button") if "human review" in b.label]) == 2
     assert all(key not in at.session_state for key in ("batch_report", "batch_exports", "results"))
     at.run()
     assert at.session_state["synthetic_demo"] is bundle
@@ -533,7 +537,9 @@ def test_reports_navigation_preserves_exports_without_inference(app, monkeypatch
     at.sidebar.radio[0].set_value("Reports").run()
     assert not at.exception and at.session_state["batch_report"] is source
     assert at.session_state["batch_exports"] is exports
-    assert len(at.get("download_button")) == 2 and len(calls) == 2
+    assert len([b for b in at.get("download_button") if "Download research " in b.label]) == 2
+    assert len([b for b in at.get("download_button") if "human review" in b.label]) == 2
+    assert len(calls) == 2
     at.run()
     assert at.session_state["batch_exports"].csv == exports.csv and len(calls) == 2
     at.sidebar.radio[0].set_value("Batch inspection").run()

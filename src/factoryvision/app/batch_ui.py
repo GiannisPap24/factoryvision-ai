@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from factoryvision.app import presentation, report_ui
+from factoryvision.app import presentation, report_ui, review_ui
 from factoryvision.inference.batch import (
     MAX_IMAGES,
     BatchService,
@@ -15,6 +15,7 @@ from factoryvision.inference.uploads import InputRejected
 
 
 def reset():
+    review_ui.clear("batch")
     for key in (
         "batch_plan",
         "batch_report",
@@ -74,11 +75,13 @@ def results(report):
         "Report summary and exports", expanded=st.session_state.get("active_page") == "Reports"
     ):
         if not report_ui.render(report):
+            review_ui.clear("batch")
             return
     good = {row.image_id: row for row in report.rows if row.status == "inspected"}
     if good:
         chosen = st.selectbox("Inspect individual result", list(good), key="batch_detail")
         detail(good[chosen])
+    review_ui.render("batch", report)
 
 
 def render(category, cashew, metal, feature):
