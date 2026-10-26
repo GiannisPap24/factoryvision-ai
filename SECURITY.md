@@ -17,7 +17,15 @@ check does not prove every dependency vulnerability is absent. The
 [initial hosted CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
 passed on 2026-10-26; passing CI is not a security guarantee.
 
-Do not post secrets or exploit details publicly. The source repository is public,
-but a private security-reporting channel has not yet been established. The owner
-must establish one before community launch. No response-time or supported-version
-commitment is implied.
+## Reporting a vulnerability privately
+
+GitHub private vulnerability reporting is enabled for this repository. Open
+[Security and quality → Advisories](https://github.com/GiannisPap24/factoryvision-ai/security/advisories)
+and choose **Report a vulnerability**. GitHub sign-in is required to submit a report.
+Do not post secrets or exploit details in public issues, comments or social posts.
+
+Include the affected source commit, a minimal synthetic reproduction and the
+potential impact. Omit credentials, private dataset images, customer information,
+model weights and unrelated environment logs. No response-time or supported-version
+commitment is implied. Ordinary non-sensitive software feedback belongs in
+[GitHub Issues](https://github.com/GiannisPap24/factoryvision-ai/issues).

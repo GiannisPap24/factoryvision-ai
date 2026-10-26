@@ -64,9 +64,12 @@ historical, not the count of the updated branch.
 ## Separate release boundaries
 
 Datasets, weights, private logs, model-enabled screenshots and generated
-distributions remain outside the source-release scope. Tags, binary releases, social promotion and
-the wider 4F community launch require separate review and authorization.
-A private security-reporting channel must be established before community launch.
+distributions remain outside the source-release scope. Tags and binary releases
+remain separately scoped. The owner has authorized one appropriate technical-community
+announcement and one LinkedIn introduction where authenticated, permitted posting
+is available. Neither announcement is claimed published in this source update.
+GitHub private vulnerability reporting was enabled and its public reporting entry
+verified on 2026-10-26; the current route is documented in [SECURITY.md](../SECURITY.md).
 
 Additional portfolio captures should use source-only Overview, Catalog or generated
 Demo with original geometry and explicit synthetic labels. Review visible details

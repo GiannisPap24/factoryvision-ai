@@ -22,6 +22,7 @@ separately prepared, verified research artifacts.
 | Run offline checks or use VS Code | [Development](development.md) |
 | Understand hosted checks and coverage | [CI](ci.md) |
 | Propose a focused change | [Contributing](../CONTRIBUTING.md) |
+| Report a bug or suggest an improvement | [Community feedback](community-feedback.md) |
 | Understand local security and privacy boundaries | [Security](../SECURITY.md) |
 | Review licence and asset redistribution boundaries | [Licensing and attribution](licensing.md) |
 | Review completed milestones and future scope | [Roadmap](roadmap.md) |

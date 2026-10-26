@@ -30,3 +30,16 @@ on 2026-10-26 after the final security/privacy review. The
 passed. Review the [publication record and update procedure](docs/publication.md)
 before publishing further changes; community launch remains separately scoped.
 For security concerns, read [SECURITY.md](SECURITY.md).
+
+## Community feedback
+
+Use the bug-report template for reproducible setup or application problems, and
+the feature/feedback template for a concrete workflow or documentation improvement.
+Describe the source commit, supported environment and smallest synthetic example.
+Public issues must not contain customer information, private images, weights,
+credentials, sensitive logs or exploit details. Vulnerabilities use the private
+reporting route in [SECURITY.md](SECURITY.md).
+
+See the [feedback process](docs/community-feedback.md) for triage and first-month
+tracking. Community feedback does not change ground-truth labels, frozen thresholds
+or scientific evaluation status.

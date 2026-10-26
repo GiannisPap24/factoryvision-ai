@@ -2,7 +2,8 @@
 
 Milestone 4E completed source-only publication on 2026-10-26 after owner approval
 and the final security/privacy review. The [initial hosted CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
-passed. Milestone 4F remains separately gated.
+passed. Bounded Milestone 4F launch work is now authorized; external announcements
+are pending platform access and destination verification, not claimed published.
 Completion of an engineering milestone does not reverse a scientific integrity gate.
 
 ## Completed research and engineering
@@ -28,9 +29,11 @@ provenance. No model is validated for consequential industrial quality decisions
 
 ## Separately gated next work
 
-Source publication and the first successful hosted CI run are complete. The wider
-4F community launch still requires its own scope and approval, including a private
-security-reporting channel; source publication does not start that work.
+Source publication and successful hosted CI are complete. For the authorized 4F
+launch, GitHub private vulnerability reporting has been enabled and its public entry
+point verified. Safe issue templates and a [feedback process](community-feedback.md)
+support the initial community round. Reddit and LinkedIn announcements remain
+pending; no external-user acquisition or industrial validation is claimed.
 
 Later 5A–5F work is the planned sequence of human review, model registry,
 robustness, performance, camera integration and pilot discovery. Each requires
