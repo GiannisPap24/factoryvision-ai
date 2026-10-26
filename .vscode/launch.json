@@ -1,0 +1,169 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "FactoryVision: debug catalog and synthetic demo",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_catalog_demo.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug quality reporting",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_reporting.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug batch inspection",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_batch.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug MetalParts feature memory",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_metalparts_feature.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug frozen MetalParts inference",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_metalparts_inference.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug MetalParts synthetic update",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_metalparts.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug local inference",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_inference.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug PCB1 normal inference",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_pcb1.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug student training",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/student_experiment.py",
+      "args": [
+        "smoke",
+        "--run-id",
+        "cashew-student-debug-v1"
+      ],
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug feature scoring",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_features.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug synthetic evaluation",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_evaluation.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug CPU training step",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/train_cashew.py",
+      "args": [
+        "--smoke",
+        "--run-id",
+        "cashew-ae-debug-42"
+      ],
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug Cashew DataLoader",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_dataloader.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug synthetic manifest",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/debug_manifest.py",
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    },
+    {
+      "name": "FactoryVision: debug current test file",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "${file}",
+        "-q"
+      ],
+      "python": "${workspaceFolder}/.venv-31410/Scripts/python.exe",
+      "cwd": "${workspaceFolder}",
+      "console": "internalConsole",
+      "justMyCode": true
+    }
+  ]
+}

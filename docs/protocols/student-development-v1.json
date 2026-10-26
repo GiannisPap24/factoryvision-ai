@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "frozen_at_utc": "2026-10-24T19:31:11.567788+00:00",
+  "architecture": "compact-st-layer23-unitl2-v1",
+  "scope": "Normal development and artificial diagnostics only",
+  "teacher": "verified ImageNet V1 ResNet18 raw layer2/layer3; all parameters and BatchNorm frozen",
+  "teacher_sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec",
+  "student": "Conv3x3 stride2 pad1: 3->16->32->64, ReLU each; head1 Conv1x1 64->128; high Conv3x3 stride2 pad1 64->96 ReLU; head2 Conv1x1 96->256; all biases; no BatchNorm/dropout",
+  "input": "RGB128 full-frame bilinear antialias /255; ImageNet channel mean/std both networks",
+  "normalization": "per spatial vector channel L2 eps1e-6 both features; no fitted statistics",
+  "loss": "channel-summed squared unit-vector difference per level; bilinear high map to16x16 align_corners=false; equal level mean; mean batch/spatial",
+  "image_score": "maximum raw16x16 discrepancy",
+  "map": "bilinear raw discrepancy to128x128 align_corners=false; no smoothing/pixel threshold",
+  "seed": 42,
+  "batch_size": 8,
+  "epochs_max": 12,
+  "patience": 3,
+  "min_delta": 0.0,
+  "optimizer": {
+    "name": "Adam",
+    "lr": 0.001,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-08,
+    "weight_decay": 0
+  },
+  "checkpoint": "strict minimum normal validation loss, ties earlier; calibration inaccessible to selection",
+  "threads": 4,
+  "workers": 0,
+  "training_shuffle": "seeded Torch generator 42; exact full membership each epoch",
+  "seconds_max": 600,
+  "peak_bytes_max": 2147483648,
+  "manifest_sha256": "80bac86ae2fc1b0ad7e0e046597fb4a3a1e1f4f92ce556d5dddbfdd37d51f84c",
+  "counts": {
+    "train": 315,
+    "validation": 67,
+    "calibration": 68
+  },
+  "calibration": "normal calibration only float64 linear q95 strict greater-than",
+  "synthetic": "same fixed first16 validation checkerboards as2C; diagnostic only, never used for selection",
+  "timing": "first validation image and first8 validation images;5warmups30repeats preloaded;30 warm-cache decodes",
+  "reload_tolerance": {
+    "atol": 1e-06,
+    "rtol": 1e-05
+  },
+  "smoke": "first16 train and first8 validation, one epoch two updates; fresh model/optimizer for full run",
+  "deviation_from_2c_proposal": "owner requested compact convolutional student and max12 epochs, replacing planning-only matching ResNet18/20epochs; prior proposal preserved"
+}

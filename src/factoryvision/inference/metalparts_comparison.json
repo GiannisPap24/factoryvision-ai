@@ -1,0 +1,199 @@
+{
+  "label": "EXPLORATORY SOURCE-DOMAIN COMPARISON \u2014 NOT INDEPENDENT TEST PERFORMANCE",
+  "autoencoder": {
+    "image": {
+      "positive": 51,
+      "negative": 36,
+      "prevalence": 0.5862068965517241,
+      "auroc": 0.5969498910675382,
+      "average_precision": 0.7142665461395848,
+      "reason": null
+    },
+    "pixel": {
+      "positive": 84903,
+      "negative": 349785597,
+      "prevalence": 0.00024266978782149396,
+      "auroc": 0.8671747847310998,
+      "average_precision": 0.02154141500770638,
+      "reason": null,
+      "bins": 65536,
+      "score_quantization": "floor(float64(MSE)*65535)",
+      "interpretation": "Exact on quantized scores; approximate unquantized native-pixel ranking; no sampling."
+    },
+    "latency_seconds": {
+      "min": 0.2554173999960767,
+      "median": 0.3586293999978807,
+      "p95": 0.3633009500001208,
+      "max": 0.3713470000002417
+    },
+    "peak_working_set_bytes": 802607104
+  },
+  "feature_memory": {
+    "image": {
+      "positive": 51,
+      "negative": 36,
+      "prevalence": 0.5862068965517241,
+      "auroc": 0.8017429193899782,
+      "average_precision": 0.887505344457561,
+      "reason": null
+    },
+    "pixel": {
+      "positive": 84903,
+      "negative": 349785597,
+      "prevalence": 0.00024266978782149396,
+      "auroc": 0.9635008759532205,
+      "average_precision": 0.30512141101011386,
+      "reason": null,
+      "label": "EXPLORATORY SOURCE-DOMAIN COMPARISON \u2014 NOT INDEPENDENT TEST PERFORMANCE",
+      "bins": 65536,
+      "bin_width": 1.5259021896696422e-05,
+      "quantization": "floor(float64(raw_score)*65535); no clipping or normalization",
+      "interpretation": "Exact quantized ranking; approximate unquantized ranking."
+    },
+    "latency_seconds": {
+      "min": 1.4914611999993213,
+      "median": 1.6426380000048084,
+      "p95": 2.1019967799962616,
+      "max": 2.197616699995706
+    },
+    "peak_working_set_bytes": 556294144,
+    "bank_bytes": 10618409,
+    "backbone_bytes": 46830571,
+    "bank_sha256": "38d89de7500b8c9c9ae1bb5e2bbdff7a400318f072fbcfba9441aa7e8a713b10",
+    "score_distributions": {
+      "validation_normal": {
+        "min": 0.14381584525108337,
+        "q25": 0.15444570407271385,
+        "median": 0.15778380632400513,
+        "q75": 0.1656683124601841,
+        "max": 0.17539381980895996
+      },
+      "source_anomaly": {
+        "min": 0.1429823637008667,
+        "q25": 0.16176480799913406,
+        "median": 0.19467520713806152,
+        "q75": 0.21515155583620071,
+        "max": 0.24655155837535858
+      }
+    }
+  },
+  "preview_assets": [
+    {
+      "sample_id": "metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9",
+      "anomaly": 0,
+      "score": 0.16416265070438385,
+      "ceiling": 0.1394450068473816,
+      "assets": {
+        "original": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9-original.png",
+          "bytes": 472402,
+          "sha256": "e8c61936d12b06b4dea65b91109b0871082234dcd79f04458ed1212aca046146"
+        },
+        "heatmap": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9-heatmap.png",
+          "bytes": 375440,
+          "sha256": "45b38c4f1c90ed992d420b1fb7a2caa0802189b8523e8877810dfef006a7327a"
+        },
+        "overlay": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9-overlay.png",
+          "bytes": 620487,
+          "sha256": "66f4eedd6dbf8a027c72c709926c08597de519de561728300f9718e7febaf3e4"
+        }
+      }
+    },
+    {
+      "sample_id": "metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0",
+      "anomaly": 1,
+      "score": 0.22118952870368958,
+      "ceiling": 0.20557773113250732,
+      "assets": {
+        "original": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0-original.png",
+          "bytes": 490341,
+          "sha256": "ce3de8d98299c2112a9402b9bbfa62398e0705a39e334c81f37ddcf7b7059197"
+        },
+        "heatmap": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0-heatmap.png",
+          "bytes": 317114,
+          "sha256": "a490ee8ccd974443f4aefbb6307ecb331faf88bd4015af67143f2a3cc85090c0"
+        },
+        "overlay": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0-overlay.png",
+          "bytes": 588173,
+          "sha256": "9da0cb8891c52a4950690b86e59e37ca746be3da97a372df8fb16d15c8b5372b"
+        }
+      }
+    },
+    {
+      "sample_id": "metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1",
+      "anomaly": 1,
+      "score": 0.16177140176296234,
+      "ceiling": 0.15031005442142487,
+      "assets": {
+        "original": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1-original.png",
+          "bytes": 455681,
+          "sha256": "6836714739ad868c3f15671e994d1c26f8c9d2f761a34a3e67a4a67e2de8af5b"
+        },
+        "heatmap": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1-heatmap.png",
+          "bytes": 372958,
+          "sha256": "bb424b36cf12d97e701f139221067a496876d178c7f56b36738798975d445eeb"
+        },
+        "overlay": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1-overlay.png",
+          "bytes": 608504,
+          "sha256": "ab7d267a2b42aa3cddeddf5c977ea4f3922b836cab400feda73cf6bfcd7f44df"
+        }
+      }
+    },
+    {
+      "sample_id": "metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a",
+      "anomaly": 1,
+      "score": 0.21638065576553345,
+      "ceiling": 0.21049147844314575,
+      "assets": {
+        "original": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a-original.png",
+          "bytes": 490246,
+          "sha256": "a494ce91df04c544f05c0d5b220945a58ed839421746f8906cde74a88dff504b"
+        },
+        "heatmap": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a-heatmap.png",
+          "bytes": 303827,
+          "sha256": "fdd99e24080b37fb4cf3748135181977511bdb7494e7f1e8b3d6f161df59d412"
+        },
+        "overlay": {
+          "path": "runs/metalparts-feature-comparison-v1/metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a-overlay.png",
+          "bytes": 566694,
+          "sha256": "060aae871aa90cc2873aa704158355555836f0b2bea0db34e9da658f863444d6"
+        }
+      }
+    }
+  ],
+  "threshold": null,
+  "review": {
+    "label": "EXPLORATORY SOURCE-DOMAIN COMPARISON \u2014 NOT INDEPENDENT TEST PERFORMANCE",
+    "feature_peaks_inside": 28,
+    "ae_peaks_inside": 16,
+    "both_peaks_outside": 22,
+    "feature_ap_higher": 41,
+    "feature_ap_lower": 10,
+    "posthoc_examples": {
+      "lowest_pixel_ap": {
+        "sample_id": "metalparts-3d17e285ae9f2a6e4d1e2c9b9129d53e28eabb53b2f82717c74662e2bd307ef4",
+        "ae_pixel_ap": 0.00020194640379424267,
+        "feature_pixel_ap": 0.0007470328033679081,
+        "ae_peak_inside": false,
+        "feature_peak_inside": false
+      },
+      "highest_pixel_ap": {
+        "sample_id": "metalparts-7e91ad184f0a9b49d66ae963258010371570a626e095e6d0cb2956017ce3f34f",
+        "ae_pixel_ap": 0.3214796267500725,
+        "feature_pixel_ap": 0.6315209242983012,
+        "ae_peak_inside": true,
+        "feature_peak_inside": true
+      }
+    }
+  }
+}

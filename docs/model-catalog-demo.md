@@ -1,0 +1,65 @@
+# Model Catalog and synthetic demonstration
+
+Run the existing app from the repository root with
+`.venv-31410/Scripts/python.exe -m factoryvision.app`. It binds `127.0.0.1:8501`.
+No research data or weights are needed for these two pages.
+
+## Model Catalog
+
+Choose **Model Catalog** in the sidebar. Six cards show family, learning method,
+outputs, runtime, availability and scientific status. Each offers a local Markdown
+model-card download. These presentation copies preserve accepted scientific text;
+relative links become explicit source-distribution paths so standalone downloads
+do not contain broken local hyperlinks. The overview lists all six registered
+methods; the detail selector follows the selected category. It does not change
+the model selections used by image or batch inspection.
+
+The typed projection in `inference/model_catalog.py` reads compatible IDs from
+`batch.models`, identity/threshold metadata from `reporting.model_info` and its
+existing packaged manifests, and availability from the original service verifiers.
+Only descriptive method annotations are added. There is no second registration,
+checkpoint search path, threshold source, or model-loading implementation.
+
+Details distinguish trained autoencoders/student, fitted statistical reference,
+and frozen-feature memory banks. They show preprocessing, outputs, pretrained
+provenance, frozen threshold availability, research status and model-card paths.
+Expected artifact SHA-256 and locally verified SHA-256 are separate fields.
+Verified means file and metadata checks passed; runtime tensors are checked when
+explicit inference loads the model. Catalog viewing never deserializes weights.
+
+Missing, changed or incomplete artifacts are unavailable, with setup guidance;
+the expected identity is never presented as proof of local availability. There
+are no downloads on navigation. The upstream provenance link opens only when
+clicked and is not an instruction to acquire or redistribute weights.
+
+## Synthetic demo
+
+Choose **Demo**, then **Generate synthetic demo**. The page prominently
+states: **Synthetic workflow demonstration — not real model inference or defect detection.**
+
+Two original geometric images are generated in memory (384 × 320 RGB rectangle
+and ellipse), together with deliberately invalid bytes. The real bounded image
+decoder validates them: two accepted, one rejected. No model is loaded or called.
+No training, anomaly scoring, probabilities, thresholding or defect judgments occur.
+Category selection does not make these examples category-matched research data.
+
+Explicit CSV/JSON buttons export the separate `synthetic-workflow-v1` schema.
+Every export retains its warning, `inference_executed=false`, null model/artifact
+identity and null scores, thresholds and research flags. The deterministic ID
+is a digest of the validated demo document. CSV uses the existing spreadsheet
+cell guard. The real research report builder rejects this unrelated demo schema.
+
+Nothing is saved automatically. **Clear synthetic demo**, page changes and category
+changes invalidate the demo state/downloads. Demo state never populates image or
+batch results. Browser downloads are explicit files under the user's control.
+For actual inference, independently acquire the permitted prerequisites described
+in [reproduction](reproduction.md); demo records cannot replace that evidence.
+
+## Verification
+
+`tests/test_catalog_demo.py` tests identities, unavailable/verified separation,
+determinism, invalid exports and no model calls. `tests/test_app.py` exercises
+navigation, warnings, explicit generation, state resets and unavailable batches
+with Streamlit AppTest. `scripts/smoke_installed.py` repeats asset-free workflows
+from an installed wheel in an empty directory with network connections denied.
+The synthetic debug configuration uses `scripts/debug_catalog_demo.py`.

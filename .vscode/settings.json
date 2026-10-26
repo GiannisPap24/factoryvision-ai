@@ -1,0 +1,52 @@
+{
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "python.defaultInterpreterPath": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+  "python.terminal.activateEnvironment": false,
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [
+    "tests"
+  ],
+  "python.testing.cwd": "${workspaceFolder}",
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.env.windows": {
+    "PATH": "${workspaceFolder}\\.venv-31410\\Scripts;${workspaceFolder}\\.tools\\uv-0.13.5;${env:PATH}",
+    "UV_CACHE_DIR": "${workspaceFolder}\\.uv-cache",
+    "UV_PYTHON_DOWNLOADS": "never",
+    "PYTHONNOUSERSITE": "1",
+    "UV_PROJECT_ENVIRONMENT": "${workspaceFolder}\\.venv-31410"
+  },
+  "ruff.path": [
+    "${workspaceFolder}/.venv-31410/Scripts/ruff.exe"
+  ],
+  "ruff.importStrategy": "fromEnvironment",
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+  "files.watcherExclude": {
+    "**/.tools/**": true,
+    "**/.uv-cache/**": true,
+    "**/.venv/**": true,
+    "**/.tmp/**": true,
+    "**/data/raw/**": true,
+    "**/runs/**": true,
+    "**/.venv-31410/**": true
+  },
+  "search.exclude": {
+    "**/.tools": true,
+    "**/.uv-cache": true,
+    "**/.venv": true,
+    "**/.tmp": true,
+    "**/data/raw": true,
+    "**/runs": true,
+    "**/reports": true,
+    "**/.venv-31410/**": true
+  },
+  "python-envs.terminal.autoActivationType": "off"
+}

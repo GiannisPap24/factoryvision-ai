@@ -1,0 +1,63 @@
+{
+  "schema": 1,
+  "id": "feature-memory-development-v1",
+  "frozen_at_utc": "2026-10-24T16:38:59.314242+00:00",
+  "checkpoint_2b": "a0e89c2f8e86444fd3f498de3c0949fa5e832e73",
+  "historical_test": "Cashew official test already observed; prohibited for this prototype; historical artifacts immutable",
+  "manifest_sha256": "80bac86ae2fc1b0ad7e0e046597fb4a3a1e1f4f92ce556d5dddbfdd37d51f84c",
+  "weights": {
+    "url": "https://download.pytorch.org/models/resnet18-f37072fd.pth",
+    "sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec",
+    "enum": "ResNet18_Weights.IMAGENET1K_V1"
+  },
+  "architecture": "resnet18-layer23-rgb128-imagenet-avg3-rmsnn-max-v1",
+  "preprocessing": "full-frame RGB bilinear antialiased square128, float32 /255; ImageNet channel mean [.485,.456,.406], std [.229,.224,.225]; no crop. Deliberate localization/CPU deviation from classification resize256/center224.",
+  "features": "frozen eval-mode ResNet18 stem/layer1 -> layer2 [128,16,16], layer3 [256,8,8]; each 3x3 stride1 padding1 average pooling including padding; bilinear layer3 to16 with align_corners=False; concatenate384 channels; no feature normalization/projection",
+  "memory": {
+    "training_normals": 315,
+    "patches_per_image": 16,
+    "expected_patches": 5040,
+    "max_patches": 8192,
+    "ordering": "sorted sample_id; row-major patches; per-ID randperm256 seeded first8 big-endian bytes SHA256(42|sample_id), first16 then sorted; fixed sampling not greedy coreset",
+    "dtype": "float32",
+    "max_reference_bytes": 12582912
+  },
+  "scoring": {
+    "patch": "RMS Euclidean distance to closest memory patch, sqrt(clamp(sum(q^2)+sum(b^2)-2q.b,0)/384)",
+    "image": "maximum of 16x16 raw patch distances",
+    "pixel": "bilinear patch grid ->128x128, align_corners=False; no smoothing",
+    "chunks": [
+      256,
+      512
+    ],
+    "max_chunk_side": 512,
+    "max_distance_matrix_bytes": 1048576,
+    "direction": "higher is more anomalous"
+  },
+  "development": {
+    "normal_validation": 67,
+    "normal_calibration": 68,
+    "threshold": "calibration normals only, q=.95 linear float64, strict score > threshold; no pixel threshold",
+    "synthetic": "first16 validation IDs only; one16x16 magenta/green checkerboard of4x4 cells each, top-left y=40+SHA256(pseudo-v1|ID)[0]%33, x=40+digest[1]%33; synthetic mask exactly overwritten square",
+    "synthetic_metrics": "paired score changes, frozen-threshold trigger counts, pooled synthetic pixel AUROC/AP, peak-in-mask count; no claim about real defect accuracy and no historical model comparison",
+    "no_tuning": "one recipe, one fit, no parameter search or refit based on validation/pseudo scores"
+  },
+  "resources": {
+    "device": "cpu",
+    "threads": 4,
+    "batch_size": 8,
+    "workers": 0,
+    "peak_working_set_ceiling_bytes": 2147483648,
+    "fit_wall_seconds_cap": 600,
+    "evaluation_wall_seconds_cap": 300,
+    "latency": "first normal validation image, batch1, 5warmups30repeats; separate feature extraction, memory search/map, total preloaded inference and30decode/resize repeats; median/p95"
+  },
+  "prohibited": [
+    "Cashew official test image/mask reads or new model scoring",
+    "pcb1 extraction/download/evaluation",
+    "student-teacher training",
+    "commercial deployment/readiness claims"
+  ],
+  "rights": "torchvision code BSD-3-Clause; pretrained dataset-derived rights separate; local research only, no blanket commercial permission asserted",
+  "outputs": "ignored runs/cashew-feature-v1; normal score IDs, patch selection, memory/hash/recipe/source provenance, synthetic-only examples/results, timing"
+}

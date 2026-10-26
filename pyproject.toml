@@ -1,0 +1,139 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "factoryvision-ai"
+version = "0.1.0"
+description = "Industrial visual inspection research: dataset contracts and split integrity"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.14.10,<3.15"
+dependencies = [
+  "torch==2.13.0+cpu",
+  "torchvision==0.28.0+cpu",
+  "numpy>=2.2,<3",
+  "pillow==13.0.0",
+  "scikit-learn==1.9.1",
+]
+
+[project.scripts]
+factoryvision = "factoryvision.cli:main"
+
+[project.optional-dependencies]
+app = [
+    "streamlit==1.66.1",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3,<10",
+  "pytest-cov>=6,<8",
+  "ruff>=0.11,<1",
+  "hatchling>=1.27,<2",
+]
+
+[tool.uv]
+required-version = ">=0.13.5"
+cache-dir = ".uv-cache"
+python-downloads = "never"
+environments = ["sys_platform == 'win32' and platform_machine == 'AMD64'"]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/factoryvision"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "/LICENSE",
+  "/SECURITY.md",
+  "/docs/interface.md",
+  "/docs/publication.md",
+  "/docs/milestone-4d-dependency-licenses.csv",
+  "/.github",
+  "/CONTRIBUTING.md",
+  "/docs/model-catalog-demo.md",
+  "/docs/ci.md",
+  "/docs/licensing.md",
+  "/docs/github-preparation.md",
+  "/docs/reporting.md",
+  "/docs/roadmap.md",
+  "/docs/local-demo.md",
+  "/docs/reproduction.md",
+  "/docs/metalparts-feature-memory-protocol.md",
+  "/docs/metalparts-feature-model-card.md",
+  "/docs/milestone-3f-metalparts-feature-memory.md",
+  "/docs/metalparts-development-diagnostic-protocol.md",
+  "/docs/metalparts-model-card.md",
+  "/docs/milestone-3e-metalparts-development-evaluation.md",
+  "/docs/metalparts-exploratory-training-protocol.md",
+  "/docs/milestone-3d-metalparts-training.md",
+  "/.streamlit",
+  "/docs/inference.md",
+  "/docs/milestone-3a-completion.md",
+  "/src",
+  "/tests",
+  "/integration_tests",
+  "/scripts",
+  "/.vscode",
+  "/.editorconfig",
+  "/.gitignore",
+  "/docs/architecture.md",
+  "/docs/dataset-contract.md",
+  "/docs/dataset-preparation.md",
+  "/docs/training.md",
+  "/docs/evaluation-protocol.md",
+  "/docs/model-card.md",
+  "/docs/feature-model-card.md",
+  "/docs/feature-memory.md",
+  "/docs/student-teacher-proposal.md",
+  "/docs/student-model-card.md",
+  "/docs/student-training.md",
+  "/docs/pcb1-confirmatory.md",
+  "/docs/milestone-2e1-completion.md",
+  "/docs/protocols",
+  "/docs/development.md",
+  "/README.md",
+  "/pyproject.toml",
+  "/uv.lock",
+  "/.python-version",
+  "/docs/milestone-2a-completion.md",
+  "/docs/milestone-2b-completion.md",
+  "/docs/milestone-2c-completion.md",
+  "/docs/milestone-2d-completion.md",
+  "/docs/milestone-2e2-completion.md",
+  "/docs/milestone-3b-dataset-strategy.md",
+  "/docs/milestone-3c-robustad-integration.md",
+  "/docs/pcb1-model-card.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config --basetemp=.tmp/pytest"
+markers = ["filesystem: filesystem containment checks, including symlinks where supported"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+src = ["src"]
+extend-exclude = [".tools", ".tmp", ".uv-cache", "dist", "build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.coverage.run]
+branch = true
+source = ["factoryvision"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 95

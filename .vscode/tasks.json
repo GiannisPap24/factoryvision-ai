@@ -1,0 +1,726 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": [],
+      "label": "FactoryVision: quality reporting tests",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/test_reporting.py",
+        "tests/test_app.py",
+        "tests/test_batch.py",
+        "-q"
+      ]
+    },
+    {
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": [],
+      "label": "FactoryVision: batch inspection tests",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/test_batch.py",
+        "tests/test_app.py",
+        "-q"
+      ]
+    },
+    {
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": [],
+      "label": "FactoryVision: inference unit tests",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/test_inference.py",
+        "tests/test_app.py",
+        "-q"
+      ]
+    },
+    {
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": [],
+      "label": "FactoryVision: local inspection app",
+      "args": [
+        "-m",
+        "factoryvision.app"
+      ]
+    },
+    {
+      "label": "FactoryVision: offline tests",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: quality checks",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/check_application_quality.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: validate synthetic manifest",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "factoryvision",
+        "validate-manifest",
+        "tests/fixtures/synthetic-manifest.json",
+        "--json"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PyTorch CPU smoke",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/smoke_torch.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: verify real Cashew",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/verify_cashew.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: real Cashew tests",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "integration_tests/test_cashew_real.py",
+        "--basetemp=.tmp/pytest-real",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: DataLoader smoke",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/debug_dataloader.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: model unit tests",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/test_training.py",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: CPU training smoke",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/train_cashew.py",
+        "--smoke",
+        "--run-id",
+        "${input:smokeRunId}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: real CPU training",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/train_cashew.py",
+        "--run-id",
+        "${input:trainingRunId}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: evaluation unit tests",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/test_evaluation.py",
+        "--basetemp=.tmp/pytest-evaluation-ui",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: frozen real evaluation (one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/evaluate_cashew.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: replay saved evaluation checks",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "integration_tests/test_evaluation_real.py",
+        "--basetemp=.tmp/pytest-evaluation-replay",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: feature model unit tests",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/test_feature_memory.py",
+        "--basetemp=.tmp/pytest-feature-ui",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: fit feature memory (one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/feature_experiment.py",
+        "fit"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: evaluate feature development (one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/feature_experiment.py",
+        "evaluate"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: verify feature development",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "integration_tests/test_feature_development_real.py",
+        "--basetemp=.tmp/pytest-feature-replay",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: Ruff checks",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "integration_tests",
+        "scripts"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: student model unit tests",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/test_student_teacher.py",
+        "--basetemp=.tmp/pytest-student-ui",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: student CPU smoke (explicit)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/student_experiment.py",
+        "smoke",
+        "--run-id",
+        "${input:studentSmokeRunId}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: student bounded training (one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/student_experiment.py",
+        "train"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: student development evaluation (one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/student_experiment.py",
+        "evaluate"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: verify student development",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "integration_tests/test_student_real.py",
+        "--basetemp=.tmp/pytest-student-real",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 offline contracts",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "pytest",
+        "tests/test_category.py",
+        "tests/test_pcb1_models.py",
+        "tests/test_confirmatory.py",
+        "-q"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 frozen manifest validation",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/verify_pcb1_seal.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 normal-only debug probe",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/debug_pcb1.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 autoencoder fit (explicit one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/pcb1_experiment.py",
+        "fit",
+        "autoencoder"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 autoencoder calibrate (explicit one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/pcb1_experiment.py",
+        "calibrate",
+        "autoencoder"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 spatial_mean fit (explicit one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/pcb1_experiment.py",
+        "fit",
+        "spatial_mean"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 spatial_mean calibrate (explicit one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/pcb1_experiment.py",
+        "calibrate",
+        "spatial_mean"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 feature_memory fit (explicit one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/pcb1_experiment.py",
+        "fit",
+        "feature_memory"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 feature_memory calibrate (explicit one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/pcb1_experiment.py",
+        "calibrate",
+        "feature_memory"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 student_teacher fit (explicit one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/pcb1_experiment.py",
+        "fit",
+        "student_teacher"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "FactoryVision: PCB1 student_teacher calibrate (explicit one-shot)",
+      "type": "process",
+      "command": "${workspaceFolder}\\.venv-31410\\Scripts\\python.exe",
+      "args": [
+        "scripts/pcb1_experiment.py",
+        "calibrate",
+        "student_teacher"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}",
+        "env": {
+          "UV_OFFLINE": "1",
+          "PYTHONNOUSERSITE": "1"
+        }
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "smokeRunId",
+      "type": "promptString",
+      "description": "New ignored run directory name (existing runs are refused)",
+      "default": "cashew-ae-smoke-new"
+    },
+    {
+      "id": "trainingRunId",
+      "type": "promptString",
+      "description": "Explicit bounded real training: new run name",
+      "default": "cashew-ae-128-new"
+    },
+    {
+      "id": "studentSmokeRunId",
+      "type": "promptString",
+      "description": "Explicit student smoke only: new ignored run ID; existing runs refused",
+      "default": "cashew-student-smoke-new"
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "schema": 1,
+  "frozen_at_utc": "2026-10-24T19:49:09.411181+00:00",
+  "category": "pcb1",
+  "checkpoint": "960b76d57c834c0b8f73d19538c5a7a013c92f26",
+  "scope": "2E1 normal-only preparation; official test opening requires new owner authorization in2E2",
+  "amendment": "Owner explicitly enrolls accepted autoencoder as fourth category-specific family; supersedes v2 three-family enrollment without modifying v1/v2. Cashew results influenced research direction; no new Cashew testing.",
+  "families": [
+    "autoencoder",
+    "spatial_mean",
+    "feature_memory",
+    "student_teacher"
+  ],
+  "source": {
+    "archive": "VisA_20220922.tar",
+    "archive_sha256": "2eb8690c803ab37de0324772964100169ec8ba1fa3f7e94291c9ca673f40f362",
+    "split_sha256": "a48557e6033318cb90556f706196bc9d247a776a23ea51aecee5a80dd0332995",
+    "revision": "2a692ab575001cbde74d402d897a7286086c6199",
+    "license": "CC-BY-4.0"
+  },
+  "split": {
+    "algorithm": "sha256-group-v1",
+    "seed": 42,
+    "ratios": "70/15/remainder by exact-pixel group; actual counts from official normal training only",
+    "physical_independence": "unverified; group equal decodedRGB hashes; retain all official memberships"
+  },
+  "input": "full-frame RGB128 bilinear antialias /255; ImageNet mean/std for pretrained feature/student methods only",
+  "autoencoder": {
+    "architecture": "conv-ae-v1",
+    "parameters": 37763,
+    "seed": 42,
+    "batch": 16,
+    "epochs": 12,
+    "patience": 3,
+    "min_delta": 1e-05,
+    "optimizer": "Adam lr.001 betas(.9,.999) eps1e-8 weight_decay0",
+    "loss": "RGB reconstruction MSE",
+    "selection": "every strict minimum normal validation loss, ties earlier; min_delta affects patience only",
+    "seconds": 1800,
+    "image_score": "spatial mean RGB squared error",
+    "map": "channel mean squared error128"
+  },
+  "spatial_mean": {
+    "fit": "sample-ID ordered sequential float64 RGB mean then castfloat32",
+    "image_score": "spatial mean RGB squared error",
+    "map": "channel mean squared error128"
+  },
+  "feature_memory": {
+    "teacher_sha256": "f37072fd47e89c5e827621c5baffa7500819f7896bbacec160b1a16c560e07ec",
+    "recipe": "accepted frozen ResNet18 layer2/3 localavg3 high bilinear16 concat384; no fitted normalization",
+    "patches_per_image": "min(16,floor(8192/N_train)); abort if<1; every normal fitting image contributes",
+    "selection": "ID sorted; first8bigendian SHA256(42|ID) seed torchrandperm256 firstk sorted",
+    "score": "RMS Euclidean exact chunked nearest neighbor; max16x16 patchdistance image; bilinear128 map",
+    "chunks": [
+      256,
+      512
+    ],
+    "seconds": 600
+  },
+  "student_teacher": {
+    "recipe_sha256": "fb5fd19e04aaa737de16b0483ca3f218af50aaf47707549dbc7c0345a42b7779",
+    "architecture": "compact-st-layer23-unitl2-v1",
+    "teacher_parameters": 2782784,
+    "student_parameters": 112128,
+    "seed": 42,
+    "batch": 8,
+    "epochs": 12,
+    "patience": 3,
+    "min_delta": 0.0,
+    "optimizer": "Adam lr.001 betas(.9,.999) eps1e-8 weight_decay0",
+    "selection": "strict minimum normal validation loss; ties earlier",
+    "seconds": 600,
+    "score": "unitL2 eps1e-6 channel-summed squared layer2/3 discrepancy equally averaged after high alignment16; max image; bilinear128 map"
+  },
+  "resources": {
+    "cpu_threads": 4,
+    "workers": 0,
+    "training_peak_bytes": 2147483648,
+    "evaluation_peak_bytes": 4294967296,
+    "max_pooled_pixels": 8000000,
+    "max_test_images": 488,
+    "evaluation_batch": 8,
+    "normal_smoke": "first32fit/16validation AE two updates; first16fit/8validation student two updates; fresh init fulltraining"
+  },
+  "calibration": {
+    "partition": "normal calibration only",
+    "quantile": 0.95,
+    "interpolation": "linear float64",
+    "comparison": "strict greater-than",
+    "pixel_threshold": null,
+    "checkpoint_selection_uses_calibration": false
+  },
+  "development_diagnostics": {
+    "synthetic": "none for PCB1; no post-fit changes",
+    "normal_validation": "distributions and false-alarm counts, exploratory for selected checkpoints"
+  },
+  "metrics": {
+    "primary": "student_teacher pooled pixel non-interpolated average_precision_score128",
+    "comparators": "report all4; predeclared student-minus-each-other pixelAP differences",
+    "secondary": [
+      "image_AUROC",
+      "image_AP",
+      "pixel_AUROC",
+      "TN_FP_FN_TP_at_frozen_image_threshold",
+      "precision",
+      "recall",
+      "F1",
+      "normal_FPR"
+    ],
+    "orientation": "higher anomalous, positive1",
+    "mask": "binary original nonzero values, nearest128; zeros for normals; allpixels allsamples; report disappearing masks",
+    "undefined": "rank metrics null if either class absent; zero-denominator rates null",
+    "ranking": "descriptive descending pixelAP allfour, ties share rank; no winner-based tuning",
+    "deferred": [
+      "AUPRO",
+      "pixel_threshold_metrics",
+      "pixel_confidence_intervals"
+    ]
+  },
+  "uncertainty": {
+    "method": "1000 paired stratified image bootstrap seed42 student-minus-each-comparator imageAUROC/AP,95percentile intervals",
+    "condition": "requires both classes; null otherwise; conditional on unverified image independence, no factory-generalization claim"
+  },
+  "leakage": {
+    "candidate": "dHash64<=4 OR pHash63<=4 OR RGB32RMS<=.02; LANCZOS",
+    "refine": "fullRGB128 RMS, center-quarterRGB64 RMS, center grayscalePearson",
+    "strong": "(fullRMS<=.015 AND cropRMS<=.025) OR correlation>=.995",
+    "review": "union first8fullRMS,first8cropRMS,first8SHA256pair ranks,and ALLstrong; no label/score selection",
+    "failure": "confirmed repeated acquisition across partitions or incomplete required review blocks fitting/test metrics; no silent removal/reassignment",
+    "2E1": "development-only screening; train/test screening deferred until separately authorized sealed opening"
+  },
+  "opening_gate": [
+    "separate explicit owner authorization bound to final sealSHA",
+    "frozen protocol/source/lock, dataset/split/archive, model/provenance/threshold hashes verify",
+    "allfits numerical/resources/reload accepted; normal integrity and visual review complete",
+    "exclusive opening marker before any heldout extraction",
+    "extract declared test images/masks into new quarantined root only; integrity and cross-partitionduplicate review; no predictions until gateaccepted",
+    "one-shot evaluation outputs exclusive newdirectory, no training/calibration codepath"
+  ],
+  "reload_tolerance": {
+    "atol": 1e-06,
+    "rtol": 1e-05
+  },
+  "latency": "first normal validation image,preloaded batch1,5warmups30repeats;separatewarmdecode30; record executionCPU/RAM",
+  "report": "stable sample-ID order rawscores/maps/binarymasks; permodel frozen thresholds, metrics, bootstrap, resources, hashes; allfailures retained; nooverwrite",
+  "failure_exclusions": "nonfinite,corrupt,mismatched/duplicatecompromised,resourcefailure abort; no test sample exclusions; emptied resized masks retained and disclosed",
+  "figure_selection": "first4anomaly and first2normal IDs only AFTER authorized opening; display scales frozen from normal calibration; no2E1testfigures"
+}

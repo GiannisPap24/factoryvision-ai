@@ -1,0 +1,26 @@
+{
+  "protocol_id": "robustad-metalparts-integrity-v1",
+  "repository": "AmazonScience/RobustAD",
+  "revision": "82c642b2d18be60f2dab104f8dd4dea1f4ccfacb",
+  "scope": "MetalParts only; source inventory and integrity, no model inference or training",
+  "source_domains": ["train", "test0", "test1", "test2", "test3", "test4", "test5", "test6"],
+  "labels": {"0": "normal", "1": "anomaly"},
+  "normal_mask": null,
+  "anomaly_mask": "single-channel PNG, aligned native dimensions, nonempty foreground",
+  "byte_integrity": "Hugging Face LFS SHA-256, or Git blob SHA-1 for non-LFS source files; retain local SHA-256 for all",
+  "pixel_identity": "SHA-256 over native RGB width, height and decoded pixel bytes; no resizing",
+  "near_duplicate_screen": "Existing fingerprints/screen_pairs: cross-domain dHash64 <= 4 OR pHash63 <= 4 OR RGB32 RMS <= 0.02",
+  "near_duplicate_disposition": "Candidates only; no automatic duplicate or independence claim",
+  "capture_metadata": "Only publisher-provided keys can establish physical identity; matching basenames are separately reported as unresolved correspondence hints",
+  "stop_conditions": [
+    "Acquisition exceeds 1 GiB additional download or 3 GiB source storage",
+    "Missing, unexpected, malformed, misaligned or hash-mismatched source files",
+    "Confirmed cross-development/test byte or pixel identity",
+    "Unresolved high-risk cross-development/test correspondence or near-duplicate concerns"
+  ],
+  "preservation": "Keep all original files, labels and official source memberships; never remove overlaps to manufacture an independent test",
+  "training_eligibility": "Only explicitly selected source-train normals could enter a later experiment; source-train anomalies remain present and excluded from unsupervised fitting, validation and calibration",
+  "test_exposure": "Decode only for inventory, alignment, mask validity, hashes and fixed fingerprints; no visual model-selection, fitted statistics or test predictions",
+  "preprocessing_planning": "Native 512x512 tiling with 128-pixel overlap and full border coverage is a proposal, independent of test mask statistics; 128x128 full-image reduction is not accepted as tiny-defect preservation",
+  "review_budget": "No repeated visual-adjudication cycle; unresolved candidates need new acquisition evidence before a confirmatory claim"
+}

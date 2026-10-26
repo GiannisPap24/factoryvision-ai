@@ -1,0 +1,32 @@
+{
+  "identity": {
+    "schema": 1,
+    "dataset": "robustad",
+    "category": "metalparts",
+    "revision": "82c642b2d18be60f2dab104f8dd4dea1f4ccfacb",
+    "architecture": "conv-ae-v1",
+    "recipe": "metalparts-native-patches-ae-v1",
+    "patches": {
+      "size": 256,
+      "stride": 192,
+      "limit": 12
+    },
+    "split_sha256": "bb87d41b2a8296d91f9f67496128e7f7280c2a7ccb688e78f48c175874874c41",
+    "protocol_sha256": "a0cc2bf67fe34e2078c8fae5b2cc0a68d4a3387bddf87aad2013f769cde18162",
+    "threshold": null,
+    "status": "EXPERIMENTAL; independent evaluation NOT CLEARED",
+    "purpose": "train"
+  },
+  "assets": {
+    "checkpoint": {
+      "path": "runs/metalparts-ae-pilot-v1/best.pt",
+      "bytes": 156595,
+      "sha256": "c23543a8d22a305193e95a36985331c57b86ecb8b71e86c58b29a82fb1ab8651"
+    },
+    "metadata": {
+      "path": "runs/metalparts-ae-pilot-v1/checkpoint.json",
+      "bytes": 762,
+      "sha256": "b9cd3959059cb05c1bc890b74f552c01d0199998fc9c5833571d3e9a430f4fb6"
+    }
+  }
+}

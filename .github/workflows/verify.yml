@@ -1,0 +1,54 @@
+name: Source verification
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verify-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows:
+    runs-on: windows-2025
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      PYTHONNOUSERSITE: "1"
+      UV_NO_PROGRESS: "1"
+      UV_PROJECT_ENVIRONMENT: ${{ github.workspace }}/.venv-31410
+    steps:
+      - name: Read source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Install pinned uv
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: "0.13.5"
+          enable-cache: false
+          restore-cache: false
+          save-cache: false
+          cache-python: false
+      - name: Install verified official Python 3.14.10 locally
+        run: |
+          $archive = Join-Path $env:RUNNER_TEMP 'python-3.14.10-amd64.zip'
+          Invoke-WebRequest 'https://www.python.org/ftp/python/3.14.10/python-3.14.10-amd64.zip' -OutFile $archive
+          if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'cc28026a650970cc1570bb127312f1f9634eb67abfe157ae6ca1acbbc627d091') { throw 'Python archive digest mismatch' }
+          Expand-Archive -LiteralPath $archive -DestinationPath '.tools/python-3.14.10'
+          $signature = Get-AuthenticodeSignature '.tools/python-3.14.10/python.exe'
+          if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'O=Python Software Foundation') { throw 'Python signer verification failed' }
+          & .tools/python-3.14.10/python.exe -c "import sys; assert sys.version_info[:3] == (3, 14, 10)"
+          if ($LASTEXITCODE -ne 0) { throw 'Python version verification failed' }
+      - name: Install locked CPU application and test dependencies
+        run: uv sync --locked --extra app --python .tools/python-3.14.10/python.exe
+      - name: Offline source, build and installed application checks
+        env:
+          UV_OFFLINE: "1"
+        run: .venv-31410/Scripts/python.exe scripts/ci_check.py --uv uv

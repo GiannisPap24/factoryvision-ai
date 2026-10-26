@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "protocol_id": "cashew-evaluation-v1",
+  "frozen_at_utc": "2026-10-24T15:59:18.699113+00:00",
+  "checkpoint_commit": "e493c943f45f6d6053b43ef4fadeb872f2ea3f18",
+  "autoencoder": {
+    "checkpoint": "runs/cashew-ae-128-seed42/best.pt",
+    "sha256": "da7e0caed8e365a08a3d301ec7e88536bc5df8e3f8b59f27635853e15ab4cdbc",
+    "metadata_sha256": "69e346e8cf9ddd79dfc0a27cf5bf94b6b770968945951c509b8edece302c2037",
+    "architecture": "conv-ae-v1",
+    "epoch": 12,
+    "parameters": 37763,
+    "threshold": 0.0031531278509646654,
+    "calibration_sha256": "8172f3c18fd4126d0539d7eae38162651fcbcb635652b6e587f11e90775d9b3b",
+    "calibration_scores_sha256": "7b717819d45de7d46d55e52cd8a20bcd67ba8235d7b9c658afe6ea16deed3fc0"
+  },
+  "dataset": {
+    "manifest_sha256": "80bac86ae2fc1b0ad7e0e046597fb4a3a1e1f4f92ce556d5dddbfdd37d51f84c",
+    "parent_sha256": "9d8e56d672589ef1234a9382cc61a52efd29804364b1b265d0cfeb478ce56372",
+    "assignments_sha256": "6ddb3acf4172bad9c4bdd667606f0fcd12941f570884eccb5ee298d2f8470aa0",
+    "partitions": {
+      "train": 315,
+      "validation": 67,
+      "calibration": 68,
+      "test": 150
+    },
+    "test_normals": 50,
+    "test_anomalies": 100,
+    "test_ids": "Every official test record, sorted sample_id; no exclusions"
+  },
+  "preprocessing": {
+    "id": "rgb-float01-bilinear-aa-square-v1",
+    "resolution": 128,
+    "rgb": "float32 RGB / 255, bilinear antialiased square resize",
+    "mask": "nonzero class IDs -> binary; nearest resize to 128; normal zeros derived; original geometry checked",
+    "mask_disappearance": "report any anomaly mask that becomes empty after fixed resize; do not adjust geometry"
+  },
+  "scoring": {
+    "positive_class": 1,
+    "positive_meaning": "anomaly / defective pixel",
+    "direction": "higher is more anomalous",
+    "spatial": "mean RGB squared residual [B,H,W], raw intensity-squared units",
+    "image": "spatial mean [B]",
+    "threshold_rule": "strict score > threshold",
+    "postprocessing": "none; no smoothing or per-image normalization"
+  },
+  "baseline": {
+    "id": "spatial-mean-v1",
+    "fit": "315 training normals only; sample-ID ordered float64 sum, divide count, cast float32",
+    "reference_shape": [
+      3,
+      128,
+      128
+    ],
+    "spatial_and_image_scoring": "same squared RGB residual and spatial mean as autoencoder",
+    "calibration": "68 calibration normals only; float64 q=.95 linear interpolation; own strict threshold; freeze numeric value and reference hash before test inference"
+  },
+  "metrics": {
+    "implementation": "scikit-learn==1.9.1",
+    "image": [
+      "roc_auc_score",
+      "average_precision_score",
+      "TN FP FN TP",
+      "precision",
+      "recall",
+      "F1",
+      "normal FPR"
+    ],
+    "ap": "non-interpolated average precision, not trapezoidal PR area",
+    "single_class": "AUROC and AP both null if either class absent",
+    "zero_denominator": "precision/recall/F1/FPR null when their respective denominator is zero",
+    "pixel": "exact pooled AUROC/AP over all 150 images at 128x128; normals included; 2457600 pixels; no subsampling",
+    "pixel_cap": 3000000,
+    "aupro": "not computed: region metric implementation/validation deferred",
+    "pixel_threshold_metrics": "not computed: no independent pixel threshold",
+    "uncertainty": "1000 paired stratified image bootstrap resamples seed42; percentile 2.5/97.5 for AE-minus-baseline AUROC/AP; conditional on image independence, not physical groups"
+  },
+  "leakage_review": {
+    "base_screen": "reports/cashew-leakage-screen.json",
+    "base_screen_sha256": "42d71df926d27cf160888fb78f9fcdf36d196dcb1e3c42abf52ddc11b34baa22",
+    "procedure": "Revalidate all image/pixel/mask hashes and split. For all 7946 prior flags compute aligned full RGB128 RMS and center-quarter RGB64 RMS plus center grayscale correlation. No model scores or labels used.",
+    "center_crop": "fractional box x/y 0.25..0.75 of original; LANCZOS64",
+    "strong_candidate": "full128 RMS<=.015 AND crop64 RMS<=.025 OR crop grayscale Pearson>=.995",
+    "visual_selection": "union of first8 full-RMS rank, first8 crop-RMS rank, first8 SHA256(a|b) rank and every strong candidate; stable ID ties",
+    "stop_rule": "Any confirmed duplicate/repeated acquisition compromising official test independence stops metrics; suspected similarity remains flagged; no silent membership changes",
+    "physical_independence": "unverified; incomplete visual review is explicitly a residual limitation"
+  },
+  "cpu": {
+    "threads": 4,
+    "workers": 0,
+    "batch_size": 16,
+    "device": "cpu",
+    "latency": "first normal validation image only, preloaded batch1; 5 warmups then100 serial repetitions per model; forward+score includes validation overhead, excludes decode; separate30 decode/resize repeats; report median/p95",
+    "memory": "process peak working set; 2GiB observed ceiling; exact pooled metric arrays bounded"
+  },
+  "visualizations": {
+    "selection": "first4 test anomalies and first2 test normals by sample_id, independent of model scores",
+    "panels": [
+      "resized original",
+      "AE reconstruction",
+      "AE heatmap",
+      "binary resized GT mask"
+    ],
+    "heatmap": "fixed blue-to-red linear clipped error [0,.05], display only",
+    "scope": "examples only, local ignored outputs"
+  },
+  "outputs": [
+    "frozen-artifacts.json",
+    "baseline-mean.pt",
+    "baseline-calibration.json",
+    "per-image.json",
+    "spatial-maps.npz",
+    "metrics.json",
+    "latency.json",
+    "example PNGs",
+    "artifact-hashes.json"
+  ],
+  "prohibitions": [
+    "No AE retraining or threshold changes",
+    "No test-driven recipe changes",
+    "No sample exclusions",
+    "No final pixel threshold",
+    "No deployment readiness claim"
+  ]
+}

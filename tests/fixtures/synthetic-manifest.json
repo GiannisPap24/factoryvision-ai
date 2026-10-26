@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "dataset": {
+    "dataset_id": "factoryvision-synthetic",
+    "version": "synthetic-v1",
+    "source": {
+      "kind": "synthetic",
+      "uri": "urn:factoryvision:synthetic:metadata-v1",
+      "revision": "synthetic-v1",
+      "license_id": "LicenseRef-FactoryVision-Synthetic",
+      "attribution": "Fabricated metadata generated locally for FactoryVision AI tests. No VisA images."
+    }
+  },
+  "samples": [
+    {
+      "sample_id": "synthetic-normal-001",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-001.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-1",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-002",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-002.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-2",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-003",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-003.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-3",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-004",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-004.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-4",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-005",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-005.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-5",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-006",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-006.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-6",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-007",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-007.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-7",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-008",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-008.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-8",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-009",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-009.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-9",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-normal-010",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/normal-010.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "train",
+      "partition": "train",
+      "group_id": "synthetic-group-10",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-test-normal",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/test-normal.JPG",
+      "label": "normal",
+      "mask_path": null,
+      "official_split": "test",
+      "partition": "test",
+      "group_id": "synthetic-test-normal-group",
+      "content_sha256": null
+    },
+    {
+      "sample_id": "synthetic-test-anomaly",
+      "dataset_id": "factoryvision-synthetic",
+      "dataset_version": "synthetic-v1",
+      "category": "cashew",
+      "image_path": "cashew/synthetic/test-anomaly.JPG",
+      "label": "anomaly",
+      "mask_path": "cashew/synthetic/test-anomaly.png",
+      "official_split": "test",
+      "partition": "test",
+      "group_id": "synthetic-test-anomaly-group",
+      "content_sha256": null
+    }
+  ],
+  "split_provenance": null
+}
+

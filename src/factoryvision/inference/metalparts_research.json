@@ -1,0 +1,223 @@
+{
+  "label": "EXPLORATORY SOURCE-DOMAIN DIAGNOSTICS \u2014 NOT INDEPENDENT TEST PERFORMANCE",
+  "manifest_sha256": "9811dc9222b6241fb284bbfe27b8286905d26b398e7c38c37e2dfc603dcc48d4",
+  "training": {
+    "initial_validation_loss": 0.07434441422433506,
+    "epochs": [
+      {
+        "epoch": 1,
+        "train_loss": 0.0281510112453597,
+        "validation_loss": 0.015160586958464355,
+        "steps": 216,
+        "patches": 1728,
+        "seconds": 8.805804200004786,
+        "peak_working_set_bytes": 490274816
+      },
+      {
+        "epoch": 2,
+        "train_loss": 0.01284813006296409,
+        "validation_loss": 0.009171449737617944,
+        "steps": 216,
+        "patches": 1728,
+        "seconds": 8.69598810000025,
+        "peak_working_set_bytes": 490274816
+      },
+      {
+        "epoch": 3,
+        "train_loss": 0.008132544923918667,
+        "validation_loss": 0.00588374514349939,
+        "steps": 216,
+        "patches": 1728,
+        "seconds": 8.748197900000378,
+        "peak_working_set_bytes": 490328064
+      },
+      {
+        "epoch": 4,
+        "train_loss": 0.00545794806870011,
+        "validation_loss": 0.004014183262201927,
+        "steps": 216,
+        "patches": 1728,
+        "seconds": 8.831908300002397,
+        "peak_working_set_bytes": 497594368
+      }
+    ]
+  },
+  "metrics": {
+    "image": {
+      "positive": 51,
+      "negative": 36,
+      "prevalence": 0.5862068965517241,
+      "auroc": 0.5969498910675382,
+      "average_precision": 0.7142665461395848,
+      "reason": null
+    },
+    "pixel": {
+      "positive": 84903,
+      "negative": 349785597,
+      "prevalence": 0.00024266978782149396,
+      "auroc": 0.8671747847310998,
+      "average_precision": 0.02154141500770638,
+      "reason": null,
+      "bins": 65536,
+      "score_quantization": "floor(float64(MSE)*65535)",
+      "interpretation": "Exact on quantized scores; approximate unquantized native-pixel ranking; no sampling."
+    },
+    "distributions": {
+      "validation_normal": {
+        "min": 0.0017981178825721145,
+        "q25": 0.0025183052639476955,
+        "median": 0.002995501388795674,
+        "q75": 0.0035560549004003406,
+        "max": 0.006451522931456566
+      },
+      "source_anomaly": {
+        "min": 0.00187949079554528,
+        "q25": 0.0025871029356494546,
+        "median": 0.0033582383766770363,
+        "q75": 0.004575161263346672,
+        "max": 0.007567490916699171
+      }
+    },
+    "latency_seconds": {
+      "min": 0.2554173999960767,
+      "median": 0.3586293999978807,
+      "p95": 0.3633009500001208,
+      "max": 0.3713470000002417
+    },
+    "peak_working_set_bytes": 802607104
+  },
+  "previews": [
+    {
+      "sample_id": "metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9",
+      "anomaly": 0,
+      "score": 0.006451522931456566,
+      "ceiling": 0.3365422189235687,
+      "assets": {
+        "original": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9-original.png",
+          "bytes": 472402,
+          "sha256": "e8c61936d12b06b4dea65b91109b0871082234dcd79f04458ed1212aca046146"
+        },
+        "reconstruction": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9-reconstruction.png",
+          "bytes": 295259,
+          "sha256": "d365037fc727bacf795948be864b2f004f56b1640fa69910b9c04deb66dc4ca2"
+        },
+        "heatmap": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9-heatmap.png",
+          "bytes": 413259,
+          "sha256": "0901e0083415b583108e8be307fd0f65228a961f8d1cbf6d43efaf535af51bc3"
+        },
+        "overlay": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9-overlay.png",
+          "bytes": 545319,
+          "sha256": "aebc45afe48f95adf0323b56d346873fe7f6c582cd00aa52725daba9f2103681"
+        },
+        "mask": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-009c0c2b5fc5b390c74f8bb7008f426da430d916e390affc2ab75df7dc933ee9-mask.png",
+          "bytes": 649,
+          "sha256": "7aebfaa3aa41fa3c8e6c956ff354bda409188a3283cabeb252328257a280b89c"
+        }
+      }
+    },
+    {
+      "sample_id": "metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0",
+      "anomaly": 1,
+      "score": 0.0036907296162098646,
+      "ceiling": 0.4015469551086426,
+      "assets": {
+        "original": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0-original.png",
+          "bytes": 490341,
+          "sha256": "ce3de8d98299c2112a9402b9bbfa62398e0705a39e334c81f37ddcf7b7059197"
+        },
+        "reconstruction": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0-reconstruction.png",
+          "bytes": 293864,
+          "sha256": "451fde9f76fdc636476fa77ebbfdda5fadfacdab2572fe7c5e666c3753906cda"
+        },
+        "heatmap": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0-heatmap.png",
+          "bytes": 336590,
+          "sha256": "65729dc1938def71b75ba7427a417ed72a52006bdfd909c5b92d27cc6ea9d43c"
+        },
+        "overlay": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0-overlay.png",
+          "bytes": 547822,
+          "sha256": "0a0eb937a03b47615be0719e40144e27972fc26d5c68eac49b2c1ea762acd4e8"
+        },
+        "mask": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-015c28f4e1ce606b04be67547f67600c903569242168046d29226b5186f8cbb0-mask.png",
+          "bytes": 753,
+          "sha256": "997c0ad2865d11e65cfa267ead7ed96451794ecf7d5cf71596d11314d9e33eec"
+        }
+      }
+    },
+    {
+      "sample_id": "metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1",
+      "anomaly": 1,
+      "score": 0.0031730185728520155,
+      "ceiling": 0.34580573439598083,
+      "assets": {
+        "original": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1-original.png",
+          "bytes": 455681,
+          "sha256": "6836714739ad868c3f15671e994d1c26f8c9d2f761a34a3e67a4a67e2de8af5b"
+        },
+        "reconstruction": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1-reconstruction.png",
+          "bytes": 271848,
+          "sha256": "d19e199958dc47e175996f451fd228da9c17ae7034ee1bbfc44bae6a5227ef60"
+        },
+        "heatmap": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1-heatmap.png",
+          "bytes": 315800,
+          "sha256": "9b701c718ea9a054dcc1a3dd01d9486ab5838b29b817ed7aa2bd0cfd76874178"
+        },
+        "overlay": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1-overlay.png",
+          "bytes": 541267,
+          "sha256": "d2846fa9cf5e7ea8614cf7d6d7e4a6a8bfacc65d4d12e7a8b582408e9b600521"
+        },
+        "mask": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0570da695eaa90a4fb8942e53cb4f1071f4f72cf5c635853b630e866d860add1-mask.png",
+          "bytes": 734,
+          "sha256": "e6366043d39003d6a641791d239889b5cb902233c23e95a51715030c1052cbc4"
+        }
+      }
+    },
+    {
+      "sample_id": "metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a",
+      "anomaly": 1,
+      "score": 0.004633700475096703,
+      "ceiling": 0.23092864453792572,
+      "assets": {
+        "original": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a-original.png",
+          "bytes": 490246,
+          "sha256": "a494ce91df04c544f05c0d5b220945a58ed839421746f8906cde74a88dff504b"
+        },
+        "reconstruction": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a-reconstruction.png",
+          "bytes": 297717,
+          "sha256": "a76a82241c2b19451c9bfcd1a33366a58fad0792a1078fa412dda1fd394208e0"
+        },
+        "heatmap": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a-heatmap.png",
+          "bytes": 409696,
+          "sha256": "a2c39b9d8a9ffc9981910d533eb5ec046cc78ba7a5cb2eaeedefdb52408795b0"
+        },
+        "overlay": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a-overlay.png",
+          "bytes": 518033,
+          "sha256": "9cfa39a4adecd124d2da1e40b2d845ec875e48af5f6416eea750b16e551d7d38"
+        },
+        "mask": {
+          "path": "runs/metalparts-source-diagnostic-v1/metalparts-0a54d1f979629d40ea7986448cd1e5e1ec885293f30e6167f8c24982f337993a-mask.png",
+          "bytes": 866,
+          "sha256": "dbad00b977dd557bc090e92fc3bc746f896036825d3534ea1d5246d726350d2b"
+        }
+      }
+    }
+  ]
+}
