@@ -12,7 +12,8 @@ Third-party dependencies, datasets, images and pretrained/derived model assets
 retain their separate terms. They are not relicensed by this grant. Dataset
 and weight redistribution is not authorized by this milestone; all such assets
 remain excluded. No material conflicting notice was identified in the reviewed
-owned-source boundary. Public GitHub publication remains unauthorized.
+owned-source boundary. The source-only [public repository](https://github.com/GiannisPap24/factoryvision-ai)
+was published on 2026-10-26 after owner approval and the final security/privacy review.
 The exact 60-package [dependency table](milestone-4d-dependency-licenses.csv)
 records the reviewed versions and notice inventory; private audit records are omitted.
 

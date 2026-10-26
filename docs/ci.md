@@ -1,10 +1,15 @@
 # Source-only Windows verification
 
 **Runtime:** Windows AMD64, Python 3.14.10, uv 0.13.5.
-Owned source is MIT licensed. This source-only candidate contains no datasets or weights.
+Owned source is MIT licensed. This source-only release contains no datasets or weights.
 
-Hosted GitHub Actions: **NOT RUN — REQUIRES REMOTE REPOSITORY**.
-Local equivalence does not prove hosted execution.
+Hosted GitHub Actions: **initial publication run PASSED on 2026-10-26**.
+[Run 40376270944](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
+verified root commit `691507dd409177219b4ba39afedfaaedfe440c06`: **711 tests passed,
+98.09% coverage**, plus lint/format, lock/dependency, distribution and installed-app checks.
+The local audit had 710 passed and one Windows symlink-permission skip; the hosted
+runner passed that test too. [Later workflow runs](https://github.com/GiannisPap24/factoryvision-ai/actions)
+have their own status; this result applies to the linked run.
 
 ## Fresh source setup
 
@@ -61,8 +66,8 @@ source-only installation evidence. It is not distributed with public source.
 Full SHA pinning reduces mutable-action risk; it does not establish that every
 upstream dependency is safe. Hosted runner images and bootstrap registries remain
 external dependencies. Review updates and lock changes explicitly. Fresh hosted
-installation, runner behavior and PR restrictions must be observed after a future
-owner-approved remote exists; no hosted support is claimed now.
+installation and runner behavior passed in the linked initial push run. Fork-PR
+behavior was not exercised by that push run and remains a separate verification scope.
 
 Sources: [GitHub secure use](https://docs.github.com/en/actions/reference/security/secure-use),
 [Windows 2025 runner image](https://github.com/actions/runner-images/blob/main/images/windows/Windows2025-Readme.md),

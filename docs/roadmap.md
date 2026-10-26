@@ -1,7 +1,8 @@
 # FactoryVision AI roadmap
 
-Milestone 4E prepares an independent local source-only public release candidate.
-Public repository creation, remotes, pushes and Milestone 4F are not authorized.
+Milestone 4E completed source-only publication on 2026-10-26 after owner approval
+and the final security/privacy review. The [initial hosted CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
+passed. Milestone 4F remains separately gated.
 Completion of an engineering milestone does not reverse a scientific integrity gate.
 
 ## Completed research and engineering
@@ -20,20 +21,21 @@ Completion of an engineering milestone does not reverse a scientific integrity g
 | 4C | Six-method catalog, synthetic demo and source-only CI configuration |
 | 4D and remediation | Technical/privacy/licensing audit; Python 3.14.10 adoption; MIT for owned source |
 | 4D-UX | Eight-workspace interface with navy, blue, teal and warm scientific maps |
-| 4E | Current independent local candidate, source-only validation and publication preparation |
+| 4E | Independent source-only publication, final security/privacy review and successful hosted CI |
 
 The [model cards and research chronology](reproduction.md) record limitations and
 provenance. No model is validated for consequential industrial quality decisions.
 
 ## Separately gated next work
 
-4F is a community launch after explicit publication approval and review of the
-first actual hosted CI run. It is not started by this release preparation.
+Source publication and the first successful hosted CI run are complete. The wider
+4F community launch still requires its own scope and approval, including a private
+security-reporting channel; source publication does not start that work.
 
 Later 5A–5F work is the planned sequence of human review, model registry,
 robustness, performance, camera integration and pilot discovery. Each requires
 a separate scope, prerequisites and acceptance criteria. No production-readiness,
 independent target-domain reliability or automatic benchmark reopening is implied.
 
-See [publication preparation](publication.md), [contributing](../CONTRIBUTING.md)
+See [publication record](publication.md), [contributing](../CONTRIBUTING.md)
 and [licensing](licensing.md).

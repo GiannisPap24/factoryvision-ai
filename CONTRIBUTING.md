@@ -24,6 +24,9 @@ Owned code, documentation and generated synthetic content are licensed under
 rights to contribute under those terms. Dependencies and research assets retain
 their own licences; see [attribution](docs/licensing.md).
 
-This is a local release candidate. No hosted contribution channel or CI run is
-claimed yet. Public repository creation and publication need a separate owner decision.
+The [source repository](https://github.com/GiannisPap24/factoryvision-ai) was published
+on 2026-10-26 after the final security/privacy review. The
+[initial hosted CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
+passed. Review the [publication record and update procedure](docs/publication.md)
+before publishing further changes; community launch remains separately scoped.
 For security concerns, read [SECURITY.md](SECURITY.md).

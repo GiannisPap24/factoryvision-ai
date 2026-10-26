@@ -44,5 +44,5 @@ New experiments require separately prepared data, approvals and fresh run identi
 
 Keep source, tests, public documentation and `uv.lock` trackable. Datasets, runs,
 private reports, environments, caches, screenshots and weights remain excluded.
-Review staged content before committing. Public publication requires the separate
-[owner decision and procedure](publication.md).
+Review staged content before committing. The source is now public; follow the
+[reviewed update procedure](publication.md#future-source-updates) for later authorized pushes.

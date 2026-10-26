@@ -1,7 +1,7 @@
 # FactoryVision AI
 
 **Runtime:** Windows AMD64, Python 3.14.10, uv 0.13.5.
-Owned source is MIT licensed. This source-only candidate contains no datasets or weights.
+Owned source is MIT licensed. This source-only release contains no datasets or weights.
 
 A local computer vision research application for visual anomaly inspection.
 Choose Cashew or experimental MetalParts, select frozen models, upload a permitted
@@ -159,9 +159,9 @@ docs/                methods, model cards, protocols, milestone evidence
 ```
 
 `data/`, `runs/`, `reports/`, `.venv/`, `.tools/` and `dist/` remain local and ignored.
-This release candidate is independently assembled from reviewed source files.
+This source release was independently assembled from reviewed files.
 Private experiment outputs and engineering audit records are excluded.
-See the [publication checklist](docs/publication.md).
+See the [publication record](docs/publication.md).
 
 ## Tests and CI status
 
@@ -173,7 +173,10 @@ installed-package Streamlit smoke without datasets or weights.
 
 GitHub Actions workflow files target Windows 2025 and Python 3.14.10 with pinned
 actions and uv, read-only permissions and no shared cache or artifact uploads.
-**Hosted CI: NOT RUN — REQUIRES REMOTE REPOSITORY.**
+**Published on 2026-10-26:** [GiannisPap24/factoryvision-ai](https://github.com/GiannisPap24/factoryvision-ai).
+The [initial hosted CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
+**passed: 711 tests, 98.09% coverage**. See [current workflow runs](https://github.com/GiannisPap24/factoryvision-ai/actions)
+for the status of later commits.
 [CI setup and security](docs/ci.md) | [Verification procedure](docs/ci.md).
 
 ## Methodology and roadmap
@@ -186,10 +189,10 @@ checkpoint; never replace artifacts or tune thresholds silently. Independent
 target-domain reliability remains **NOT ESTABLISHED**.
 
 The [roadmap](docs/roadmap.md) records completed research and engineering work,
-the current 4E local release candidate, and a separately gated 4F community launch. Later 5A–5F work covers
+the completed 4E source publication, and a separately gated 4F community launch. Later 5A–5F work covers
 human review, registry, robustness, performance, camera and pilot discovery.
 Those milestones require separate authorization. See [contributing preparation](CONTRIBUTING.md)
-and [proposed repository presentation](docs/github-preparation.md).
+and [repository presentation](docs/github-preparation.md).
 
 ## Licensing and attribution
 
@@ -202,5 +205,5 @@ No trained weights or third-party images are distributed here. FactoryVision-own
 source is licensed under [MIT](LICENSE), Copyright (c) 2026 GiannisPap24.
 Third-party datasets, images, weights and dependencies retain their own terms;
 MIT does not authorize their redistribution. The [licensing inventory](docs/licensing.md)
-records dependency notices and research-asset boundaries. Public publication remains
-unauthorized.
+records dependency notices and research-asset boundaries. The public source release
+excludes datasets, model weights and private research assets.

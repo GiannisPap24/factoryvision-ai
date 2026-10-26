@@ -13,8 +13,11 @@ from the source release. Dependency installation uses separately licensed upstre
 packages; no dependency binaries are bundled here.
 
 Use the pinned runtime and lockfile, and review updates explicitly. A clean local
-check does not prove every dependency vulnerability is absent. Hosted CI has not run.
+check does not prove every dependency vulnerability is absent. The
+[initial hosted CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
+passed on 2026-10-26; passing CI is not a security guarantee.
 
-Do not post secrets or exploit details publicly. This local candidate has no public
-security-reporting channel yet. The owner must establish a private reporting channel
-before community launch. No response-time or supported-version commitment is implied.
+Do not post secrets or exploit details publicly. The source repository is public,
+but a private security-reporting channel has not yet been established. The owner
+must establish one before community launch. No response-time or supported-version
+commitment is implied.

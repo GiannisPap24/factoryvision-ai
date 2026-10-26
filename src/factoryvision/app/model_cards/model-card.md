@@ -14,7 +14,7 @@ Both use 128x128 float32 RGB in [0,1], bilinear antialiased resizing and raw mea
 
 Each threshold uses 68 separate normal calibration images, linear 95th-percentile interpolation and strict greater-than classification. AE: **0.0031531278509646654**. Spatial mean: **0.017185416119173163**. These empirical thresholds do not guarantee a production false-alarm rate.
 
-VisA is attributed to its creators through the [official dataset repository](https://github.com/amazon-science/spot-diff) and [dataset registry](https://registry.opendata.aws/visa/). Source data is CC BY 4.0; local license/provenance records are retained. Images are resized/binarized for evaluation as described above. Images, weights and derived examples remain local and Git-ignored pending redistribution and release-scope review. Source-code licensing remains an owner decision.
+VisA is attributed to its creators through the [official dataset repository](https://github.com/amazon-science/spot-diff) and [dataset registry](https://registry.opendata.aws/visa/). Source data is CC BY 4.0; local license/provenance records are retained. Images are resized/binarized for evaluation as described above. Images, weights and derived examples remain local and Git-ignored pending redistribution and release-scope review. FactoryVision-owned source is MIT licensed; this does not grant redistribution rights for dataset images or weights.
 
 ## Frozen evaluation
 

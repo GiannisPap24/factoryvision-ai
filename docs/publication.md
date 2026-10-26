@@ -1,63 +1,64 @@
-# Publication preparation
+# Source publication
 
-**Local candidate only. Publication requires a separate explicit owner decision.**
-No GitHub repository, remote, push, public screenshot or binary release is created
-by this milestone. Hosted GitHub Actions: **NOT RUN — REQUIRES REMOTE REPOSITORY**.
+**Published on 2026-10-26 after owner approval and a successful independent final
+security/privacy/supply-chain/file-content audit.**
 
-## Proposed metadata
-
-- Repository: `GiannisPap24/factoryvision-ai`
-- Description: Local visual anomaly inspection research with PyTorch, Streamlit, model comparison and a dataset-free synthetic demo.
-- Topics: `computer-vision`, `anomaly-detection`, `pytorch`, `streamlit`, `visual-inspection`, `research`, `python`, `model-evaluation`
+- Public repository: [GiannisPap24/factoryvision-ai](https://github.com/GiannisPap24/factoryvision-ai).
+- Initial root commit: `691507dd409177219b4ba39afedfaaedfe440c06`.
+- Initial inventory: 245 reviewed source/configuration/documentation files.
+- Initial [hosted CI run 40376270944](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944):
+  **SUCCESS**, 711 tests passed, 98.09% coverage on Windows AMD64 / Python 3.14.10.
 - Licence: MIT for FactoryVision-owned source, Copyright (c) 2026 GiannisPap24.
+
+The independent staging repository was published to an empty public repository
+with one parentless commit on `main`. The remote tree and commit matched the
+reviewed source. No development history, datasets, weights, private reports,
+screenshots or release binaries were uploaded. Later documentation/source updates
+extend this clean history; the initial SHA above is the publication baseline,
+not a claim that the branch will always contain only one commit.
 
 The [README](../README.md) links [quick start](local-demo.md), [roadmap](roadmap.md),
 [contributing](../CONTRIBUTING.md), [licensing](licensing.md) and [security](../SECURITY.md).
 Historical Cashew results, PCB1 BLOCKED, PCB2 INCONCLUSIVE and exploratory
-MetalParts results must retain their qualifications. Synthetic examples demonstrate
+MetalParts results retain their qualifications. Synthetic examples demonstrate
 workflow only. No production-ready quality-control claim is supported.
 
-## Owner review checklist
+## Verification evidence
 
-- Review the private 4E acceptance report, complete file inventory and exact root SHA.
-- Confirm the candidate has one root commit on `main`, a clean working tree, no
-  remotes/tags/alternate object store and no inherited development commits.
-- Review source-only setup, package scans, licensing and all eight private UI captures.
-- Keep datasets, weights, private logs and screenshots out of this source release.
-- Approve the exact source commit, account, repository name and visibility separately.
-- Establish a private security-reporting channel before community launch.
-- Expect and review the first hosted workflow run; do not claim it has already passed.
+The final local audit compared all 245 working files and Git blobs with the reviewed
+inventory and inspected source/configuration, dependencies and distribution contents.
+Fresh wheel and sdist installations and synthetic application checks passed.
+The local suite had 710 passed and one Windows symlink-permission skip; the hosted
+runner passed all 711 tests. Private audit records are not distributed here.
 
-## Exact later publication procedure
+The linked hosted run also passed lint/format, lock/dependency checks, wheel/sdist
+scans and an installed-application smoke test. See [CI details](ci.md) and
+[current Actions runs](https://github.com/GiannisPap24/factoryvision-ai/actions)
+for later commit results. A passing audit or CI run is not a guarantee that every
+future vulnerability is absent.
 
-These are instructions for a later, separately authorized action, not commands
-executed during 4E. Use only the independent candidate directory. Never use the
-development repository or copy its `.git` directory.
+## Future source updates
 
-1. The owner approves the exact candidate root SHA recorded in the local 4E report
-   and the public destination `GiannisPap24/factoryvision-ai`. Re-review any changes.
-2. In that candidate, run `git status --porcelain`, `git rev-list --count HEAD`,
-   `git rev-list --parents -n 1 HEAD`, `git branch --list`, `git tag --list`,
-   `git remote -v` and `git fsck --full`. Require a clean tree, one parentless
-   commit on main, no tags/remotes and a healthy object database. Compare `git
-   rev-parse HEAD` with the approved SHA; verify the private inventory again.
-3. Create an **empty** public GitHub repository using the approved name and
-   description. Do not initialize a README, licence or `.gitignore` on GitHub.
-4. Only after steps 1–3, from the candidate, execute:
+1. Use only the independent public-source repository. Never copy the development
+   repository's `.git`, private assets or historical commits into it.
+2. Confirm the intended account, repository, branch and remote HEAD. Review the
+   entire proposed diff and file inventory for secrets, personal information,
+   workstation paths, unwanted binaries and scientific or licensing changes.
+3. Run checks appropriate to the change, including distribution/content checks
+   when packaged documentation or source changes. Stage only reviewed files.
+4. For an owner-authorized update, create a normal commit and push only `main` to
+   `GiannisPap24/factoryvision-ai`. Do not force-push, mirror or push unrelated refs.
+5. Verify the remote SHA, public diff and the actual hosted CI result. Report
+   pending or failed checks accurately; do not silently weaken them.
 
-   ```powershell
-   git remote add origin https://github.com/GiannisPap24/factoryvision-ai.git
-   git push -u origin main
-   ```
+## Separate release boundaries
 
-5. Confirm the GitHub default branch is main and its HEAD is the approved SHA.
-   Set the reviewed description and topics. Observe the actual Actions run;
-   investigate failures and report its real status. Do not silently weaken checks.
-6. Verify the public tree, rendered README and links. Do not upload distributions,
-   screenshots or research assets automatically. Tags, releases, social promotion
-   and 4F community launch remain separately gated.
+Datasets, weights, private logs, screenshots and generated distributions remain
+outside the source-release scope. Tags, binary releases, social promotion and
+the wider 4F community launch require separate review and authorization.
+A private security-reporting channel must be established before community launch.
 
-Recommended future screenshots are source-only Overview, Catalog and generated
-Demo. Use original geometry and label it synthetic; review all visible details
-before separate publication approval. Private model-enabled screenshots are
-review evidence only and are not included in the source candidate.
+Future portfolio captures should use source-only Overview, Catalog or generated
+Demo with original geometry and explicit synthetic labels. Review visible details
+before separate publication approval. Private model-enabled screenshots remain
+local review evidence.
