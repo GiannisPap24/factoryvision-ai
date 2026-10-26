@@ -1,5 +1,28 @@
 # FactoryVision AI architecture
 
+## Current application flow
+
+```mermaid
+flowchart TD
+    UI[Streamlit workspace] --> Upload[Bounded image validation]
+    Upload --> Gate[Artifact hash and provenance checks]
+    Gate --> CPU[Frozen CPU inference services]
+    CPU --> Review[Scores and spatial evidence]
+    CPU --> Batch[Completed batch snapshot]
+    Batch --> Report[Validated research CSV and JSON]
+    UI --> Catalog[Metadata and model cards]
+    UI --> Demo[Original synthetic geometry]
+    Demo --> Validate[Validation only]
+    Validate --> Export[Separate synthetic CSV and JSON]
+```
+
+Real inference requires verified local model files. The synthetic branch never
+calls a model and cannot populate a research report. UI state is session-local;
+there is no database, cloud inference or background training. The component
+sections below include historical implementation context; current setup is in
+the [local guide](local-demo.md), with research prerequisites in
+[reproduction](reproduction.md).
+
 ## Milestone 4C catalog and demonstration
 
 The single Streamlit frontend adds Model Catalog and Synthetic demo pages.
@@ -17,8 +40,8 @@ services, batch coordinator and report contracts are unchanged.
 `scripts/ci_check.py` is shared by local source-only verification and the active
 Windows GitHub Actions workflow. It installs the built wheel into an isolated runtime and checks
 the app from an empty directory. See [catalog/demo](model-catalog-demo.md) and
-[CI](ci.md). The [hosted run for f461b4f](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40377255928)
-passed 711 tests with 98.09% branch coverage, distribution checks and a fresh-install smoke.
+[CI](ci.md). The [hosted run for 8e8dade](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40380407763)
+passed 711 tests with 98.09% combined statement and branch coverage, distribution checks and a fresh-install smoke.
 See [current runs](https://github.com/GiannisPap24/factoryvision-ai/actions) for later commits.
 
 ## Milestone 4A presentation and session lifecycle

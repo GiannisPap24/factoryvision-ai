@@ -15,7 +15,12 @@ if ($LASTEXITCODE -ne 0) { throw 'Clone failed' }
 Set-Location factoryvision-ai
 ```
 
-If already cloned, open PowerShell at that repository root instead. The following
+If already cloned, open PowerShell at that repository root instead.
+
+### Download and verify local tools
+
+Run these bootstrap blocks once for a new checkout. Existing verified tools can
+be reused; the guards deliberately refuse to overwrite their directories. The following
 blocks use project-local tools, without global installation or activation. Obtain
 and verify the official standalone
 [uv 0.13.5](https://github.com/astral-sh/uv/releases/tag/0.13.5):
@@ -48,12 +53,21 @@ $signature = Get-AuthenticodeSignature '.tools/python-3.14.10/python.exe'
 if ($signature.Status -ne 'Valid' -or $signature.SignerCertificate.Subject -notmatch 'O=Python Software Foundation') { throw 'Python signer verification failed' }
 & .tools/python-3.14.10/python.exe -c "import sys; assert sys.version_info[:3] == (3, 14, 10)"
 if ($LASTEXITCODE -ne 0) { throw 'Python version verification failed' }
+```
+
+### Install locked dependencies
+
+Run from the repository root after verifying the tools. The default sync includes
+development dependencies so the same environment supports the demo and CI checks.
+Initial installation needs internet access; `UV_OFFLINE` must not be set to `1`
+unless all required dependencies are already cached.
+
+```powershell
 $env:UV_PROJECT_ENVIRONMENT = Join-Path (Get-Location) '.venv-31410'
 $env:UV_CACHE_DIR = Join-Path (Get-Location) '.uv-cache'
 $env:UV_PYTHON_DOWNLOADS = 'never'
 .tools/uv-0.13.5/uv.exe sync --locked --extra app --python .tools/python-3.14.10/python.exe
 if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed' }
-.venv-31410/Scripts/python.exe -m factoryvision.app
 ```
 
 Set `UV_PROJECT_ENVIRONMENT` in
@@ -71,6 +85,12 @@ Run from the research root only when using approved existing artifacts.
 
 ## First synthetic demo
 
+Start the app from the repository root:
+
+```powershell
+.venv-31410/Scripts/python.exe -m factoryvision.app
+```
+
 Open **http://127.0.0.1:8501**. Choose **Demo** in the sidebar, then **Generate
 synthetic demo**. Two original geometric images pass validation and one deliberately
 invalid input is rejected. Choose **Download synthetic demo CSV** or **Download
@@ -84,6 +104,20 @@ the verified artifacts described below.
 
 For later launches, run `.venv-31410/Scripts/python.exe -m factoryvision.app` from
 the repository root. You do not need to repeat downloads or installation.
+
+## Troubleshooting
+
+| Symptom | What to do |
+|---|---|
+| Models show **Unavailable** and inspection is disabled | Expected in the public checkout. Use Catalog and Demo; real inference requires the exact verified artifacts below. |
+| `uv` or `python` is not recognized | Use the explicit `.tools/uv-0.13.5/uv.exe` and `.venv-31410/Scripts/python.exe` paths from the repository root. Activation and global PATH changes are unnecessary. |
+| The Python environment or Streamlit is missing | Complete **Install locked dependencies** with `--extra app`; launch with that environment's interpreter. |
+| An uncached dependency cannot be found in offline mode | For an online installation, remove the terminal-only override with `Remove-Item Env:UV_OFFLINE -ErrorAction SilentlyContinue`, then repeat the locked sync. Do not change the lockfile to resolve a cache miss. |
+| Port 8501 is already in use | Stop the previous FactoryVision session with Ctrl+C in its terminal. If another application owns the port, resolve that conflict before launching; do not terminate unrelated processes. |
+| An archive digest, Python signer or version check fails | Stop setup. Check the official source and pinned values; do not bypass verification or disable Windows protections. |
+
+Linux, macOS, GPU execution and other Python versions are not verified release
+targets. See [development checks](development.md) for the supported local gate.
 
 ## Missing or damaged model files
 
@@ -118,7 +152,7 @@ Large MetalParts images require many native tiles and more time and RAM. If CPU
 inference fails, clear and retry with one model or a smaller supported input.
 Do not resize an official test image to bypass its protection.
 
-## Batch inspection (4B1)
+## Batch inspection
 
 Open **Batch Inspection** in the sidebar, choose the category and one compatible
 model, and use **Choose batch images** to select multiple PNG/JPEG files. Reduce

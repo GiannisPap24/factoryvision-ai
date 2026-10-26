@@ -8,6 +8,8 @@
 Explore six frozen methods, compare spatial evidence and export research results.
 Try the interface and synthetic workflow after installation—no dataset or model weights needed.
 
+[Quick start](#quick-start-clone-to-first-demo) · [Available workflows](#what-you-can-run) · [Research results](#research-results-and-limits) · [Documentation](docs/README.md)
+
 ![FactoryVision Overview with six registered methods and explicit research status](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/overview.jpg)
 *Overview from the public app without weights. Zero models are ready for real inference.*
 
@@ -30,9 +32,6 @@ Try the interface and synthetic workflow after installation—no dataset or mode
 
 The public repository contains **no datasets, checkpoints or pretrained weights**. Unavailable models remain disabled; there are no fabricated predictions or automatic weight downloads. See [artifact prerequisites](docs/reproduction.md).
 
-![Model Catalog showing method provenance and unavailable local artifacts](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/catalog.jpg)
-*Catalog: method descriptions and model cards remain accessible without weights.*
-
 ## Quick start: clone to first demo
 
 Verified platform: **Windows AMD64 · Python 3.14.10 · uv 0.13.5**. Git and an internet connection are needed for the initial checkout and dependencies.
@@ -45,20 +44,37 @@ Verified platform: **Windows AMD64 · Python 3.14.10 · uv 0.13.5**. Git and an 
    Set-Location factoryvision-ai
    ```
 
-2. Follow [first installation](docs/local-demo.md#first-installation) to download and verify project-local Python and uv. It includes exact download URLs, SHA-256 checks and the Python signature check; no activation or security-policy change is needed. Then, from the repository root:
+2. Follow [download and verify local tools](docs/local-demo.md#download-and-verify-local-tools) once to prepare project-local Python and uv. Start at that section if you have already cloned; do not repeat the clone. The guide includes exact download URLs, SHA-256 checks and the Python signature check. Then install from the repository root:
 
    ```powershell
    $env:UV_PROJECT_ENVIRONMENT = Join-Path (Get-Location) '.venv-31410'
+   $env:UV_CACHE_DIR = Join-Path (Get-Location) '.uv-cache'
    $env:UV_PYTHON_DOWNLOADS = 'never'
    .tools/uv-0.13.5/uv.exe sync --locked --extra app --python .tools/python-3.14.10/python.exe
    if ($LASTEXITCODE -ne 0) { throw 'Dependency installation failed' }
+   ```
+
+3. Start the app:
+
+   ```powershell
    .venv-31410/Scripts/python.exe -m factoryvision.app
    ```
 
-3. Open **http://127.0.0.1:8501**, choose **Demo → Generate synthetic demo**, then download the synthetic CSV or JSON. Stop the server with **Ctrl+C**.
+   Open **http://127.0.0.1:8501**, choose **Demo → Generate synthetic demo**, then download the synthetic CSV or JSON. Stop the server with **Ctrl+C**. For later sessions, repeat only this launch command from the repository root.
 
 ![Synthetic demo with original geometry and empty prediction fields](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/demo.jpg)
 *Original geometry tests validation and exports only. No inference occurs; scores, thresholds and research flags are null. Demo exports cannot become research reports.*
+
+<details>
+<summary>Model Catalog preview</summary>
+
+![Model Catalog showing method provenance and unavailable local artifacts](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/catalog.jpg)
+
+Method descriptions and model cards remain accessible without weights.
+
+</details>
+
+If a model is unavailable, that is expected in a fresh checkout. There is currently no public weight bundle. See [missing-model guidance](docs/local-demo.md#missing-or-damaged-model-files) and [troubleshooting](docs/local-demo.md#troubleshooting) before changing local settings.
 
 ## Architecture and local privacy
 
@@ -68,7 +84,7 @@ Uploads stay in process memory and are not saved by the app. Clear them when fin
 
 ## Tests and CI
 
-Published on **2026-10-26**. The [verified hosted run for f461b4f](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40377255928) passed **711 tests with 98.09% branch coverage**, plus lint, lock/dependency checks, wheel/sdist inspection and fresh-install smoke checks. The badge above links to the current branch status; historical results do not assert that later runs passed.
+The [verified hosted run for 8e8dade](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40380407763) passed **711 tests with 98.09% combined statement and branch coverage**, plus lint, lock/dependency checks, wheel/sdist inspection and fresh-install smoke checks. The badge above links to the current branch status. The percentage combines executed statements and branch outcomes; it is not the branch-only percentage. See [coverage interpretation](docs/ci.md#interpreting-coverage).
 
 After the installation above (including development dependencies), run:
 
@@ -93,6 +109,8 @@ Scores have different units across methods and are not defect probabilities. Hea
 
 ## Documentation and licence
 
-[Setup and workflows](docs/local-demo.md) · [Interface](docs/interface.md) · [Catalog and Demo](docs/model-catalog-demo.md) · [Development](docs/development.md) · [Roadmap](docs/roadmap.md) · [Publication record](docs/publication.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
+Start with the [documentation index](docs/README.md) for user guides, engineering references and historical research records.
+
+[Setup and workflows](docs/local-demo.md) · [Architecture](docs/architecture.md) · [Development](docs/development.md) · [Roadmap](docs/roadmap.md) · [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md)
 
 FactoryVision-owned source and original synthetic content: [MIT](LICENSE), Copyright (c) 2026 GiannisPap24. VisA (Zou et al., 2022), AmazonScience RobustAD, pretrained weights and dependencies retain separate terms and attribution. No third-party dataset images or weights are redistributed. See the [licensing inventory](docs/licensing.md). Screenshots show only the public interface and original geometry; these repository presentation assets are excluded from wheel and sdist packages.

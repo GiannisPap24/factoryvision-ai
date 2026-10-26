@@ -6,10 +6,23 @@ Owned source is MIT licensed. This source-only release contains no datasets or w
 Hosted GitHub Actions: **initial publication run PASSED on 2026-10-26**.
 [Run 40376270944](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
 verified root commit `691507dd409177219b4ba39afedfaaedfe440c06`: **711 tests passed,
-98.09% coverage**, plus lint/format, lock/dependency, distribution and installed-app checks.
+98.09% combined statement and branch coverage**, plus lint/format, lock/dependency, distribution and installed-app checks.
 The local audit had 710 passed and one Windows symlink-permission skip; the hosted
 runner passed that test too. [Later workflow runs](https://github.com/GiannisPap24/factoryvision-ai/actions)
 have their own status; this result applies to the linked run.
+
+## Interpreting coverage
+
+The suite enables branch measurement with `--cov-branch`. Coverage.py's total
+combines executed statements and branch outcomes:
+
+`(covered statements + covered branch outcomes) / (all statements + all branch outcomes)`.
+
+The reported **98.09%** is that combined total, not branch-only coverage. The
+configured 95% floor applies to the combined report. Test counts can differ locally
+when Windows does not grant symlink-creation privileges; the skip is reported
+explicitly and must not be counted as a pass. Historical CI links identify the
+exact commit tested; use the workflow badge or current runs for the latest state.
 
 ## Fresh source setup
 

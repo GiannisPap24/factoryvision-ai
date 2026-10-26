@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "factoryvision-ai"
 version = "0.1.0"
-description = "Industrial visual inspection research: dataset contracts and split integrity"
+description = "Local visual anomaly inspection research with PyTorch, Streamlit and a synthetic demo"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -20,6 +20,11 @@ dependencies = [
 
 [project.scripts]
 factoryvision = "factoryvision.cli:main"
+
+[project.urls]
+Repository = "https://github.com/GiannisPap24/factoryvision-ai"
+Documentation = "https://github.com/GiannisPap24/factoryvision-ai/blob/main/docs/README.md"
+Issues = "https://github.com/GiannisPap24/factoryvision-ai/issues"
 
 [project.optional-dependencies]
 app = [
@@ -55,6 +60,7 @@ packages = ["src/factoryvision"]
 [tool.hatch.build.targets.sdist]
 include = [
   "/LICENSE",
+  "/docs/README.md",
   "/SECURITY.md",
   "/docs/interface.md",
   "/docs/publication.md",

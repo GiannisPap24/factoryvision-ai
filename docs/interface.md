@@ -21,10 +21,15 @@ shared calibrated scale across models or images. Display normalization never
 changes raw arrays, scores, frozen thresholds or exported research values.
 See [inference contracts](inference.md) for preprocessing and numerical behavior.
 
-## Review images
+## Published screenshots and review evidence
 
-Release review screenshots are private evidence, not distributed assets. For a
-future portfolio capture, prefer the source-only Overview, Model Catalog and
-generated Demo using original synthetic geometry. Label synthetic examples as
-workflow demonstrations, never defect-detection performance. Check filenames,
-browser chrome, paths and overlays before separately approving publication.
+The README includes three reviewed public screenshots: source-only Overview,
+Model Catalog and generated Demo. They show the interface without weights and
+original synthetic geometry, with no real predictions or third-party dataset
+imagery. Their [capture provenance](https://github.com/GiannisPap24/factoryvision-ai/blob/main/docs/images/README.md)
+is recorded alongside the repository images. These presentation assets are
+excluded from wheel and sdist packages.
+
+The larger engineering review set and model-enabled captures remain private.
+Future public captures should retain the same clear synthetic labels and undergo
+review of visible filenames, browser chrome, paths and image metadata.
