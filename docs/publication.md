@@ -51,14 +51,24 @@ future vulnerability is absent.
 5. Verify the remote SHA, public diff and the actual hosted CI result. Report
    pending or failed checks accurately; do not silently weaken them.
 
+## README presentation update
+
+After the initial source publication, the owner authorized three original UI
+screenshots for the README: Overview, Model Catalog and synthetic Demo. They were
+captured from the installed public app without private artifacts. Visible content
+and JPEG metadata were reviewed for personal information. Only original geometry
+appears; there are no dataset images or model predictions. These repository assets
+are excluded from wheel and sdist packages. Initial inventory counts above remain
+historical, not the count of the updated branch.
+
 ## Separate release boundaries
 
-Datasets, weights, private logs, screenshots and generated distributions remain
-outside the source-release scope. Tags, binary releases, social promotion and
+Datasets, weights, private logs, model-enabled screenshots and generated
+distributions remain outside the source-release scope. Tags, binary releases, social promotion and
 the wider 4F community launch require separate review and authorization.
 A private security-reporting channel must be established before community launch.
 
-Future portfolio captures should use source-only Overview, Catalog or generated
+Additional portfolio captures should use source-only Overview, Catalog or generated
 Demo with original geometry and explicit synthetic labels. Review visible details
-before separate publication approval. Private model-enabled screenshots remain
+and metadata before any further owner-authorized publication. Private model-enabled screenshots remain
 local review evidence.

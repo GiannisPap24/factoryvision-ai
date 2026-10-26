@@ -14,16 +14,18 @@ CSV/JSON in a dedicated session key; page/category changes clear it. Research
 results and schema-v1 reports never accept this schema. Existing six inference
 services, batch coordinator and report contracts are unchanged.
 
-`scripts/ci_check.py` is shared by local source-only verification and the proposed
-Windows workflow. It installs the built wheel into an isolated runtime and checks
+`scripts/ci_check.py` is shared by local source-only verification and the active
+Windows GitHub Actions workflow. It installs the built wheel into an isolated runtime and checks
 the app from an empty directory. See [catalog/demo](model-catalog-demo.md) and
-[CI](ci.md); hosted Actions has not run.
+[CI](ci.md). The [hosted run for f461b4f](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40377255928)
+passed 711 tests with 98.09% branch coverage, distribution checks and a fresh-install smoke.
+See [current runs](https://github.com/GiannisPap24/factoryvision-ai/actions) for later commits.
 
 ## Milestone 4A presentation and session lifecycle
 
 The single Streamlit frontend shares `app/presentation.py` for local CSS, availability/help, workflow cards and category switching. Category changes clear both result sets, upload widget references and consent. Model/image/consent changes invalidate stale results. The UI catches CPU runtime/memory failures without exposing private exception text. No new service, model or dataset was introduced. Pillow was updated from 12.3.0 to 13.0.0 for documented decoder advisories; upload parsing now restricts formats before decoding. The application still performs no downloads or network inference. Model resources remain cached separately from per-session images; all existing identity checks still execute. See [local demo](local-demo.md).
 
-FactoryVision AI is a local research package for future industrial visual anomaly detection and localization. Milestone 2A adds a compact autoencoder, real CPU training, reconstruction scores and provisional normal calibration. Milestone 2B adds a frozen held-out evaluator and one normal-only spatial mean baseline. Further models or deployment require separate authorization.
+FactoryVision AI is a local research package for future industrial visual anomaly detection and localization. The current application exposes six registered methods across Cashew and experimental MetalParts. The sections below preserve the research sequence: Milestone 2A introduced the compact autoencoder and normal calibration; 2B added historical held-out evaluation and the spatial mean baseline. Further research or deployment follows the separately gated roadmap.
 
 ## Implemented package
 
@@ -73,7 +75,7 @@ Filesystem resolution is optional and separate from pure validation. It rejects 
 
 ## Technology decisions
 
-Python 3.12.15, local uv 0.13.4, pytest, pytest-cov and Ruff. Hatchling builds wheels and source distributions. Runtime dependencies are torch 2.13.0+cpu, torchvision 0.28.0+cpu, NumPy, Pillow and scikit-learn 1.9.1. The explicit CPU package index and Windows AMD64 lock prevent accidental GPU selection. The optional Streamlit frontend calls reusable in-process inference services. There is no database, remote inference service or experiment tracker. The sections below retain the sequence of research boundaries; the application and reporting sections describe the current implementation.
+Windows AMD64 / Python 3.14.10, local uv 0.13.5, pytest, pytest-cov and Ruff. Hatchling builds wheels and source distributions. Runtime dependencies are torch 2.13.0+cpu, torchvision 0.28.0+cpu, NumPy, Pillow and scikit-learn 1.9.1. The explicit CPU package index and Windows AMD64 lock prevent accidental GPU selection. The optional Streamlit frontend calls reusable in-process inference services. There is no database, remote inference service or experiment tracker. The sections below retain the sequence of research boundaries; the application and reporting sections describe the current implementation.
 
 The domain remains standard-library only. Acquisition is an explicit script, separate from package imports and default tests. Archive preflight examines all members before writing only Cashew and necessary metadata into a new directory. VisA ingestion reconciles the one-class CSV with category annotations, hashes bytes/decoded RGB pixels and enriches the immutable manifest before splitting. Image loading decodes one sample on demand; zero-worker DataLoaders keep ordering and memory predictable. See dataset-preparation.md for resource limits, interfaces and caveats.
 

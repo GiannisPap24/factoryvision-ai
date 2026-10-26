@@ -12,11 +12,11 @@ no reliable OOD detector. PCB1 remains **BLOCKED** due to source overlap. PCB2 r
 
 ## Launch and use
 
-From the authoritative repository root, on Windows AMD64 / Python 3.12.15:
+Complete the [first installation](local-demo.md#first-installation), then run from
+the public repository root on Windows AMD64 / Python 3.14.10 / uv 0.13.5:
 
 ```powershell
-.tools/uv-0.13.4/uv.exe sync --locked --extra app
-.venv/Scripts/python.exe -m factoryvision.app
+.venv-31410/Scripts/python.exe -m factoryvision.app
 ```
 
 The optional app extra pins Streamlit 1.66.1. Existing ML dependency versions remain
@@ -24,9 +24,10 @@ unchanged. After initial dependency installation, inference requires no internet
 Visit `http://127.0.0.1:8501`. Stop the server with Ctrl+C. The VS Code task
 **FactoryVision: local inspection app** runs the same entrypoint, explicitly only.
 
-Overview shows artifact availability. In Image inspection, upload a permitted Cashew
-image, choose one or more available methods, acknowledge the category/test-data
-restriction, and press **Run inspection**. Neither upload nor model selection runs
+Overview shows artifact availability. A fresh checkout has no weights: use Catalog
+and the synthetic Demo until approved artifacts are present. In Inspect, choose one
+available model, upload a permitted Cashew image, acknowledge the category/test-data
+restriction and press **Run inspection**. Compare supports multiple compatible models. Neither upload nor model selection runs
 inference. Changing image, selection or acknowledgement clears stale results.
 Clear image and results removes current application references and resets the uploader.
 Research results displays historical metrics, never recomputes evaluation.
