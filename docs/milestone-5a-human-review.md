@@ -4,8 +4,9 @@
 
 Human Review V1 adds local observations to existing inspection results. It does
 not change a score, research flag, threshold, model configuration or historical
-evaluation. This feature is implemented on a local feature branch; publication
-requires separate diff and security review. No source changes have been pushed.
+evaluation. Publication update: Human Review V1 was merged through [PR #1](https://github.com/GiannisPap24/factoryvision-ai/pull/1)
+at `648091dbe2301ee2429b0e4c19576f64479efc88`; the merge CI passed.
+The verification sections below preserve the local acceptance record.
 
 ## Using the workflow
 
@@ -255,6 +256,6 @@ and a conspicuously labelled synthetic browser harness live under
 `reports/human-review-5a/`. They are excluded from source distributions and are
 not scientific evidence or public demo assets.
 
-The recommended next scope is **5B — Model Registry**, after reviewing 5A's
-diff/security results and separately deciding whether to publish it. No later
-milestone, camera integration or community message is initiated here.
+Human Review publication is complete. The subsequent **5B — Model Registry**
+work is documented in [its acceptance record](milestone-5b-model-registry.md).
+No camera integration or community message is initiated by this record.

@@ -57,3 +57,20 @@ $env:UV_PROJECT_ENVIRONMENT = Join-Path (Get-Location) '.venv-31410'
 The default suite uses fabricated data and blocks network access. It does not run
 `integration_tests/` or real experiments. Use the synthetic inference debugger
 configurations, not the training configurations, for a portfolio demonstration.
+
+## Inspect historical provenance without rerunning (5B)
+
+Open **Model Catalog** in a source-only installation. Registry schema 1 links the
+existing model identity to its exact artifact SHA-256, dataset/split provenance,
+recorded run ID, recipe/protocol digests where recorded, and accepted evidence
+sources. No dataset, checkpoint or pretrained download is needed.
+
+The evidence index is discovery, not a rerun or an experiment scheduler. Historical
+Cashew Python 3.12.15 provenance is not rewritten to the application's Python
+3.14.10 runtime. Execution timestamps and canonical configuration fingerprints
+remain unavailable; a recipe-file digest is explicitly a different identity.
+Source references are portable package names, not owner directories.
+
+New historical entries require reviewed source/evidence changes and adapter tests.
+There is no runtime metadata import or append-only store in V1: the existing package
+evidence remains authoritative. See [5B](milestone-5b-model-registry.md).

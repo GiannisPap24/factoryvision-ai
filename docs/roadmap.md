@@ -35,16 +35,22 @@ point verified. Safe issue templates and a [feedback process](community-feedback
 support the initial community round. Community announcements remain pending;
 no external-user acquisition or industrial validation is claimed.
 
-Milestone **5A — Human Review V1** is implemented and verified locally on the feature branch;
-publication remains pending separate diff/security review. See the
-[implementation and verification record](milestone-5a-human-review.md).
-It adds local observations, revisions and explicit exports without changing
-predictions, thresholds or research status.
+Milestone **5A — Human Review V1** was merged in [PR #1](https://github.com/GiannisPap24/factoryvision-ai/pull/1)
+at `648091dbe2301ee2429b0e4c19576f64479efc88`; its
+[hosted CI](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40404981472)
+passed. See the [implementation record](milestone-5a-human-review.md).
+Human observations do not change predictions, thresholds or research status.
 
-The next proposed milestone is **5B — Model Registry**. Later work covers
-robustness, performance, camera integration and pilot discovery. Each requires
-a separate scope, prerequisites and acceptance criteria. No production-readiness,
-independent target-domain reliability or automatic benchmark reopening is implied.
+Milestone **5B — Model Registry & Experiment Tracking V1** extends the existing
+Model Catalog with content-addressed artifact versions, recorded provenance and
+an offline historical evidence index. See the [5B acceptance record](milestone-5b-model-registry.md).
+Publication of this local feature branch requires separate owner approval.
+
+The proposed **5C** scope is a bounded robustness assessment plan: define permitted
+development inputs, perturbations, provenance and acceptance criteria before any
+execution. It must preserve PCB1 BLOCKED, PCB2 INCONCLUSIVE and RobustAD target
+NOT CLEARED. It does not authorize retraining, reopening official benchmarks,
+camera integration or deployment. No 5C implementation has started.
 
 See [publication record](publication.md), [contributing](../CONTRIBUTING.md)
 and [licensing](licensing.md).

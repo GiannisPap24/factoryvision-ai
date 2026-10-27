@@ -62,6 +62,7 @@ include = [
   "/LICENSE",
   "/docs/README.md",
   "/docs/milestone-5a-human-review.md",
+  "/docs/milestone-5b-model-registry.md",
   "/docs/community-feedback.md",
   "/SECURITY.md",
   "/docs/interface.md",

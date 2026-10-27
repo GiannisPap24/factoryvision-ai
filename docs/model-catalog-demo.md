@@ -63,3 +63,18 @@ navigation, warnings, explicit generation, state resets and unavailable batches
 with Streamlit AppTest. `scripts/smoke_installed.py` repeats asset-free workflows
 from an installed wheel in an empty directory with network connections denied.
 The synthetic debug configuration uses `scripts/debug_catalog_demo.py`.
+
+## Registry and historical evidence (5B)
+
+Model Catalog now includes **Version and recorded provenance** for the selected
+model, a metadata-only JSON download, and **Historical experiment evidence**
+with category/status filters. Six registrations and their original availability
+checks are preserved. Missing checkpoints disable real inference but do not hide
+accepted historical evidence. Frozen pretrained extractors are components of
+feature-memory and student methods, not newly trained models.
+
+Cashew image/pixel AUROC and AP retain the model card's printed precision.
+MetalParts values retain the packaged exploratory diagnostics and quantization
+scope. PCB1/PCB2 show integrity status and missing metrics, never zero metrics.
+Other endpoints and detailed training settings remain in downloadable model cards.
+See [contracts and verification](milestone-5b-model-registry.md).

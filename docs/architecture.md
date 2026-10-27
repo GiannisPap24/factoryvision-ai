@@ -23,6 +23,25 @@ sections below include historical implementation context; current setup is in
 the [local guide](local-demo.md), with research prerequisites in
 [reproduction](reproduction.md).
 
+## Milestone 5B registry and experiment evidence
+
+`inference/model_registry.py` wraps the existing CatalogEntry and ModelInfo contracts;
+model IDs, expected hashes, thresholds and service verification keep their original
+authorities. An artifact version is `sha256:<existing artifact digest>`, not a new
+mutable alias. Frozen schema-v1 records bind model, dataset, artifact and evidence.
+
+Historical evidence is projected from exact allowlisted, SHA-256-pinned installed
+manifests and model cards. Pins detect unreviewed package changes, not publisher
+identity. Reads are bounded to 256 KiB. Paths within manifests are never followed
+by the index. JSON export contains metadata only. The index has no write/import,
+directory discovery, model deserialization, training or network operation.
+
+The existing Model Catalog workspace calls `app/registry_ui.py` for provenance and
+category/status filters. All eight workspaces, inference, batch, reports and human
+review contracts remain in place. Six model evidence summaries and two integrity
+summaries do not imply eight trained experiments. Missing fields remain null.
+See [5B](milestone-5b-model-registry.md) for source mapping and limitations.
+
 ## Milestone 4C catalog and demonstration
 
 The single Streamlit frontend adds Model Catalog and Synthetic demo pages.
