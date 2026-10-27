@@ -14,6 +14,7 @@ separately prepared, verified research artifacts.
 | Understand real inference, upload validation and scores | [Inference contracts](inference.md) |
 | Inspect a completed batch and interpret CSV/JSON | [Research reporting](reporting.md) |
 | Record, revise and export session-local human observations | [Human Review V1](milestone-5a-human-review.md) |
+| Inspect artifact versions, provenance and historical evidence | [Model Registry V1](milestone-5b-model-registry.md) |
 
 ## Understand and contribute to the code
 

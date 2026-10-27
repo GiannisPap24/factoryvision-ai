@@ -13,6 +13,7 @@ from factoryvision.inference.batch import BatchService
 from factoryvision.inference.metalparts import MetalPartsService
 from factoryvision.inference.metalparts_feature import MetalPartsFeatureService
 from factoryvision.inference.model_catalog import catalog_entries
+from factoryvision.inference.model_registry import experiment_index, registry_records
 from factoryvision.inference.review import Decision
 from factoryvision.inference.review import json_bytes as review_json
 from factoryvision.inference.service import InspectionService
@@ -47,6 +48,9 @@ engine = BatchService(
 )
 entries = catalog_entries(engine)
 assert len(entries) == 6 and not any(row.available for row in entries)
+registry = registry_records(engine)
+assert len(registry) == 6 and all(not row.catalog.available for row in registry)
+assert [row.status for row in experiment_index()[-2:]] == ["BLOCKED", "INCONCLUSIVE"]
 demo = build_demo()
 assert json.loads(json_bytes(demo.report))["inference_executed"] is False
 assert csv_bytes(demo.report) == csv_bytes(build_demo().report)
@@ -54,6 +58,8 @@ app = AppTest.from_file(ui.__file__, default_timeout=15).run()
 assert not app.exception
 app.sidebar.radio[0].set_value("Model Catalog").run()
 assert not app.exception and app.error and app.table
+app.selectbox(key="registry_category").set_value("pcb1").run()
+assert not app.exception and any("BLOCKED" in text.value for text in app.text)
 app.sidebar.radio[0].set_value("Synthetic demo").run()
 assert not app.exception and any(NOTICE in warning.value for warning in app.warning)
 next(button for button in app.button if button.label == "Generate synthetic demo").click().run()

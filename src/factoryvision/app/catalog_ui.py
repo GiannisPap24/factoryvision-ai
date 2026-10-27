@@ -6,11 +6,17 @@ from pathlib import PurePosixPath
 import streamlit as st
 
 from factoryvision.app import presentation
-from factoryvision.inference.model_catalog import catalog_entries
+from factoryvision.app.registry_ui import render_history, render_provenance
+from factoryvision.inference.model_registry import RegistryInvalid, registry_records
 
 
 def render(coordinator, category):
-    entries = catalog_entries(coordinator)
+    try:
+        records = registry_records(coordinator)
+    except RegistryInvalid as exc:
+        st.error(str(exc))
+        return
+    entries = tuple(record.catalog for record in records)
     st.caption("File verification only. Models load on explicit inference; nothing is downloaded.")
     with st.expander("Registry summary"):
         presentation.table(
@@ -92,3 +98,5 @@ def render(coordinator, category):
     with st.expander("Scientific limitations", expanded=False):
         for limitation in definition.limitations:
             st.write(limitation)
+    render_provenance(next(r for r in records if r.catalog == entry))
+    render_history()

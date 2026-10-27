@@ -17,6 +17,7 @@ Try the interface and synthetic workflow after installation—no dataset or mode
 
 ## What it does
 
+- Model Registry V1: artifact versions, provenance and eight historical evidence summaries, available without weights. [Scope and verification](docs/milestone-5b-model-registry.md).
 - Eight workspaces: Overview, Inspect, Compare, Batch Inspection, Reports, Model Catalog, Research and Demo.
 - Six registered methods: four Cashew methods (autoencoder, spatial baseline, ResNet18 feature memory and student–teacher) and two experimental MetalParts methods.
 - With verified local artifacts: explicit CPU inference, aligned heatmaps, overlays, reconstructions where supported, model-specific scores and latency.
