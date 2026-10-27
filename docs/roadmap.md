@@ -44,13 +44,40 @@ Human observations do not change predictions, thresholds or research status.
 Milestone **5B — Model Registry & Experiment Tracking V1** extends the existing
 Model Catalog with content-addressed artifact versions, recorded provenance and
 an offline historical evidence index. See the [5B acceptance record](milestone-5b-model-registry.md).
-Publication of this local feature branch requires separate owner approval.
+It was merged in [PR #2](https://github.com/GiannisPap24/factoryvision-ai/pull/2)
+at `2e59101b011b74b5fc0658c79d46cb2d7fb5f002`. The accepted
+[main CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40565890977)
+passed with **840 tests and 98.24% coverage**. The acceptance record retains its
+historical local results; those are not the later hosted counts.
 
-The proposed **5C** scope is a bounded robustness assessment plan: define permitted
-development inputs, perturbations, provenance and acceptance criteria before any
-execution. It must preserve PCB1 BLOCKED, PCB2 INCONCLUSIVE and RobustAD target
-NOT CLEARED. It does not authorize retraining, reopening official benchmarks,
-camera integration or deployment. No 5C implementation has started.
+Milestone **5C-1** is limited to the [synthetic robustness protocol](protocols/robustness-v1.md),
+strict metadata contracts and focused offline tests. It implements no perturbation
+algorithms, inference runner, OOD detector or UI. Local owner review is pending;
+5C-2 execution work requires a separate gate. This work preserves PCB1 BLOCKED,
+PCB2 INCONCLUSIVE, observed Cashew test status, exploratory-only MetalParts and
+RobustAD target NOT CLEARED. Human Review observations remain distinct from ground
+truth. Synthetic diagnostics do not establish industrial accuracy or OOD confidence.
+
+## Owner-agreed strategic direction
+
+These milestones are **proposed and separately gated**. Their listing is neither
+execution authorization nor evidence of achieved industrial performance, customer
+adoption or deployment approval.
+
+| Milestone | Proposed direction |
+|---|---|
+| 5C | Robustness & OOD-oriented Testing; synthetic-first methodology and separate evaluation authorization |
+| 5D | Performance Optimization, ONNX and AMD GPU feasibility; preserve numerical and scientific validity |
+| 5E | Camera Inspection; separately approved capture, privacy and inspection scope |
+| 5F | Industrial Pilot Discovery; identify use cases and evidence requirements before pilot claims |
+| 6A | Local Inference API |
+| 6B | Industrial Integrations |
+| 6C | Commercial Readiness |
+
+Historical acceptance records remain intact. Later documentation maintenance should
+reconcile the 5B record's pre-publication wording, older CI counts where presented
+as current, the dataset-contract licensing decision wording and the inference
+guide's historical future-work paragraph; these are outside 5C-1's implementation.
 
 See [publication record](publication.md), [contributing](../CONTRIBUTING.md)
 and [licensing](licensing.md).
