@@ -1,4 +1,4 @@
-"""Strict, I/O-free metadata for robustness-v1. This module cannot run experiments."""
+"""Strict, I/O-free metadata for protocol V2. This module cannot run experiments."""
 
 import json
 import math
@@ -6,6 +6,7 @@ from dataclasses import asdict, dataclass, fields
 from enum import StrEnum
 
 PROTOCOL_ID = "factoryvision-synthetic-robustness"
+PROTOCOL_VERSION = 2
 MAX_REPORT_BYTES = 2 * 1024 * 1024
 MAX_METADATA_BYTES = 65536
 
@@ -140,7 +141,7 @@ class Parent:
 
 def _identity(protocol_id, protocol_version, schema_version, provenance, classification):
     _require(type(protocol_id) is str and protocol_id == PROTOCOL_ID)
-    _require(type(protocol_version) is int and protocol_version == 1)
+    _require(type(protocol_version) is int and protocol_version == PROTOCOL_VERSION)
     _require(type(schema_version) is int and schema_version == 1)
     _require(type(provenance) is Provenance)
     _require(type(classification) is Classification)
@@ -159,7 +160,7 @@ class Plan:
     budgets: Budgets = Budgets()
     baseline_repetitions: int = 3
     protocol_id: str = PROTOCOL_ID
-    protocol_version: int = 1
+    protocol_version: int = PROTOCOL_VERSION
     schema_version: int = 1
     provenance: Provenance = Provenance.OWNED_SYNTHETIC
     classification: Classification = Classification.SOFTWARE_DIAGNOSTIC
@@ -209,7 +210,7 @@ class Diagnostic:
     applicability: Applicability
     status: DiagnosticStatus = DiagnosticStatus.NOT_EVALUATED
     protocol_id: str = PROTOCOL_ID
-    protocol_version: int = 1
+    protocol_version: int = PROTOCOL_VERSION
     schema_version: int = 1
     provenance: Provenance = Provenance.OWNED_SYNTHETIC
     classification: Classification = Classification.SOFTWARE_DIAGNOSTIC

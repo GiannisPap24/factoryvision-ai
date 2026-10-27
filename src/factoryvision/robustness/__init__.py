@@ -1,1 +1,1 @@
-"""Synthetic robustness protocol contracts; no execution or historical evidence."""
+"""Synthetic numerical diagnostics; no inference, runner or historical evidence."""

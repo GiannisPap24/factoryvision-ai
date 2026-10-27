@@ -52,11 +52,17 @@ historical local results; those are not the later hosted counts.
 
 Milestone **5C-1** is limited to the [synthetic robustness protocol](protocols/robustness-v1.md),
 strict metadata contracts and focused offline tests. It implements no perturbation
-algorithms, inference runner, OOD detector or UI. Local owner review is pending;
-5C-2 execution work requires a separate gate. This work preserves PCB1 BLOCKED,
+algorithms, inference runner, OOD detector or UI. Its six-file local checkpoint was
+approved and verified before 5C-2 implementation. This work preserves PCB1 BLOCKED,
 PCB2 INCONCLUSIVE, observed Cashew test status, exploratory-only MetalParts and
 RobustAD target NOT CLEARED. Human Review observations remain distinct from ground
 truth. Synthetic diagnostics do not establish industrial accuracy or OOD confidence.
+
+Milestone **5C-2** implements [protocol V2 numerical diagnostics](protocols/robustness-v2.md):
+deterministic synthetic-array transformations and model-independent score/raw-map
+metrics. The owner approved explicit contrast and noise-stream amendments to V1.
+This remains local work awaiting review, with no neural-network inference, dataset
+access, runner, UI or publication. Milestone 5C-3 requires separate authorization.
 
 ## Owner-agreed strategic direction
 
