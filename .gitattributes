@@ -1,0 +1,13 @@
+# Exact Model Registry SOURCES allowlist; preserve the reviewed raw-byte hashes.
+# These six resources are committed as LF. Do not convert them on Windows checkout.
+src/factoryvision/inference/metalparts_artifacts.json text eol=lf
+src/factoryvision/app/model_cards/model-card.md text eol=lf
+src/factoryvision/app/model_cards/feature-model-card.md text eol=lf
+src/factoryvision/app/model_cards/student-model-card.md text eol=lf
+src/factoryvision/app/model_cards/metalparts-model-card.md text eol=lf
+src/factoryvision/app/model_cards/metalparts-feature-model-card.md text eol=lf
+# These three resources are already committed as CRLF and pinned in that form.
+# Disable conversion in both directions; do not renormalize or change their hashes.
+src/factoryvision/inference/cashew_artifacts.json -text
+src/factoryvision/inference/metalparts_feature_artifacts.json -text
+src/factoryvision/inference/metalparts_comparison.json -text

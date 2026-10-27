@@ -197,3 +197,25 @@ def test_missing_resource_does_not_disclose_path(monkeypatch):
     assert "private" not in str(failure.value)
     with pytest.raises(registry.RegistryInvalid):
         registry.EvidenceReference("cashew_artifacts.json", "0" * 64)
+
+
+@pytest.mark.parametrize("name", registry.SOURCES)
+def test_line_ending_tampering_is_not_normalized(name, monkeypatch):
+    original = registry.source_bytes(name)
+    changed = (
+        original.replace(b"\r\n", b"\n")
+        if b"\r\n" in original
+        else original.replace(b"\n", b"\r\n")
+    )
+    assert changed != original
+
+    class Resource:
+        def joinpath(self, *parts):
+            return self
+
+        def open(self, mode):
+            return io.BytesIO(changed)
+
+    monkeypatch.setattr(registry, "files", lambda *a: Resource())
+    with pytest.raises(registry.RegistryInvalid):
+        registry.source_bytes(name)

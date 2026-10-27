@@ -96,6 +96,7 @@ include = [
   "/.vscode",
   "/.editorconfig",
   "/.gitignore",
+  "/.gitattributes",
   "/docs/architecture.md",
   "/docs/dataset-contract.md",
   "/docs/dataset-preparation.md",
