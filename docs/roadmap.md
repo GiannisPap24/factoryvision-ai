@@ -83,8 +83,14 @@ separate owner authorization. The foundation was checkpointed locally for 5C-4B2
 Milestone **5C-4B2A** adds [synthetic Windows isolation and supervisor accounting](protocols/windows-isolation-v1.md).
 Actual nested-job assignment, suspended launch, small committed-memory caps,
 short watchdogs, cancellation and owned-handle cleanup were tested. The implementation
-is uncommitted and awaits owner review. Proposed real-model limits and actual
+was checkpointed locally for 5C-4B2B. Proposed real-model limits and actual
 development execution remain unvalidated and unauthorized; the Cashew pilot is blocked.
+
+Milestone **5C-4B2B** verifies [supervisor crash containment](protocols/windows-crash-containment-v1.md)
+with disposable synthetic processes, explicit handle ownership and fail-closed
+interruption accounting. The worker exits after actual supervisor termination while
+the controller remains outside the dedicated job. These test-only additions await
+owner review; real-model integration, recovery design and execution need separate approval.
 
 ## Owner-agreed strategic direction
 
