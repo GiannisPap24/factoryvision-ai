@@ -78,7 +78,13 @@ Milestone **5C-4B1** adds the [development admission foundation](protocols/devel
 and an internal synthetic service-interface probe. Sample/artifact admission stays
 unverified and real execution remains denied. Windows isolation is a documented,
 unverified prerequisite; the real pilot remains blocked pending its acceptance and
-separate owner authorization. This local foundation awaits review; 5C-4B2 has not started.
+separate owner authorization. The foundation was checkpointed locally for 5C-4B2A.
+
+Milestone **5C-4B2A** adds [synthetic Windows isolation and supervisor accounting](protocols/windows-isolation-v1.md).
+Actual nested-job assignment, suspended launch, small committed-memory caps,
+short watchdogs, cancellation and owned-handle cleanup were tested. The implementation
+is uncommitted and awaits owner review. Proposed real-model limits and actual
+development execution remain unvalidated and unauthorized; the Cashew pilot is blocked.
 
 ## Owner-agreed strategic direction
 
