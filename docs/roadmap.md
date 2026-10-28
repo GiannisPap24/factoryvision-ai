@@ -71,6 +71,15 @@ accounting and validated in-memory JSON/CSV. Protocol V2 remains unchanged.
 This local implementation awaits owner review; it makes no real-model or industrial
 performance claim. Milestone 5C-4 requires separate authorization.
 
+Milestone **5C-4A** accepted the seven-file 5C-3 local checkpoint and reviewed the
+six inference interfaces without real-data/model access. It selected Cashew AE as
+a conditional planning candidate, not an approved sample or execution.
+Milestone **5C-4B1** adds the [development admission foundation](protocols/development-admission-v1.md)
+and an internal synthetic service-interface probe. Sample/artifact admission stays
+unverified and real execution remains denied. Windows isolation is a documented,
+unverified prerequisite; the real pilot remains blocked pending its acceptance and
+separate owner authorization. This local foundation awaits review; 5C-4B2 has not started.
+
 ## Owner-agreed strategic direction
 
 These milestones are **proposed and separately gated**. Their listing is neither
