@@ -89,8 +89,14 @@ development execution remain unvalidated and unauthorized; the Cashew pilot is b
 Milestone **5C-4B2B** verifies [supervisor crash containment](protocols/windows-crash-containment-v1.md)
 with disposable synthetic processes, explicit handle ownership and fail-closed
 interruption accounting. The worker exits after actual supervisor termination while
-the controller remains outside the dedicated job. These test-only additions await
-owner review; real-model integration, recovery design and execution need separate approval.
+the controller remains outside the dedicated job. These test-only additions were
+checkpointed locally for 5C-4C1; real integration and execution need separate approval.
+
+Milestone **5C-4C1** adds [Cashew integration preparation](protocols/cashew-development-preparation-v1.md)
+with internal synthetic pixels, lossless transport, existing interface/diagnostic
+validators and abort-only ledger accounting. The lifecycle is explicitly a test double;
+the Windows runner and real services are unchanged. Source-only work awaits owner review.
+No sample/artifact is cleared, no real worker is enabled and the Cashew pilot remains blocked.
 
 ## Owner-agreed strategic direction
 
