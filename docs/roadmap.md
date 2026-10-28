@@ -62,7 +62,14 @@ Milestone **5C-2** implements [protocol V2 numerical diagnostics](protocols/robu
 deterministic synthetic-array transformations and model-independent score/raw-map
 metrics. The owner approved explicit contrast and noise-stream amendments to V1.
 This remains local work awaiting review, with no neural-network inference, dataset
-access, runner, UI or publication. Milestone 5C-3 requires separate authorization.
+access, runner, UI or publication. Its nine-file local checkpoint was verified
+before the separately authorized 5C-3 work.
+
+Milestone **5C-3** adds a [bounded synthetic runner and scalar reports](protocols/robustness-runner-v1.md),
+with internally generated probes, analytical-only adapters, cumulative unit
+accounting and validated in-memory JSON/CSV. Protocol V2 remains unchanged.
+This local implementation awaits owner review; it makes no real-model or industrial
+performance claim. Milestone 5C-4 requires separate authorization.
 
 ## Owner-agreed strategic direction
 

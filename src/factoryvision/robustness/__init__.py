@@ -1,1 +1,1 @@
-"""Synthetic numerical diagnostics; no inference, runner or historical evidence."""
+"""Bounded synthetic diagnostics; no real model inference or historical evidence."""
