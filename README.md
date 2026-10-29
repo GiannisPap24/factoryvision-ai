@@ -5,15 +5,27 @@
 [![MIT licence](https://img.shields.io/badge/License-MIT-teal)](LICENSE)
 
 **A local visual anomaly inspection research app built with PyTorch and Streamlit.**
-Explore six frozen methods, compare spatial evidence and export research results.
+Explore six registered research methods; real inference requires verified local artifacts.
 Try the interface and synthetic workflow after installation—no dataset or model weights needed.
 
 [Quick start](#quick-start-clone-to-first-demo) · [Available workflows](#what-you-can-run) · [Research results](#research-results-and-limits) · [Documentation](docs/README.md)
 
-![FactoryVision Overview with six registered methods and explicit research status](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/overview.jpg)
-*Overview from the public app without weights. Zero models are ready for real inference.*
+![FactoryVision Overview: Open synthetic demo is the first action, six methods are registered and zero Cashew models are ready](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/overview.jpg)
+*Start with original synthetic examples. Registered methods remain unavailable until their exact local artifacts are verified.*
 
 **Research demonstration. Not validated for industrial acceptance, food safety or automated product-quality decisions.**
+
+### Explore the interface
+
+Real captures from the source-only application. Click a preview to inspect it at full size.
+
+| Synthetic Demo | Model Catalog |
+|---|---|
+| [![Original rectangle and circle, two valid inputs, one rejected input and empty prediction fields](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/demo.jpg)](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/demo.jpg) | [![Cashew method cards showing Unavailable, method descriptions and model-card downloads](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/catalog.jpg)](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/catalog.jpg) |
+| Generated geometry exercises validation; no model inference or defect decision occurs. | Browse registered methods and their limitations without downloading weights. |
+| **Synthetic Human Review** | **Synthetic results and exports** |
+| [![Saved synthetic observation marked needs further review, with one reviewed example, one pending example and review export buttons](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/human-review.jpg)](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/human-review.jpg) | [![Validation results with null scores and thresholds, synthetic CSV and JSON download buttons and the review privacy notice](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/exports.jpg)](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/exports.jpg) |
+| Notes and revisions are session-only. Export them before navigation clears them. Human observations are not ground truth. | Download the real demonstration outputs. Synthetic exports cannot become research reports. |
 
 ## What it does
 
@@ -68,19 +80,7 @@ Verified platform: **Windows AMD64 · Python 3.14.10 · uv 0.13.5**. Git and an 
    .venv-31410/Scripts/python.exe -m factoryvision.app
    ```
 
-   Open **http://127.0.0.1:8501**, choose **Demo → Generate synthetic demo**, then download the synthetic CSV or JSON. Stop the server with **Ctrl+C**. For later sessions, repeat only this launch command from the repository root.
-
-![Synthetic demo with original geometry and empty prediction fields](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/demo.jpg)
-*Original geometry tests validation and exports only. No inference occurs; scores, thresholds and research flags are null. Demo exports cannot become research reports.*
-
-<details>
-<summary>Model Catalog preview</summary>
-
-![Model Catalog showing method provenance and unavailable local artifacts](https://raw.githubusercontent.com/GiannisPap24/factoryvision-ai/main/docs/images/catalog.jpg)
-
-Method descriptions and model cards remain accessible without weights.
-
-</details>
+   Open **http://127.0.0.1:8501**, choose **Open synthetic demo → Generate synthetic demo** (or **Demo** in the sidebar), then download the synthetic CSV or JSON. Stop the server with **Ctrl+C**. For later sessions, repeat only this launch command from the repository root.
 
 If a model is unavailable, that is expected in a fresh checkout. There is currently no public weight bundle. See [missing-model guidance](docs/local-demo.md#missing-or-damaged-model-files) and [troubleshooting](docs/local-demo.md#troubleshooting) before changing local settings.
 
@@ -90,11 +90,11 @@ One Streamlit frontend calls reusable inference services. Immutable registries v
 
 Uploads stay in process memory and are not saved by the app. Clear them when finished; secure memory erasure is not claimed. Only upload permitted images. Input limits, session lifecycle and the limits of protected-test detection are documented in [architecture](docs/architecture.md), [inference](docs/inference.md) and [reporting](docs/reporting.md).
 
-Human reviews and notes also stay in the current session. Save a decision explicitly, then download its JSON/CSV if needed. Exports include all saved revisions and notes, so enter no private information. Changing inputs, models or categories clears associated reviews; no database, feedback upload or automatic training is involved. [Review lifecycle and privacy limits](docs/milestone-5a-human-review.md).
+Human reviews and notes also stay in the current session. Save a decision explicitly, then download its JSON/CSV if needed. Exports include all saved revisions and notes, so enter no private information. Changing inputs, models or categories clears associated reviews. Workspace navigation also clears current work, except a completed batch and its saved reviews between Batch Inspection and Reports. A contextual sidebar notice explains the loss before navigation; it does not block the change or save unsaved edits. No database, feedback upload or automatic training is involved. [Review lifecycle and privacy limits](docs/milestone-5a-human-review.md).
 
 ## Tests and CI
 
-The [verified hosted run for 8e8dade](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40380407763) passed **711 tests with 98.09% combined statement and branch coverage**, plus lint, lock/dependency checks, wheel/sdist inspection and fresh-install smoke checks. The badge above links to the current branch status. The percentage combines executed statements and branch outcomes; it is not the branch-only percentage. See [coverage interpretation](docs/ci.md#interpreting-coverage).
+The [accepted public main CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976), at merge commit `4c3987e669360e36930ffe8d4317dd040bc0f47c` for [PR #3](https://github.com/GiannisPap24/factoryvision-ai/pull/3), passed **1,448 tests with 97.61% combined statement and branch coverage**, plus Windows packaging/privacy checks and fresh-install smoke. This evidence applies to that baseline, not subsequent unpublished changes. The badge links to current main status. Coverage combines statements and branch outcomes; it is not branch-only coverage. See [coverage interpretation](docs/ci.md#interpreting-coverage).
 
 After the installation above (including development dependencies), run:
 
@@ -102,7 +102,7 @@ After the installation above (including development dependencies), run:
 .venv-31410/Scripts/python.exe scripts/ci_check.py --uv .tools/uv-0.13.5/uv.exe
 ```
 
-Default tests use fabricated data and require no private assets. The local Human Review V1 candidate passes **797 tests (one Windows symlink-privilege skip)** with **98.18% combined coverage**; this is separate from the published baseline CI above. See the [5A verification record](docs/milestone-5a-human-review.md) and [CI details](docs/ci.md).
+Default tests use fabricated data and require no private assets. Older counts in the [5A verification record](docs/milestone-5a-human-review.md) describe historical acceptance stages. **5C is merged; 5D is ongoing local, unpublished work.** Public main has no completed ONNX or GPU integration. See the [roadmap and acceptance gates](docs/roadmap.md) and [CI details](docs/ci.md).
 
 ## Research results and limits
 

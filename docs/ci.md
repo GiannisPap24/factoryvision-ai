@@ -3,7 +3,13 @@
 **Runtime:** Windows AMD64, Python 3.14.10, uv 0.13.5.
 Owned source is MIT licensed. This source-only release contains no datasets or weights.
 
-Hosted GitHub Actions: **initial publication run PASSED on 2026-10-26**.
+Accepted public main: **1,448 passed, 97.61% combined coverage**, at
+`4c3987e669360e36930ffe8d4317dd040bc0f47c` (5C merge, PR #3).
+[Run 40795664976](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976)
+also passed Windows packaging/privacy checks and fresh-install smoke. This is
+baseline evidence, not a CI result for unpublished 5D or launch-readiness changes.
+
+Historical initial publication: **PASSED on 2026-10-26**.
 [Run 40376270944](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
 verified root commit `691507dd409177219b4ba39afedfaaedfe440c06`: **711 tests passed,
 98.09% combined statement and branch coverage**, plus lint/format, lock/dependency, distribution and installed-app checks.
@@ -18,13 +24,21 @@ combines executed statements and branch outcomes:
 
 `(covered statements + covered branch outcomes) / (all statements + all branch outcomes)`.
 
-The reported **98.09%** is that combined total, not branch-only coverage. The
+Both the current **97.61%** and historical **98.09%** are combined totals, not branch-only coverage. The
 configured 95% floor applies to the combined report. Test counts can differ locally
 when Windows does not grant symlink-creation privileges; the skip is reported
 explicitly and must not be counted as a pass. Historical CI links identify the
 exact commit tested; use the workflow badge or current runs for the latest state.
 
 ## Fresh source setup
+
+The launch-readiness candidate constrains its app extra to pandas 3.0.6 and
+Streamlit 1.66.1. See the [Windows compatibility rationale](local-demo.md#windows-application-dependency-compatibility),
+including the unresolved earlier import timeout and limits of SAC compatibility
+evidence. Acceptance must use a fresh environment created from the candidate
+lockfile, followed by a fresh installed-wheel smoke. The earlier manually
+overridden experiment and the public-main counts above are separate evidence;
+they do not establish full acceptance of this candidate or validate pandas 3.1.0.
 
 Follow [verified Python and uv setup](local-demo.md#first-installation), including
 the development dependencies. Then run from the source root:
@@ -64,12 +78,12 @@ comes from `site-packages`, six missing models, catalog presentation, explicit
 synthetic generation/exports, resets and unavailable batch behavior. Network access
 is denied except Windows asyncio's same-process loopback socket pair.
 
-The 5C candidate also checks the installed analytical robustness runner, denied
+The merged 5C verification also checks the installed analytical robustness runner, denied
 real-development admission and five requests through the fixed synthetic Windows
 IPC worker. These run from the empty directory using packaged modules, without
 datasets or model artifacts. The full suite includes actual Windows isolation,
 crash-containment and IPC tests; skips must be reported separately from passes.
-Historical counts above do not describe the 5C candidate. See the
+The initial publication counts do not describe the later 5C merge. See the
 [current scope and runnable examples](protocols/robustness-source-only.md).
 
 Generated environments and builds remain in unique ignored `.tmp/ci-*` and

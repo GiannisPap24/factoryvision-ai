@@ -85,13 +85,41 @@ Run from the research root only when using approved existing artifacts.
 
 ## First synthetic demo
 
+### Windows application dependency compatibility
+
+The `app` extra explicitly pins **pandas 3.0.6** alongside **Streamlit 1.66.1**.
+The same constraint is present in wheel metadata for compatible installers using
+the app extra; `uv sync --locked --extra app` also verifies the locked artifacts.
+The supported environment remains Windows AMD64, Python 3.14.10, uv 0.13.5 and
+the existing CPU-only PyTorch dependencies.
+
+This pin follows a confirmed Windows Smart App Control native-extension block
+with pandas 3.1.0 on the reviewed machine. The official pandas 3.0.6 wheel passed
+an isolated application/browser smoke and 69 focused tests with SAC, antivirus
+and real-time protection enabled. An earlier 30-second pandas 3.0.6 import
+timeout remains unexplained; later successful runs do not establish its cause.
+Reputation and scanning behavior can differ across systems and over time, so
+this is not a guarantee for every Windows installation.
+
+Use the [official pandas 3.0.6 release](https://pypi.org/project/pandas/3.0.6/).
+The reviewed Windows CPython 3.14 wheel is
+`pandas-3.0.6-cp314-cp314-win_amd64.whl`, SHA-256
+`77ccbe5057aece6fc172b9b77f19c04335af6882bc2e10c8f3ee4e6bfb3da553`.
+If an import stalls or Windows blocks a component, stop and retain bounded,
+sanitized diagnostics. Do not disable SAC or Defender, add security exceptions,
+or repeatedly retry imports. Dependency changes need a new acceptance run.
+
+### Launch and generate examples
+
 Start the app from the repository root:
 
 ```powershell
 .venv-31410/Scripts/python.exe -m factoryvision.app
 ```
 
-Open **http://127.0.0.1:8501**. Choose **Demo** in the sidebar, then **Generate
+Open **http://127.0.0.1:8501**. With no verified models, Overview makes **Open
+synthetic demo** the primary action and **Open Model Catalog** the secondary action.
+Missing weights are expected. Choose that demo action (or **Demo** in the sidebar), then **Generate
 synthetic demo**. Two original geometric images pass validation and one deliberately
 invalid input is rejected. Choose **Download synthetic demo CSV** or **Download
 synthetic demo JSON** to save the examples explicitly. No file is written automatically.
@@ -144,6 +172,14 @@ Changing category clears both categories' result and upload references. A browse
 reload starts a new Streamlit session; disconnected session retention follows
 Streamlit's session timeout. Clear explicitly when done; no secure erasure is claimed.
 The app has no login and is intended for one trusted local owner.
+
+Before changing workspace or category, read the contextual notice above the
+sidebar controls. Current images, results and associated Human Review notes are
+cleared on workspace changes; the synthetic demo is cleared too. Save and export
+notes first, including synthetic practice notes. A completed batch and saved
+reviews survive navigation between Batch Inspection and Reports only. Unsaved
+form edits may be lost even on that pair. Notices do not intercept navigation or
+automatically persist data; existing Clear controls remain available.
 
 Use self-created, non-sensitive images for demonstrations. Synthetic inputs test
 software behavior only and say nothing about real defect performance. Scores are

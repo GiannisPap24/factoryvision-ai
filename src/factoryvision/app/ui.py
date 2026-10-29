@@ -215,6 +215,7 @@ def render(engine, metal_engine=None):
     presentation.styling()
     st.sidebar.header("FactoryVision AI")
     st.sidebar.caption("Industrial Precision")
+    navigation_notice = st.sidebar.empty()
     category = st.sidebar.selectbox("Category", ["Cashew", "MetalParts (experimental)"])
     labels = {
         "Overview": "Overview",
@@ -350,6 +351,10 @@ def render(engine, metal_engine=None):
                 "Clearing is not a secure memory-erasure guarantee. No cloud inference "
                 "or application telemetry."
             )
+    # Fill above navigation after rendering so newly created results are covered immediately.
+    notice = presentation.navigation_notice(st.session_state)
+    if notice:
+        navigation_notice.warning("Before navigating: " + notice)
 
 
 if __name__ == "__main__":
