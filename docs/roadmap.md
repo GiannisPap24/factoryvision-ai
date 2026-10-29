@@ -103,8 +103,14 @@ Milestone **5C-4C2A** adds [isolated synthetic Cashew IPC](protocols/cashew-isol
 one fixed analytical worker, two explicitly inherited pipe endpoints, bounded frames,
 five supervisor-charged requests and scalar-only diagnostics. Actual Windows subprocess,
 failure and cleanup tests pass locally. The numerical double and owned-job cleanup are
-reused through small extractions. This implementation remains uncommitted for owner review;
-real models/data remain unauthorized and the Cashew pilot remains blocked.
+reused through small extractions. Its eight-file local checkpoint is
+`c2148cba82d59ecff9684db40d0a0ea14aa79082`; real models/data remain unauthorized
+and the Cashew pilot remains blocked.
+
+Milestone **5C-RC1** integrates the source-only acceptance review, packaging smoke
+and [runnable robustness guide](protocols/robustness-source-only.md). This is local
+release preparation; publication requires a separate owner decision. Earlier
+paragraphs and protocol reports retain the scope and evidence of their own phases.
 
 ## Owner-agreed strategic direction
 

@@ -23,6 +23,7 @@ separately prepared, verified research artifacts.
 | Follow data through the application | [Architecture](architecture.md) |
 | Run offline checks or use VS Code | [Development](development.md) |
 | Understand hosted checks and coverage | [CI](ci.md) |
+| Run synthetic robustness diagnostics and understand containment limits | [Source-only robustness](protocols/robustness-source-only.md) |
 | Propose a focused change | [Contributing](../CONTRIBUTING.md) |
 | Report a bug or suggest an improvement | [Community feedback](community-feedback.md) |
 | Understand local security and privacy boundaries | [Security](../SECURITY.md) |

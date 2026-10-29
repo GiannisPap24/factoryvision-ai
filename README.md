@@ -17,6 +17,7 @@ Try the interface and synthetic workflow after installation—no dataset or mode
 
 ## What it does
 
+- [Synthetic robustness diagnostics](docs/protocols/robustness-source-only.md): deterministic perturbations, scalar stability reports and a bounded Windows analytical worker. No actual model execution or validated OOD detector is provided by this workflow.
 - Model Registry V1: artifact versions, provenance and eight historical evidence summaries, available without weights. [Scope and verification](docs/milestone-5b-model-registry.md).
 - Eight workspaces: Overview, Inspect, Compare, Batch Inspection, Reports, Model Catalog, Research and Demo.
 - Six registered methods: four Cashew methods (autoencoder, spatial baseline, ResNet18 feature memory and student–teacher) and two experimental MetalParts methods.
@@ -32,6 +33,10 @@ Try the interface and synthetic workflow after installation—no dataset or mode
 | Model Catalog and downloadable model cards | Multi-model comparison and anomaly maps |
 | Synthetic Demo and its CSV/JSON examples | Batch inference and completed research reports |
 | Synthetic human-review practice, with null prediction fields | Human review of actual single-image and batch results |
+
+The separate [robustness Python examples](docs/protocols/robustness-source-only.md)
+also run without weights. They generate their own synthetic pixels; real-development
+admission and model execution remain disabled.
 
 The public repository contains **no datasets, checkpoints or pretrained weights**. Unavailable models remain disabled; there are no fabricated predictions or automatic weight downloads. See [artifact prerequisites](docs/reproduction.md).
 

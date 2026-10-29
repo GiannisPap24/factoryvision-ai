@@ -64,6 +64,14 @@ comes from `site-packages`, six missing models, catalog presentation, explicit
 synthetic generation/exports, resets and unavailable batch behavior. Network access
 is denied except Windows asyncio's same-process loopback socket pair.
 
+The 5C candidate also checks the installed analytical robustness runner, denied
+real-development admission and five requests through the fixed synthetic Windows
+IPC worker. These run from the empty directory using packaged modules, without
+datasets or model artifacts. The full suite includes actual Windows isolation,
+crash-containment and IPC tests; skips must be reported separately from passes.
+Historical counts above do not describe the 5C candidate. See the
+[current scope and runnable examples](protocols/robustness-source-only.md).
+
 Generated environments and builds remain in unique ignored `.tmp/ci-*` and
 `dist/ci-*` directories; checks never overwrite historical reports. No automatic
 cleanup touches research directories. CI stdout contains runner diagnostics; no
