@@ -342,6 +342,50 @@ class _Win32:
     def close(self, handle):
         return bool(self.k.CloseHandle(handle))
 
+    def cleanup(self, job, process, assigned):
+        """Shared bounded owned-job cleanup; at most three separate two-second waits."""
+        exit_confirmed, empty, closed = not bool(process.process), not bool(job), True
+        peak_job = peak_process = 0
+
+        def close_owned(handle):
+            try:
+                return self.close(handle)
+            except BaseException:
+                return False
+
+        # Cleanup is bounded separately: each wait is <= 2s, at most 6s total.
+        # This grace is not hidden in the execution deadline or claimed as real time.
+        try:
+            if process.process:
+                if not self.exited(process.process):
+                    self.terminate(job, process.process, assigned)
+                exit_confirmed = self.exited(process.process, 2000)
+            if job:
+                until = time.monotonic() + 2.0
+                while True:
+                    empty = self.query(job, 1, _Accounting).active == 0
+                    if empty or time.monotonic() >= until:
+                        break
+                    time.sleep(0.005)
+                info = self.query(job, 9, _Extended)
+                peak_job, peak_process = info.peak_job, info.peak_process
+        except BaseException:
+            exit_confirmed = not bool(process.process)
+            empty = False
+        finally:
+            # Close our job FIRST: kill-on-close is a final fallback if termination failed.
+            if job:
+                closed = close_owned(job) and closed
+            if process.process and not exit_confirmed:
+                try:
+                    exit_confirmed = self.exited(process.process, 2000)
+                except BaseException:
+                    exit_confirmed = False
+            for handle in (process.thread, process.process):
+                if handle:
+                    closed = close_owned(handle) and closed
+        return exit_confirmed, empty, closed, peak_job, peak_process
+
 
 class SyntheticSupervisor:
     """Sequential, bounded test harness. A fresh dedicated job for each reservation.
@@ -391,12 +435,6 @@ class SyntheticSupervisor:
             if time.monotonic() >= deadline:
                 return Outcome.TIMED_OUT, "wall_clock_deadline"
             return None
-
-        def close_owned(handle):
-            try:
-                return api.close(handle)
-            except BaseException:
-                return False
 
         try:
             api = _Win32()
@@ -460,37 +498,10 @@ class SyntheticSupervisor:
             # No host/child exception text, environment, paths or raw child output.
             reason = "supervisor_failure"
         finally:
-            # Cleanup is bounded separately: each wait is <= 2s, at most 6s total.
-            # This grace is not hidden in the execution deadline or claimed as real time.
-            try:
-                if process.process:
-                    if not api.exited(process.process):
-                        api.terminate(job, process.process, assigned)
-                    exit_confirmed = api.exited(process.process, 2000)
-                if job:
-                    until = time.monotonic() + 2.0
-                    while True:
-                        empty = api.query(job, 1, _Accounting).active == 0
-                        if empty or time.monotonic() >= until:
-                            break
-                        time.sleep(0.005)
-                    info = api.query(job, 9, _Extended)
-                    peak_job, peak_process = info.peak_job, info.peak_process
-            except BaseException:
-                exit_confirmed = not bool(process.process)
-                empty = False
-            finally:
-                # Close our job FIRST: kill-on-close is a final fallback if termination failed.
-                if job:
-                    closed = close_owned(job) and closed
-                if process.process and not exit_confirmed:
-                    try:
-                        exit_confirmed = api.exited(process.process, 2000)
-                    except BaseException:
-                        exit_confirmed = False
-                for handle in (process.thread, process.process):
-                    if handle:
-                        closed = close_owned(handle) and closed
+            if api is not None:
+                exit_confirmed, empty, closed, peak_job, peak_process = api.cleanup(
+                    job, process, assigned
+                )
             if not (exit_confirmed and empty and closed):
                 self._blocked = True
                 reason = "cleanup_unverified"

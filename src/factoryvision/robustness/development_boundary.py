@@ -151,15 +151,20 @@ class SyntheticInspectionDouble:
         require(type(self.spec) is InterfaceSpec)
         self.spec.__post_init__()
 
-    def evaluate(self, pixels):
-        from factoryvision.inference.service import InspectionResult
-
+    def evaluate_output(self, pixels):
+        """Same analytical fixture without importing the neural service's result wrapper."""
         _rgb(pixels)
-        m = self.spec.model
         # Constant raw map makes the interface probe analytically transparent. No NN/resize.
         value = float(np.mean(pixels, dtype=np.float64) / 255)
         spatial = np.full((128, 128), value, dtype=np.float32)
-        score = float(spatial.mean())
+        return InterfaceOutput(float(spatial.mean()), spatial)
+
+    def evaluate(self, pixels):
+        from factoryvision.inference.service import InspectionResult
+
+        output = self.evaluate_output(pixels)
+        m = self.spec.model
+        score, spatial = output.score, output.spatial.copy()  # Preserve wrapper mutability.
         return InspectionResult(
             m.model_id,
             m.name,

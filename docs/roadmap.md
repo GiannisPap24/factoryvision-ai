@@ -95,8 +95,16 @@ checkpointed locally for 5C-4C1; real integration and execution need separate ap
 Milestone **5C-4C1** adds [Cashew integration preparation](protocols/cashew-development-preparation-v1.md)
 with internal synthetic pixels, lossless transport, existing interface/diagnostic
 validators and abort-only ledger accounting. The lifecycle is explicitly a test double;
-the Windows runner and real services are unchanged. Source-only work awaits owner review.
+the Windows runner and real services were unchanged in that phase. Its four-file source-only
+checkpoint was reviewed and created locally before 5C-4C2A.
 No sample/artifact is cleared, no real worker is enabled and the Cashew pilot remains blocked.
+
+Milestone **5C-4C2A** adds [isolated synthetic Cashew IPC](protocols/cashew-isolated-ipc-v1.md):
+one fixed analytical worker, two explicitly inherited pipe endpoints, bounded frames,
+five supervisor-charged requests and scalar-only diagnostics. Actual Windows subprocess,
+failure and cleanup tests pass locally. The numerical double and owned-job cleanup are
+reused through small extractions. This implementation remains uncommitted for owner review;
+real models/data remain unauthorized and the Cashew pilot remains blocked.
 
 ## Owner-agreed strategic direction
 
