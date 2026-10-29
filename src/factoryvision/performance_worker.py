@@ -23,7 +23,17 @@ from factoryvision.robustness.contracts import Parent, ParentID
 from factoryvision.robustness.runner import AnalyticalAdapter, _generate
 
 # Finite internal integration-test seams; never user options or wire commands.
-_FAULTS = ("none", "hang", "exit", "malformed", "oversized", "trailing", "deny_io", "deny_model")
+_FAULTS = (
+    "none",
+    "hang",
+    "exit",
+    "malformed",
+    "oversized",
+    "trailing",
+    "deny_io",
+    "deny_model",
+    "profile_display",
+)
 
 
 def generate(side):
@@ -126,6 +136,10 @@ def main(import_start):
     # Resolve the package resource reader while imports are still permitted.
     # The measured decoder retains its normal per-call public-resource reads.
     files("factoryvision.inference")
+    if fault == "profile_display":
+        from factoryvision import performance_display_profile
+
+        groups = performance_display_profile.prepare()
     torch.set_num_threads(contract.THREADS)
     torch.set_num_interop_threads(1)
     # Reuse tensor preprocessing without permitting models, checkpoints or downloads.
@@ -174,6 +188,13 @@ def main(import_start):
         warmups=contract.WARMUPS,
         samples_ms=measure(side),
     )
+    if fault == "profile_display":
+        original, _ = generate(side)
+        raw = readonly(AnalyticalAdapter().evaluate(original).raw_map.astype(np.float32))
+        record = SimpleNamespace(
+            original=original, spatial=raw, reconstruction=None, reference=None
+        )
+        result["display_profile_ms"] = performance_display_profile.measure(record, groups)
     contract.validate_worker(result, "result", side, repetition)
     send(result)
     if fault == "trailing":

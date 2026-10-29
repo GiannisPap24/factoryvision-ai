@@ -17,9 +17,14 @@ def panels(result):
         [[255, 247, 188], [254, 196, 79], [217, 95, 14], [153, 52, 4]], dtype=np.float32
     )
     rgb = np.stack(
-        [np.interp(intensity, [0, 1 / 3, 2 / 3, 1], stops[:, c]) for c in range(3)], axis=-1
+        [
+            np.round(np.interp(intensity, [0, 1 / 3, 2 / 3, 1], stops[:, c])).astype(np.uint8)
+            for c in range(3)
+        ],
+        axis=-1,
     )
-    heatmap = Image.fromarray(np.round(rgb).astype(np.uint8))
+    # Identical per-channel rounding; stack bytes instead of a float64 RGB temporary.
+    heatmap = Image.fromarray(rgb)
     overlay = Image.blend(original, heatmap, 0.45)
     output = {"original": original, "heatmap": heatmap, "overlay": overlay, "ceiling": ceiling}
     for name in ("reconstruction", "reference"):

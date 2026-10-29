@@ -114,6 +114,30 @@ def envelope(kind, side, repetition):
 def validate_worker(data, kind, side, repetition):
     base = envelope(kind, side, repetition)
     extra = {"import_ms", "runtime"} if kind == "ready" else {"warmups", "samples_ms"}
+    if kind == "result" and type(data) is dict and "display_profile_ms" in data:
+        extra.add("display_profile_ms")
+        profile = data["display_profile_ms"]
+        require(
+            type(profile) is dict
+            and set(profile)
+            == {
+                "geometry",
+                "original_rgb_resize",
+                "spatial_resize",
+                "normalization",
+                "palette",
+                "color_interpolation",
+                "rgb_conversion",
+                "overlay_blend",
+                "output_auxiliary",
+                "preview_copy",
+                "preview_resize",
+                "png_encoding",
+                "buffer_output",
+            }
+        )
+        for value in profile.values():
+            number(value)
     require(kind in ("ready", "result") and type(data) is dict and set(data) == set(base) | extra)
     require(all(type(data[k]) is type(v) and data[k] == v for k, v in base.items()))
     if kind == "ready":

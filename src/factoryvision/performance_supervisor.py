@@ -18,7 +18,17 @@ from factoryvision.robustness.cashew_isolated_ipc import _IpcWin32, _StartupEx
 from factoryvision.robustness.execution_ledger import Case, ExecutionLedger, Outcome
 
 LIMITS = wi.Limits(job_mib=2048, process_mib=2048, deadline_seconds=10.0)
-_FAULTS = ("none", "hang", "exit", "malformed", "oversized", "trailing", "deny_io", "deny_model")
+_FAULTS = (
+    "none",
+    "hang",
+    "exit",
+    "malformed",
+    "oversized",
+    "trailing",
+    "deny_io",
+    "deny_model",
+    "profile_display",
+)
 
 
 class _Api(_IpcWin32):

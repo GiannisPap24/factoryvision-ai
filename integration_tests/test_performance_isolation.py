@@ -202,3 +202,16 @@ def test_suspended_assignment_allowlist_and_membership_order(monkeypatch):
     row = supervisor.Benchmark().run()["attempts"][0]
     assert events == ["suspended", "assigned", "verified", "resumed"]
     clean(row)
+
+
+def test_fixed_display_profiling_in_existing_isolation(monkeypatch):
+    from factoryvision.performance_display_profile import LABELS
+
+    monkeypatch.setattr(supervisor._Api, "_fault", "profile_display")
+    row = supervisor.Benchmark()._one(512, 1, None)
+    assert row["outcome"] == "complete" and row["charged"] == 1
+    clean(row)
+    profile = row["result"]["display_profile_ms"]
+    assert set(profile) == set(LABELS) and all(v >= 0 for v in profile.values())
+    assert len(row["result"]["samples_ms"]) == 30
+    print(json.dumps({"display_profile_ms": profile}, sort_keys=True))
