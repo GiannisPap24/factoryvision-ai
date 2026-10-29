@@ -23,8 +23,9 @@ See [inference contracts](inference.md) for preprocessing and numerical behavior
 
 ## Published screenshots and review evidence
 
-The README includes three reviewed public screenshots: source-only Overview,
-Model Catalog and generated Demo. They show the interface without weights and
+The README includes five reviewed screenshots: source-only Overview,
+Model Catalog, generated Demo, synthetic Human Review and synthetic exports.
+They show the interface without weights and
 original synthetic geometry, with no real predictions or third-party dataset
 imagery. Their [capture provenance](https://github.com/GiannisPap24/factoryvision-ai/blob/main/docs/images/README.md)
 is recorded alongside the repository images. These presentation assets are

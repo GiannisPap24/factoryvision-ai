@@ -29,6 +29,7 @@ Issues = "https://github.com/GiannisPap24/factoryvision-ai/issues"
 [project.optional-dependencies]
 app = [
     "streamlit==1.66.1",
+    "pandas==3.0.6",
 ]
 
 [dependency-groups]

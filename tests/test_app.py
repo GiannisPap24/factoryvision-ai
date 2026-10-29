@@ -98,7 +98,9 @@ def test_metalparts_errors_and_research(app, tmp_path, monkeypatch):
     metal = MetalPartsService(tmp_path)
     at = AppTest.from_function(metal_entry, args=(cashew, metal), default_timeout=10).run()
     at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
-    assert at.error and not at.exception
+    assert not at.exception and any(
+        "Missing weights are expected" in item.value for item in at.info
+    )
     at.sidebar.radio[0].set_value("Image inspection").run()
     monkeypatch.setattr(metalparts_ui.st, "file_uploader", lambda *a, **k: io.BytesIO(b"bad"))
     at.run()

@@ -44,7 +44,7 @@ New experiments require separately prepared data, approvals and fresh run identi
 
 Keep source, tests, public documentation and `uv.lock` trackable. Datasets, runs,
 private reports, environments, caches, unreviewed screenshots and weights remain excluded.
-The three reviewed README screenshots are repository-only presentation assets;
+The five reviewed README screenshots are repository-only presentation assets;
 they are deliberately excluded from packages. Keep that boundary when updating docs.
 Review staged content before committing. The source is now public; follow the
 [reviewed update procedure](publication.md#future-source-updates) for later authorized pushes.

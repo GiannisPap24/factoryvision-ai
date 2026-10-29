@@ -80,9 +80,23 @@ def clear_inspection():
 def overview(category, statuses):
     ready = sum(row["available"] for row in statuses)
     with st.container(horizontal=True, gap="small"):
-        st.button("Start inspection", type="primary", on_click=navigate, args=("Image inspection",))
-        st.button("Compare models", on_click=navigate, args=("Compare",))
-        st.button("Open demo", on_click=navigate, args=("Synthetic demo",))
+        if ready:
+            st.button(
+                "Start inspection", type="primary", on_click=navigate, args=("Image inspection",)
+            )
+            st.button("Compare models", on_click=navigate, args=("Compare",))
+            st.button("Open demo", on_click=navigate, args=("Synthetic demo",))
+        else:
+            st.button(
+                "Open synthetic demo", type="primary", on_click=navigate, args=("Synthetic demo",)
+            )
+            st.button("Open Model Catalog", on_click=navigate, args=("Model Catalog",))
+    if not ready:
+        st.info(
+            "Start with Synthetic Demo: generate examples, review validation and try exports. "
+            "Missing weights are expected in a fresh checkout. The demo performs no neural "
+            "inference and produces no anomaly scores."
+        )
     for column, label, value in zip(
         st.columns(4),
         (
@@ -98,12 +112,37 @@ def overview(category, statuses):
             st.metric(label, value, border=True)
     left, right = st.columns([1.6, 1], gap="medium")
     with left.container(border=True, key="fv-card-workflow"):
-        st.subheader("Your inspection workflow")
-        for number, title, body in (
-            ("01", "Select an image", "Choose a permitted image and a compatible model."),
-            ("02", "Run a frozen model", "Start CPU inference explicitly. Inputs stay local."),
-            ("03", "Review spatial evidence", "Inspect aligned maps and model-specific scores."),
-        ):
+        st.subheader("Your inspection workflow" if ready else "Try the public demo")
+        workflow = (
+            (
+                ("01", "Select an image", "Choose a permitted image and a compatible model."),
+                ("02", "Run a frozen model", "Start CPU inference explicitly. Inputs stay local."),
+                (
+                    "03",
+                    "Review spatial evidence",
+                    "Inspect aligned maps and model-specific scores.",
+                ),
+            )
+            if ready
+            else (
+                (
+                    "01",
+                    "Generate examples",
+                    "Use original geometry; no uploads or model weights needed.",
+                ),
+                (
+                    "02",
+                    "Review validation",
+                    "See accepted and rejected inputs. No defect prediction.",
+                ),
+                (
+                    "03",
+                    "Try review and export",
+                    "Practice Human Review and download synthetic JSON/CSV.",
+                ),
+            )
+        )
+        for number, title, body in workflow:
             st.markdown(f"**{number} · {title}**")
             st.caption(body)
     with right.container(border=True, key="fv-card-status"):
@@ -153,14 +192,45 @@ def availability(statuses):
         "availability",
     )
     if any(not row["available"] for row in statuses):
-        st.error(
-            "Some registered models are unavailable. Restore verified local artifacts to inspect."
+        st.caption(
+            "Unavailable methods need their exact verified local artifacts. "
+            "Registration describes a method; it does not make it ready for inference."
         )
         with st.expander("Artifact verification details"):
             for row in statuses:
                 if not row["available"]:
                     st.write(f"{row['name']}: {row['reason']}")
         setup_help()
+
+
+def navigation_notice(state):
+    """Describe existing cleanup without retaining data or reading review content."""
+    if state.get("synthetic_demo") is not None:
+        return (
+            "Changing workspace or category clears the synthetic demo and its Human Review "
+            "notes, including unsaved edits. Download any exports first."
+        )
+    plan = state.get("batch_plan")
+    if state.get("batch_report") is not None or (plan is not None and plan.items):
+        return (
+            "Changing category or leaving Batch Inspection and Reports clears batch inputs, "
+            "results and Human Review notes. A completed batch and saved reviews are retained "
+            "between those two workspaces. Save and export notes first; unsaved edits may be lost."
+        )
+    uploads = any(
+        state.get(f"{prefix}_{state.get(prefix + '_generation', 0)}")
+        for prefix in ("upload", "metal_upload", "batch_upload")
+    )
+    if (
+        uploads
+        or any(state.get(key) is not None for key in ("results", "metal_result", "metal_results"))
+        or any(key.startswith("fv_review_") for key in state)
+    ):
+        return (
+            "Changing workspace or category clears the current image, results and Human Review "
+            "notes, including unsaved edits. Save and export notes before navigating."
+        )
+    return None
 
 
 def steps():
