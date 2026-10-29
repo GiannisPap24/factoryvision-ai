@@ -17,6 +17,14 @@ from factoryvision.inference.model_registry import experiment_index, registry_re
 from factoryvision.inference.review import Decision
 from factoryvision.inference.review import json_bytes as review_json
 from factoryvision.inference.service import InspectionService
+from factoryvision.robustness import cashew_isolated_ipc, runner
+from factoryvision.robustness.contracts import Category, Kind, Parent, ParentID, Perturbation, Plan
+from factoryvision.robustness.development_admission import (
+    DevelopmentAdmission,
+    ExecutionDenied,
+    require_execution,
+)
+from factoryvision.robustness.reporting import json_bytes as robustness_json
 
 assert "site-packages" in str(factoryvision.__file__)
 assert not list(Path.cwd().iterdir()), "Smoke working directory must be empty."
@@ -41,6 +49,28 @@ def local_pair(*args, **kwargs):
 socket.socket.connect = deny
 socket.socket.connect_ex = deny
 socket.socketpair = local_pair
+for module in (runner, cashew_isolated_ipc):
+    assert "site-packages" in str(module.__file__)
+plan = Plan(
+    Category.CASHEW,
+    (Parent(ParentID.FIRST, 10, 10),),
+    (Perturbation(Kind.IDENTITY), Perturbation(Kind.BRIGHTNESS, 1.1)),
+)
+diagnostic = runner.run(plan)
+assert diagnostic.attempted_units == 4
+assert robustness_json(diagnostic) == robustness_json(runner.run(plan))
+try:
+    require_execution(DevelopmentAdmission())
+except ExecutionDenied:
+    pass
+else:
+    raise AssertionError("Real development execution must remain denied.")
+isolated = cashew_isolated_ipc.IsolatedCashewProbe().run()
+payload = json.loads(cashew_isolated_ipc.json_bytes(isolated))
+assert payload["run_status"] == "complete" and payload["model_execution"] == "not_run"
+assert isolated.isolation.charged == 5 and len(isolated.observations) == 5
+assert not list(Path.cwd().iterdir()), "Synthetic robustness must not persist files."
+print("PASS: installed synthetic runner, denied real admission and five isolated IPC attempts.")
 engine = BatchService(
     InspectionService(Path.cwd()),
     MetalPartsService(Path.cwd()),
