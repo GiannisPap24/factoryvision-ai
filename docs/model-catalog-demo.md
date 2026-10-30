@@ -6,13 +6,17 @@ No research data or weights are needed for these two pages.
 
 ## Model Catalog
 
-Choose **Model Catalog** in the sidebar. Six cards show family, learning method,
-outputs, runtime, availability and scientific status. Each offers a local Markdown
+Choose **Model Catalog** in the sidebar. Compact Cashew and MetalParts sections
+group four and two methods, with learning method, scientific status and a local Markdown
 model-card download. These presentation copies preserve accepted scientific text;
 relative links become explicit source-distribution paths so standalone downloads
 do not contain broken local hyperlinks. The overview lists all six registered
 methods; the detail selector follows the selected category. It does not change
-the model selections used by image or batch inspection.
+the model selections used by image or batch inspection. Category remains the shared
+sidebar control; **Catalog method** selects details within that category. A shared
+unavailable notice appears only when every method in a group is unavailable;
+mixed availability shows each method's status. Details retain family, outputs,
+runtime and expandable artifact identity, provenance and scientific limitations.
 
 The typed projection in `inference/model_catalog.py` reads compatible IDs from
 `batch.models`, identity/threshold metadata from `reporting.model_info` and its
@@ -42,6 +46,14 @@ and ellipse), together with deliberately invalid bytes. The real bounded image
 decoder validates them: two accepted, one rejected. No model is loaded or called.
 No training, anomaly scoring, probabilities, thresholding or defect judgments occur.
 Category selection does not make these examples category-matched research data.
+
+The two images remain paired on desktop and mobile. **Input validation** separates
+valid and rejected inputs; **Not computed** is a display label, while exported
+scores, thresholds and research flags remain null. **Review & exports** jumps to
+the demo downloads and expandable **Human Review & review exports** section.
+Review exports remain available before saving: they contain two pending records
+with empty notes, null review timestamps and no revision history. Saving remains
+explicit; regeneration starts a fresh review of the new demo object.
 
 Explicit CSV/JSON buttons export the separate `synthetic-workflow-v1` schema.
 Every export retains its warning, `inference_executed=false`, null model/artifact

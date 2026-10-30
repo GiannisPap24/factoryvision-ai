@@ -285,7 +285,7 @@ def render(engine, metal_engine=None):
             "Recorded experiments, methodology and limits. No new evaluation.",
         ),
         "Synthetic demo": (
-            "Synthetic workflow demonstration",
+            "Synthetic Demo",
             "Original geometry. Validation only. No model inference.",
         ),
     }

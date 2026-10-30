@@ -71,6 +71,9 @@
 .st-key-fv-shell :is(button,a,summary,input,textarea):focus-visible {outline:3px solid #101B2B;outline-offset:3px;}
 .st-key-fv-shell [class*="st-key-fv-card-"],.st-key-fv-inspection-setup {background:var(--fv-surface);border-radius:8px;}
 .st-key-fv-card-start {border-top:4px solid var(--fv-teal);}
+.st-key-fv-shell [class*="st-key-fv-card-catalog-"] {border-top:3px solid var(--fv-teal);}
+.st-key-fv-shell [class*="st-key-fv-card-catalog-"] hr {margin:.35rem 0;}
+.st-key-fv-demo-images img {background:var(--fv-demoBg);max-height:280px;}
 .st-key-fv-shell img {border-radius:6px;object-fit:contain;max-width:100%;}
 .st-key-fv-shell label p {white-space:normal;overflow:visible;text-overflow:clip;}
 .st-key-fv-shell [class*="st-key-fv-table"] {overflow-x:auto;}
@@ -85,12 +88,16 @@
 .fv-empty-viewer p {font-size:16px;margin:.5rem 0;}
 .st-key-fv-shell .fv-legend {height:.65rem;display:flex;border-radius:.25rem;overflow:hidden;max-width:22rem;margin:.5rem 0;}
 .st-key-fv-shell .fv-legend span {flex:1;}
+/* Simple synthetic geometry stays paired; inspection previews keep native stacking. */
+.st-key-fv-demo-images [data-testid="stColumn"] {min-width:0!important;flex:1 1 0!important;}
 @media(max-width:600px){
 .st-key-fv-shell h1 {font-size:1.75rem;}
 .st-key-fv-shell table {font-size:.8rem;}
 .fv-workbench-header {padding:12px 16px;gap:4px;}
 .st-key-fv-overview-actions {flex-direction:column;align-items:stretch;}
 .st-key-fv-overview-actions button {width:100%;}
+.st-key-fv-demo-actions {flex-direction:column;align-items:stretch;}
+.st-key-fv-demo-actions button {width:100%;}
 .fv-workbench-header span {display:none;}
 .fv-workbench-header small {width:100%;margin:0;}
 .fv-empty-viewer {min-height:144px;padding:12px 8px;}

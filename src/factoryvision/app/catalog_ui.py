@@ -17,6 +17,36 @@ def render(coordinator, category):
         st.error(str(exc))
         return
     entries = tuple(record.catalog for record in records)
+    for column, group, label in zip(
+        st.columns([1.35, 1], gap="medium"),
+        ("cashew", "metalparts"),
+        ("Cashew", "MetalParts"),
+        strict=True,
+    ):
+        methods = tuple(e for e in entries if e.definition.identity.category == group)
+        all_unavailable = not any(e.available for e in methods)
+        with column.container(border=True, key="fv-card-catalog-" + group, gap="xsmall"):
+            st.subheader(label)
+            st.caption(f"{len(methods)} registered methods")
+            if all_unavailable:
+                st.markdown("**All unavailable locally** · Model cards available")
+            for index, entry in enumerate(methods):
+                definition, info = entry.definition, entry.definition.identity
+                if index:
+                    st.divider()
+                st.markdown("**" + info.name + "**")
+                if not all_unavailable:
+                    st.caption("Verified files" if entry.available else "Unavailable")
+                st.caption(definition.learning + ". " + definition.evaluation)
+                card_name = PurePosixPath(definition.documentation).name
+                st.download_button(
+                    "Download model card",
+                    files("factoryvision.app").joinpath("model_cards", card_name).read_bytes(),
+                    file_name=card_name,
+                    mime="text/markdown",
+                    key="model-card-" + info.model_id,
+                    on_click="ignore",
+                )
     st.caption("File verification only. Models load on explicit inference; nothing is downloaded.")
     with st.expander("Registry summary"):
         presentation.table(
@@ -31,33 +61,19 @@ def render(coordinator, category):
             ],
             "catalog",
         )
-    for offset in range(0, len(entries), 2):
-        for column, entry in zip(st.columns(2), entries[offset : offset + 2], strict=True):
-            definition, info = entry.definition, entry.definition.identity
-            with column.container(border=True, key="fv-card-catalog-" + info.model_id):
-                st.subheader(info.name)
-                st.caption(info.category.upper() + " · " + definition.family)
-                st.markdown("**" + ("Verified files" if entry.available else "Unavailable") + "**")
-                st.write(definition.learning)
-                st.caption("Outputs: " + ", ".join(definition.outputs))
-                st.caption("Local runtime: Python 3.14.10 · PyTorch CPU · Pillow")
-                st.caption(definition.evaluation)
-                card_name = PurePosixPath(definition.documentation).name
-                st.download_button(
-                    "Download model card",
-                    files("factoryvision.app").joinpath("model_cards", card_name).read_bytes(),
-                    file_name=card_name,
-                    mime="text/markdown",
-                    key="model-card-" + info.model_id,
-                    on_click="ignore",
-                )
+    st.subheader("Method details & provenance")
+    st.caption(
+        "Category: "
+        + ("Cashew" if category == "cashew" else "MetalParts (experimental)")
+        + " · Change category in navigation. Catalog selection does not change inspection models."
+    )
     choices = {
         e.definition.identity.model_id: e
         for e in entries
         if e.definition.identity.category == category
     }
     selected = st.selectbox(
-        "Catalog model",
+        "Catalog method",
         list(choices),
         format_func=lambda key: choices[key].definition.identity.name,
         key="catalog_model_" + category,
@@ -67,6 +83,7 @@ def render(coordinator, category):
     st.subheader(info.name)
     st.caption("Stable model ID: " + info.model_id + " · Category: " + info.category)
     st.write(definition.family + " · " + definition.learning)
+    st.caption("Local runtime: Python 3.14.10 · PyTorch CPU · Pillow")
     st.warning(definition.evaluation)
     if entry.available:
         st.success(
@@ -84,17 +101,18 @@ def render(coordinator, category):
         if info.frozen_threshold is None
         else f"Frozen research threshold: {info.frozen_threshold:.17g}; score > threshold."
     )
-    st.caption("Expected artifact SHA-256")
-    st.code(info.registered_artifact_sha256, language=None)
-    st.caption("Verified local artifact SHA-256")
-    st.code(entry.verified_artifact_sha256 or "Unavailable", language=None)
-    if definition.pretrained_sha256:
-        st.write("Frozen torchvision ResNet18 IMAGENET1K_V1 component; not newly trained here.")
-        st.code(definition.pretrained_sha256, language=None)
-        st.link_button("Pretrained component source (external)", definition.pretrained_url)
-    else:
-        st.write("No pretrained third-party component.")
-    st.write("Model card in the source distribution: " + definition.documentation)
+    with st.expander("Artifact identity and pretrained components"):
+        st.caption("Expected artifact SHA-256")
+        st.code(info.registered_artifact_sha256, language=None)
+        st.caption("Verified local artifact SHA-256")
+        st.code(entry.verified_artifact_sha256 or "Unavailable", language=None)
+        if definition.pretrained_sha256:
+            st.write("Frozen torchvision ResNet18 IMAGENET1K_V1 component; not newly trained here.")
+            st.code(definition.pretrained_sha256, language=None)
+            st.link_button("Pretrained component source (external)", definition.pretrained_url)
+        else:
+            st.write("No pretrained third-party component.")
+        st.write("Model card in the source distribution: " + definition.documentation)
     with st.expander("Scientific limitations", expanded=False):
         for limitation in definition.limitations:
             st.write(limitation)

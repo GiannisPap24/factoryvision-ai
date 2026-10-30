@@ -62,3 +62,60 @@ def test_rejected_upload_has_no_stale_preview(source_app, category, payload):
     expected = "nonempty" if not payload else "corrupt"
     assert any(expected in error.value for error in at.error)
     assert all(b.disabled for b in at.button if b.label.startswith("Run "))
+
+
+def test_catalog_groups_keep_all_cards_and_mixed_readiness(source_app, monkeypatch):
+    at, engine = source_app
+    at.run().sidebar.radio[0].set_value("Model Catalog").run()
+    assert sum("All unavailable locally" in item.value for item in at.markdown) == 2
+    cards = [b for b in at.get("download_button") if b.label == "Download model card"]
+    assert len(cards) == 6
+    assert len(at.selectbox(key="catalog_model_cashew").options) == 4
+    monkeypatch.setattr(
+        engine,
+        "statuses",
+        lambda: [
+            {"id": key, "available": key == "autoencoder", "reason": "Synthetic status fixture"}
+            for key in ("autoencoder", "spatial_mean", "feature_memory", "student_teacher")
+        ],
+    )
+    at.run()
+    assert not at.exception
+    assert sum("All unavailable locally" in item.value for item in at.markdown) == 1
+    assert any(item.value == "Verified files" for item in at.caption)
+    assert sum(item.value == "Unavailable" for item in at.caption) == 3
+    at.selectbox(key="catalog_model_cashew").set_value("spatial_mean").run()
+    assert any("Real inference is disabled" in item.value for item in at.error)
+    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+    assert len(at.selectbox(key="catalog_model_metalparts").options) == 2
+    assert len([b for b in at.get("download_button") if b.label == "Download model card"]) == 6
+
+
+def test_demo_validation_display_and_pending_exports_preserve_contract(source_app):
+    from test_review_app import save
+
+    from factoryvision.demo import csv_bytes, json_bytes
+
+    at, _ = source_app
+    at.run().sidebar.radio[0].set_value("Synthetic demo").run()
+    assert not at.image and not at.get("download_button")
+    button(at, "Generate synthetic demo").click().run()
+    demo, csv_export, json_export = at.session_state["synthetic_demo"]
+    assert len(at.image) == 2
+    assert list(at.table[0].value["Validation"]) == ["Valid", "Valid", "Rejected"]
+    assert list(at.table[0].value["Score"]) == ["Not computed"] * 3
+    assert all(
+        row.score is row.threshold is row.research_anomaly_flag is None for row in demo.report.rows
+    )
+    assert csv_export == csv_bytes(build_demo().report)
+    assert json_export == json_bytes(build_demo().report)
+    assert any("Exports include the two pending records" in item.value for item in at.info)
+    assert len(at.get("download_button")) == 4
+    save(at, scope="demo", note="Synthetic geometry checked")
+    assert not any("No saved review yet" in item.value for item in at.info)
+    button(at, "Generate synthetic demo").click().run()
+    assert all(not r.history for r in at.session_state["fv_review_demo_bundle"].records)
+    assert any("No saved review yet" in item.value for item in at.info)
+    button(at, "Clear synthetic demo").click().run()
+    assert not at.image and not at.get("download_button") and not at.exception
+    assert "fv_review_demo_bundle" not in at.session_state

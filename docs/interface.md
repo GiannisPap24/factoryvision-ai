@@ -61,7 +61,10 @@ Empty and invalid files show validation errors and cannot retain a previous prev
 Native sidebar collapse/expand, keyboard operation and contextual loss notices are
 retained. Closing the sidebar does not clear work. Workspace/category changes
 retain their original cleanup rules, including the completed Batch/Reports exception.
-The other six workspaces keep their existing content, exports and serializers.
+Compare, Batch Inspection, Reports and Research keep their existing content,
+exports and serializers. Catalog and Demo use the compact UX-2B presentation
+described in [Model Catalog and synthetic demo](model-catalog-demo.md), with
+the same scientific and session contracts.
 The design prototype banner is not part of the application. Native widget spacing,
 sidebar geometry and controls intentionally differ from the static design reference.
 
