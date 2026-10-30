@@ -75,12 +75,11 @@ def show_result(result):
 
 
 def inspect(engine, compare=False):
-    if compare:
-        controls, output = st.container(border=True), st.container()
-    else:
-        controls, output = st.columns([1, 2.2], gap="medium")
+    controls, output, preview_slot = presentation.inspection_layout(compare)
+    image = None
     with controls:
-        st.subheader("Inspection controls")
+        st.subheader("Inspection controls" if compare else "Inspection setup")
+        st.caption("Category: MetalParts (experimental) · Change category in navigation")
         st.warning(
             "Experimental source-domain models. Autoencoder trained; feature memory fitted with "
             "a frozen backbone. Independent defect performance is unestablished; "
@@ -102,21 +101,6 @@ def inspect(engine, compare=False):
             if compare
             else "Select one model, upload a permitted image and run inspection."
         )
-        st.caption(
-            "JPEG / PNG · ≤8 MiB · 256–4096 pixels per side · ≤16M pixels · "
-            "opaque, upright, single-frame. Uploads remain in memory."
-        )
-        st.caption(
-            "Category is not detected automatically. Official test0–test6 images and transformed "
-            "copies are prohibited."
-        )
-        if st.button("Clear MetalParts image and results"):
-            st.session_state["metal_upload_generation"] = (
-                st.session_state.get("metal_upload_generation", 0) + 1
-            )
-            st.session_state.pop("metal_result", None)
-            st.session_state.pop("metal_results", None)
-            st.session_state.pop("metal_request", None)
         upload = st.file_uploader(
             "Choose a MetalParts image",
             type=["png", "jpg", "jpeg"],
@@ -127,7 +111,7 @@ def inspect(engine, compare=False):
             "I confirm this is a permitted MetalParts image, not an official test image.",
             key="metal_ack",
         )
-        if upload is None:
+        if upload is None and compare:
             st.info("Upload a permitted image to begin. Inference runs only on request.")
         payload = upload.getvalue() if upload is not None else None
         identity = (
@@ -141,7 +125,7 @@ def inspect(engine, compare=False):
             st.session_state.pop("metal_results", None)
             st.session_state["metal_request"] = identity
         valid = False
-        if payload:
+        if payload is not None:
             try:
                 image = decode_upload(payload)
                 if min(image.size) < 256:
@@ -150,20 +134,18 @@ def inspect(engine, compare=False):
                         "no automatic upscaling."
                     )
                 image.thumbnail((640, 640))
-                with st.expander("Input preview"):
-                    st.image(image, caption="Original RGB before inference", width="content")
+                if compare:
+                    with st.expander("Input preview"):
+                        st.image(image, caption="Original RGB before inference", width="content")
                 valid = True
             except InputRejected as exc:
                 st.error(str(exc))
         statuses = [options[name].status() for name in selected]
-        for status in statuses:
-            if not status["available"]:
-                st.error(status["reason"])
-        if any(not status["available"] for status in statuses):
-            presentation.setup_help()
+        st.button("Clear MetalParts image and results", on_click=presentation.clear_inspection)
         if st.button(
             "Run MetalParts inspection",
             type="primary",
+            width="content" if compare else "stretch",
             disabled=not (
                 valid and acknowledge and selected and all(s["available"] for s in statuses)
             ),
@@ -181,6 +163,23 @@ def inspect(engine, compare=False):
                 st.error(str(exc))
             except (RuntimeError, MemoryError):
                 presentation.inference_failure()
+        for status in statuses:
+            if not status["available"]:
+                st.error(status["reason"])
+        if any(not status["available"] for status in statuses):
+            presentation.setup_help()
+        with st.expander("Permitted inputs and limits"):
+            st.caption(
+                "JPEG / PNG · ≤8 MiB · 256–4096 pixels per side · ≤16M pixels · "
+                "opaque, upright, single-frame. Uploads remain in memory."
+            )
+            st.caption(
+                "Category is not detected automatically. Official test0–test6 images and "
+                "transformed copies are prohibited."
+            )
+    if preview_slot is not None:
+        with preview_slot.container():
+            presentation.input_viewer(image if valid else None)
     with output:
         if st.session_state.get("metal_results"):
             results = st.session_state["metal_results"]
@@ -188,7 +187,7 @@ def inspect(engine, compare=False):
                 with column:
                     show_result(result)
 
-        if not st.session_state.get("metal_results"):
+        if not st.session_state.get("metal_results") and compare:
             st.subheader("Spatial evidence")
             st.info("No inspection yet. Run a permitted input to view native-resolution evidence.")
         review_ui.render("single", st.session_state.get("metal_results"), "metalparts")

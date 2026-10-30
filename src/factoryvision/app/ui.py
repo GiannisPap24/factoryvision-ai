@@ -106,26 +106,15 @@ def show_result(result):
 
 
 def inspect(engine, statuses, compare=False):
-    if compare:
-        controls, output = st.container(border=True), st.container()
-    else:
-        controls, output = st.columns([1, 2.2], gap="medium")
+    if not compare and not any(row["available"] for row in statuses):
+        st.caption("Inference unavailable · No verified local model artifacts")
+    controls, output, preview_slot = presentation.inspection_layout(compare)
+    preview = None
     with controls:
-        st.subheader("Inspection controls")
-        st.caption("1 · Select model   2 · Upload   3 · Run")
-        with st.expander("Permitted inputs and limits"):
-            st.write(
-                "Cashew research models: category and distribution are not detected "
-                "automatically. Official test images, including PCB1/PCB2, are prohibited."
-            )
-            st.caption(
-                "JPEG / PNG · ≤8 MiB · ≤4096 pixels per side · ≤16M pixels · "
-                "opaque, upright, single-frame. Uploads stay in process memory."
-            )
-        if st.button("Clear image and results"):
-            st.session_state["upload_generation"] = st.session_state.get("upload_generation", 0) + 1
-            st.session_state.pop("results", None)
-            st.session_state.pop("request_identity", None)
+        st.subheader("Inspection controls" if compare else "Inspection setup")
+        st.caption("Category: Cashew · Change category in navigation")
+        if compare:
+            st.caption("1 · Select model   2 · Upload   3 · Run")
         available = {s["id"]: s["name"] for s in statuses if s["available"]}
         chosen = st.multiselect(
             "Models",
@@ -145,7 +134,7 @@ def inspect(engine, statuses, compare=False):
             "I confirm this is a permitted Cashew image, not an official test image.",
             key="cashew_ack",
         )
-        if upload is None:
+        if upload is None and compare:
             st.info("Choose a model and upload an image to begin. Inference runs only on request.")
         payload = upload.getvalue() if upload is not None else None
         identity = (
@@ -158,23 +147,22 @@ def inspect(engine, statuses, compare=False):
             st.session_state.pop("results", None)
             st.session_state["request_identity"] = identity
         valid = False
-        if payload:
+        if payload is not None:
             try:
                 preview = decode_upload(payload)
                 preview.thumbnail((640, 640))
-                with st.expander("Input preview"):
-                    st.image(preview, caption="Original RGB before inference", width="content")
+                if compare:
+                    with st.expander("Input preview"):
+                        st.image(preview, caption="Original RGB before inference", width="content")
                 valid = True
             except InputRejected as exc:
                 st.error(str(exc))
-        if not available:
-            st.error(
-                "No verified local model artifacts are available. "
-                "See model availability on Overview."
-            )
-            presentation.setup_help()
+        st.button("Clear image and results", on_click=presentation.clear_inspection)
         if st.button(
-            "Run inspection", type="primary", disabled=not (valid and chosen and acknowledged)
+            "Run inspection",
+            type="primary",
+            width="content" if compare else "stretch",
+            disabled=not (valid and chosen and acknowledged),
         ):
             st.session_state.pop("results", None)
             try:
@@ -184,13 +172,35 @@ def inspect(engine, statuses, compare=False):
                 st.error(str(exc))
             except (RuntimeError, MemoryError):
                 presentation.inference_failure()
+        if not available:
+            st.error(
+                "No verified local model artifacts are available. "
+                "Preview remains available; inference is disabled. "
+                "See Model Catalog for prerequisites."
+            )
+            presentation.setup_help()
+        with st.expander("Permitted inputs and limits"):
+            st.write(
+                "Cashew research models: category and distribution are not detected "
+                "automatically. Official test images, including PCB1/PCB2, are prohibited."
+            )
+            st.caption(
+                "JPEG / PNG · ≤8 MiB · ≤4096 pixels per side · ≤16M pixels · "
+                "opaque, upright, single-frame. Uploads stay in process memory."
+            )
         st.caption(
             "Models are displayed in selection order. Their raw scores use different scales; "
             "they cannot be used to rank models. Changing the image or selection clears results."
+            if compare
+            else "Preview only until an explicit run. "
+            "Changing image, model or consent clears results."
         )
+    if preview_slot is not None:
+        with preview_slot.container():
+            presentation.input_viewer(preview if valid else None)
     with output:
         results = st.session_state.get("results", ())
-        if not results:
+        if not results and compare:
             st.subheader("Spatial evidence")
             st.info(
                 "No inspection yet. Select a model, upload a permitted image and run inspection."
@@ -247,8 +257,8 @@ def render(engine, metal_engine=None):
     st.sidebar.caption("PCB1: BLOCKED · PCB2: INCONCLUSIVE")
     titles = {
         "Overview": (
-            "Inspection workspace",
-            "Explore frozen research models. Inspect permitted images. Keep results local.",
+            "Overview",
+            "Explore the workflow. Understand availability. Keep results local.",
         ),
         "Image inspection": (
             "Inspect an image",
@@ -280,6 +290,7 @@ def render(engine, metal_engine=None):
         ),
     }
     with st.container(key="fv-shell"):
+        presentation.header()
         st.title(titles[page][0])
         st.caption(titles[page][1])
         statuses = engine.statuses() if category == "Cashew" else []

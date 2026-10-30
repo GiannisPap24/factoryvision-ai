@@ -1,5 +1,7 @@
 [theme]
 base = "light"
+paddingTop = "1rem"
+paddingBottom = "2rem"
 primaryColor = "#2563EB"
 backgroundColor = "#F5F7FA"
 secondaryBackgroundColor = "#FFFFFF"
@@ -44,6 +46,7 @@ chartSequentialColors = ["#FFF7BC", "#FEEAA1", "#FEDD83", "#FECE62", "#FEC44F", 
 chartDivergingColors = ["#164E63", "#0E7490", "#0891B2", "#67E8F9", "#CFFAFE", "#FFF7BC", "#FEC44F", "#F08020", "#D95F0E", "#993404"]
 
 [theme.sidebar]
+paddingTop = "1rem"
 backgroundColor = "#101B2B"
 secondaryBackgroundColor = "#1E293B"
 textColor = "#F1F5F9"
