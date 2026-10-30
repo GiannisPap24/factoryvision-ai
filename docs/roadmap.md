@@ -6,14 +6,17 @@ passed. Bounded Milestone 4F launch work is now authorized; external announcemen
 are pending platform access and destination verification, not claimed published.
 Completion of an engineering milestone does not reverse a scientific integrity gate.
 
-**Current public baseline:** Milestone **5C merged through
-[PR #3](https://github.com/GiannisPap24/factoryvision-ai/pull/3)** at
-`4c3987e669360e36930ffe8d4317dd040bc0f47c`.
-[Hosted main CI](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976):
-**1,448 passed, 97.61% combined coverage**, including Windows packaging/privacy
-and fresh-install checks. **5D is ongoing locally and unpublished**; its CPU,
-display and random-weight ONNX experiments are not part of accepted public main.
-There is no completed production ONNX or GPU integration.
+**Current public baseline:** Milestone **5C** plus the source-only Reddit-readiness
+improvements merged through [PR #4](https://github.com/GiannisPap24/factoryvision-ai/pull/4)
+at `8a303e9b9641a6d01379a7d20e02239315acbd2d`.
+Historical [5C main CI](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976)
+recorded **1,448 passed, 97.61% combined coverage**; those counts do not describe
+the later readiness release or this candidate.
+**5D is a local, uncommitted integration candidate**, pending final acceptance and
+owner publication approval. The [5D summary](milestone-5d-integration.md) records
+CPU diagnostics, exact display allocation reduction and synthetic ONNX/DirectML
+feasibility. The GPU feasibility experiment is closed as successful synthetic
+research; production GPU integration is deferred. No trained-model speedup is established.
 
 ## Completed research and engineering
 
@@ -134,7 +137,7 @@ adoption or deployment approval.
 
 | Milestone | Proposed direction |
 |---|---|
-| 5D | Ongoing local performance and runtime compatibility work; unpublished and separately reviewed |
+| 5D | Local integration candidate; synthetic GPU feasibility closed, production GPU integration deferred |
 | 5E | Camera Inspection; separately approved capture, privacy and inspection scope |
 | 5F-A / 5F-B / 5F-C | Dataset eligibility, independent model validation, then supervised pilot discovery |
 | 6A | Local Inference API |
@@ -151,7 +154,7 @@ training from Human Review, autonomous product rejection or machine control.
 
 | Target milestone / problem | Current status | Proposed remediation | Completion evidence | Required authorization | Stop / blocked condition |
 |---|---|---|---|---|---|
-| **5D — Performance & Runtime Compatibility** | Local CPU/display/random-weight ONNX experiments only; real-model performance and AMD GPU compatibility unverified. P2 deprecated pathlib usage remains. | Profile CPU time and memory, optimize display allocations, verify ONNX export and numerical parity, investigate AMD compatibility and reliable CPU fallback; runtime isolation, resource monitoring and reproducible benchmark methodology. Replace deprecated pathlib usage before future Python compatibility changes. | Repeated workload-matched measurements with uncertainty, equivalence/parity tests, supported-runtime tests, bounded failure/resource evidence and no deprecation regressions. Separate synthetic evidence from trained-model benchmarks. | Separate owner approval for trained models/data, GPU/runtime installation and each implementation scope. | Unclear artifact eligibility, changed scientific semantics, unsupported runtime or need to weaken Windows protections. No speedup claim from synthetic evidence alone. |
+| **5D — Performance & Runtime Compatibility** | Local CPU/display/random-weight ONNX candidate; DirectML synthetic execution and five-case parity verified, experiment closed. Production GPU integration deferred; real-model performance unverified. P2 deprecated pathlib usage remains. | Profile CPU time and memory, optimize display allocations, verify ONNX export and numerical parity, investigate AMD compatibility and reliable CPU fallback; runtime isolation, resource monitoring and reproducible benchmark methodology. Replace deprecated pathlib usage before future Python compatibility changes. | Repeated workload-matched measurements with uncertainty, equivalence/parity tests, supported-runtime tests, bounded failure/resource evidence and no deprecation regressions. Separate synthetic evidence from trained-model benchmarks. | Separate owner approval for trained models/data, GPU/runtime installation and each implementation scope. | Unclear artifact eligibility, changed scientific semantics, unsupported runtime or need to weaken Windows protections. No speedup claim from synthetic evidence alone. |
 | **5E — Camera & Input Reliability** | Camera workflow and validated OOD detection absent. Category is manual; wrong-category inputs are not reliably detected. P2 accessibility/responsive work remains. | Camera acquisition, focus and quality checks, illumination variation, motion blur/invalid frames, safe input limits and unsupported-image rejection; clear uncertainty/abstention, keyboard/focus/readability/responsive usability and human confirmation before consequential decisions. | Authorized capture tests across acquisition conditions; bounded input rejection; keyboard and narrow-viewport acceptance; independent OOD evaluation before any OOD accuracy claim. | Capture/privacy permissions and scoped UI/input implementation approval. | No consent, unsupported acquisition conditions or uncertainty presented as a reliable defect decision. Basic quality checks are not validated OOD detection. |
 | **5F-A — Dataset Integrity & Scientific Eligibility** | PCB1 **BLOCKED** by source overlap; PCB2 **INCONCLUSIVE**, 56 similarity pairs await independent adjudication; RobustAD target **NOT CLEARED**. | Establish train/validation/test and source/acquisition-group independence; exact/near-duplicate screening; provenance/licensing review, independently acquired evaluation data where necessary and independent human label adjudication. | Documented group-aware split audit, resolved similarity evidence, licensing/provenance records and independent adjudication accepted before evaluation. | Explicit data acquisition/access and independent-adjudication approval. | Any unresolved overlap, missing rights or non-independent labels. Historical observed tests never become new blind evidence. Frozen gates cannot be overridden. |
 | **5F-B — Independent Model Validation** | Cashew AE historical recall **0.52**, **48/100 anomalies missed** at its frozen threshold; official test already observed. MetalParts remains exploratory-only. | False-negative/false-positive analysis; predeclared model selection and evaluation; separate development/calibration, independent held-out testing, pixel localization where applicable, real acquisition robustness, independent OOD evaluation, defensible uncertainty and use-case acceptance thresholds. | Eligible independent data from 5F-A, preregistered protocol, error/localization analyses with uncertainty and independently reviewed acceptance results. | New model/evaluation scope and trained-artifact access approved in advance. | Tuning against the observed Cashew official test, unresolved eligibility or presenting exploratory scores as industrial accuracy. |

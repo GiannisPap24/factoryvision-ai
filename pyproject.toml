@@ -62,6 +62,10 @@ packages = ["src/factoryvision"]
 include = [
   "/LICENSE",
   "/docs/README.md",
+  "/docs/milestone-5d-integration.md",
+  "/docs/performance-baseline.md",
+  "/docs/performance-display-5d2.md",
+  "/docs/onnx-synthetic-feasibility.md",
   "/docs/milestone-5a-human-review.md",
   "/docs/milestone-5b-model-registry.md",
   "/docs/community-feedback.md",
@@ -148,3 +152,4 @@ source = ["factoryvision"]
 [tool.coverage.report]
 show_missing = true
 fail_under = 95
+precision = 2
