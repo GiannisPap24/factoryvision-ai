@@ -34,3 +34,44 @@ excluded from wheel and sdist packages.
 The larger engineering review set and model-enabled captures remain private.
 Future public captures should retain the same clear synthetic labels and undergo
 review of visible filenames, browser chrome, paths and image metadata.
+
+## Inspection Workbench V2 — first implementation slice
+
+Overview, the shared shell and single-image inspection follow the reviewed local
+UX-1R direction. The native sidebar remains the single eight-workspace navigation
+control and the authority for category selection. A navy workspace header and
+packaged `app/workbench.css` provide the shared visual foundation; no remote font,
+JavaScript component or additional frontend is used. The header stays inside the
+native content region, rather than replacing Streamlit browser/sidebar controls.
+
+Overview offers Synthetic Demo first when no methods are ready. Its original
+geometry thumbnails are illustrative only: they do not generate a Demo session,
+review records or exports. Local readiness details and Model Catalog remain
+available. Real inference actions appear only when verified methods are available.
+
+Single-image inspection places the validated RGB preview on the left and setup
+on the right, stacking preview first on narrow screens. Category stays in the
+sidebar; its current value is repeated in setup. Preview validation does not load
+models or run inference. No weights means no anomaly output. Both categories keep
+the original limits, consent and explicit execution gates; MetalParts also keeps
+its minimum image size and exploratory-only restrictions. Clear releases upload
+widget state, results, review state and consent through the existing cleanup helper.
+Empty and invalid files show validation errors and cannot retain a previous preview.
+
+Native sidebar collapse/expand, keyboard operation and contextual loss notices are
+retained. Closing the sidebar does not clear work. Workspace/category changes
+retain their original cleanup rules, including the completed Batch/Reports exception.
+The other six workspaces keep their existing content, exports and serializers.
+The design prototype banner is not part of the application. Native widget spacing,
+sidebar geometry and controls intentionally differ from the static design reference.
+
+The bounded density polish uses Streamlit 1.66 theme padding in both the source
+and packaged themes. Setup uses compact native container gaps and a wider desktop
+column; Run spans that column. Detailed input limits remain in native disclosures,
+with upload validation, consent and unavailable-model gates unchanged. Clear keeps
+its existing callback and precedes Run. Mobile Overview actions stack vertically;
+only the empty preview is shortened, not uploaded image geometry.
+
+The native sidebar supports its own click/Enter controls. Escape does not reliably
+close it or restore focus as in the design prototype; no DOM script overrides that
+behavior. Keyboard focus styling and navigation cleanup remain native.

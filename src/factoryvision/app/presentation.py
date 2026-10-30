@@ -1,34 +1,48 @@
 """Shared local presentation and session lifecycle; no model or dataset operations."""
 
+from importlib.resources import files
+
 import streamlit as st
 
 
 def styling():
-    # Static CSS scoped to our documented st.container(key=...) classes only.
-    # No untrusted interpolation, external assets or Streamlit internal selectors.
-    st.html("""<style>
-    .st-key-fv-shell {max-width: 1440px; margin: 0 auto;}
-    .st-key-fv-shell h1 {letter-spacing: -.035em; line-height: 1.15;}
-    .st-key-fv-shell h2, .st-key-fv-shell h3 {letter-spacing: -.02em;}
-    .st-key-fv-nav label {padding: .4rem .5rem; border-radius: .375rem;}
-    .st-key-fv-nav label:has(input:checked) {background: #1E40AF;}
-    .st-key-fv-nav label:focus-within {outline: 3px solid #60A5FA; outline-offset: 2px;}
-    .st-key-fv-shell [class*="st-key-fv-card-"] {background: #FFFFFF; border-radius: .5rem;}
-    .st-key-fv-shell img {border-radius: .5rem;}
-    .st-key-fv-shell label p {white-space: normal; overflow: visible; text-overflow: clip;}
-    .st-key-fv-shell [class*="st-key-fv-table"] {overflow-x: auto;}
-    .st-key-fv-shell table {font-size: .9rem;}
-    .st-key-fv-shell button:focus-visible, .st-key-fv-nav input:focus-visible {
-        outline: 3px solid #2563EB; outline-offset: 3px;
-    }
-    .st-key-fv-shell .fv-legend {height: .65rem; display: flex; border-radius: .25rem;
-        overflow: hidden; max-width: 22rem; margin: .5rem 0;}
-    .st-key-fv-shell .fv-legend span {flex: 1;}
-    @media (max-width: 600px) {
-        .st-key-fv-shell h1 {font-size: 1.7rem;}
-        .st-key-fv-shell table {font-size: .8rem;}
-    }
-    </style>""")
+    # Packaged, constant CSS only; no user content, external assets or JavaScript.
+    st.html(files("factoryvision.app").joinpath("workbench.css").read_text(encoding="utf-8"))
+
+
+def header():
+    st.html(
+        '<div class="fv-workbench-header">'
+        "<strong>FactoryVision AI</strong><span>Inspection Workbench</span>"
+        "<small>Research · Local CPU</small></div>"
+    )
+
+
+def input_viewer(image=None):
+    """Display already validated RGB pixels; never call an inference service."""
+    with st.container(key="fv-input-viewer"):
+        st.markdown("**Input preview**")
+        if image is None:
+            st.html(
+                '<div class="fv-empty-viewer"><h2>Your image belongs here.</h2>'
+                "<p>Choose a permitted image in Inspection setup. A validated preview "
+                "is separate from inference.</p><p>No model output, score or anomaly map.</p></div>"
+            )
+        else:
+            st.image(image, caption="Validated RGB · preview only", width="content")
+        st.caption("Original RGB before inference · Session only")
+
+
+def inspection_layout(compare):
+    if compare:
+        return st.container(border=True), st.container(), None
+    viewer, setup = st.columns([1.8, 1], gap="medium")
+    preview = viewer.empty()
+    return (
+        setup.container(border=True, key="fv-inspection-setup", gap="xsmall"),
+        st.container(),
+        preview,
+    )
 
 
 def table(data, key):
@@ -79,83 +93,66 @@ def clear_inspection():
 
 def overview(category, statuses):
     ready = sum(row["available"] for row in statuses)
-    with st.container(horizontal=True, gap="small"):
-        if ready:
-            st.button(
-                "Start inspection", type="primary", on_click=navigate, args=("Image inspection",)
-            )
-            st.button("Compare models", on_click=navigate, args=("Compare",))
-            st.button("Open demo", on_click=navigate, args=("Synthetic demo",))
-        else:
-            st.button(
-                "Open synthetic demo", type="primary", on_click=navigate, args=("Synthetic demo",)
-            )
+    left, right = st.columns([1.4, 1], gap="medium")
+    with left.container(border=True, key="fv-card-start"):
+        st.caption("START HERE · " + category)
+        st.subheader("Explore the inspection workflow")
+        st.write("Try validation, Human Review and exports with original synthetic examples.")
+        with st.container(horizontal=True, gap="small", key="fv-overview-actions"):
+            if ready:
+                st.button(
+                    "Start inspection",
+                    type="primary",
+                    on_click=navigate,
+                    args=("Image inspection",),
+                )
+                st.button("Compare models", on_click=navigate, args=("Compare",))
+                st.button("Open demo", on_click=navigate, args=("Synthetic demo",))
+            else:
+                st.button(
+                    "Open synthetic demo",
+                    type="primary",
+                    on_click=navigate,
+                    args=("Synthetic demo",),
+                )
             st.button("Open Model Catalog", on_click=navigate, args=("Model Catalog",))
-    if not ready:
-        st.info(
-            "Start with Synthetic Demo: generate examples, review validation and try exports. "
-            "Missing weights are expected in a fresh checkout. The demo performs no neural "
-            "inference and produces no anomaly scores."
-        )
-    for column, label, value in zip(
-        st.columns(4),
-        (
-            "Object categories",
-            "Registered methods",
-            "Ready for " + category.split(" ")[0],
-            "Execution",
-        ),
-        (2, 6, ready, "Local CPU"),
-        strict=True,
-    ):
-        with column.container(key="fv-card-" + label.replace(" ", "-")):
-            st.metric(label, value, border=True)
-    left, right = st.columns([1.6, 1], gap="medium")
-    with left.container(border=True, key="fv-card-workflow"):
-        st.subheader("Your inspection workflow" if ready else "Try the public demo")
-        workflow = (
+        if not ready:
+            st.info(
+                "Missing weights are expected in a fresh checkout. The demo performs no "
+                "neural inference and produces no anomaly scores."
+            )
+        else:
+            st.caption(f"{ready} verified local methods available for {category}.")
+        from factoryvision.demo import build_demo
+
+        # Original thumbnails only. Do not create a Demo session or review/export bundle.
+        with st.container(horizontal=True, gap="small", key="fv-sample-strip"):
+            for number, image in enumerate(build_demo().images, 1):
+                st.image(image, caption=f"Synthetic example {number}", width=96)
+        st.caption("Original geometry · No dataset or model weights required")
+    with right.container(border=True, key="fv-card-workflow"):
+        st.subheader("A simple first run")
+        for number, title, body in (
+            ("01", "Generate examples", "Open Demo, then generate the synthetic inputs."),
+            ("02", "Review validation", "See valid and rejected inputs. No defect prediction."),
             (
-                ("01", "Select an image", "Choose a permitted image and a compatible model."),
-                ("02", "Run a frozen model", "Start CPU inference explicitly. Inputs stay local."),
-                (
-                    "03",
-                    "Review spatial evidence",
-                    "Inspect aligned maps and model-specific scores.",
-                ),
-            )
-            if ready
-            else (
-                (
-                    "01",
-                    "Generate examples",
-                    "Use original geometry; no uploads or model weights needed.",
-                ),
-                (
-                    "02",
-                    "Review validation",
-                    "See accepted and rejected inputs. No defect prediction.",
-                ),
-                (
-                    "03",
-                    "Try review and export",
-                    "Practice Human Review and download synthetic JSON/CSV.",
-                ),
-            )
-        )
-        for number, title, body in workflow:
+                "03",
+                "Try review and export",
+                "Practice Human Review and download synthetic JSON/CSV.",
+            ),
+        ):
             st.markdown(f"**{number} · {title}**")
             st.caption(body)
-    with right.container(border=True, key="fv-card-status"):
-        st.subheader("Research status")
-        st.markdown(
-            "**Cashew** · Historical evaluation\n\n"
-            "**MetalParts** · Exploratory only\n\n"
-            "**PCB1: BLOCKED** · Source overlap\n\n"
-            "**PCB2: INCONCLUSIVE** · Adjudication pending"
-        )
-    with st.container(border=True, key="fv-card-readiness"):
-        st.subheader("Local model readiness")
+    with st.expander("Local model readiness", expanded=bool(ready)):
+        st.caption("Six registered methods across two categories. Registration is not readiness.")
         availability(statuses)
+    with st.container(border=True, key="fv-card-boundaries"):
+        st.markdown("**Research boundaries**")
+        st.caption("PCB1: BLOCKED · PCB2: INCONCLUSIVE · RobustAD: NOT CLEARED")
+        st.caption(
+            "MetalParts: exploratory-only. Cashew official test already observed. "
+            "Human Review is not verified ground truth. Real Cashew pilot: BLOCKED."
+        )
     st.warning(
         "Research demonstration. Not validated for industrial acceptance, "
         "food safety or automated product-quality decisions."
