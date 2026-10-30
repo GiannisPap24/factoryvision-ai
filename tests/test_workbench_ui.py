@@ -96,10 +96,16 @@ def test_demo_validation_display_and_pending_exports_preserve_contract(source_ap
 
     from factoryvision.demo import csv_bytes, json_bytes
 
+    warning = (
+        "Session-only reviews: Generating a new demo or clearing the current demo removes "
+        "saved Human Review entries. Export your reviews before continuing."
+    )
     at, _ = source_app
     at.run().sidebar.radio[0].set_value("Synthetic demo").run()
+    assert any(item.value == warning for item in at.warning)
     assert not at.image and not at.get("download_button")
     button(at, "Generate synthetic demo").click().run()
+    assert any(item.value == warning for item in at.warning)
     demo, csv_export, json_export = at.session_state["synthetic_demo"]
     assert len(at.image) == 2
     assert list(at.table[0].value["Validation"]) == ["Valid", "Valid", "Rejected"]
@@ -112,10 +118,14 @@ def test_demo_validation_display_and_pending_exports_preserve_contract(source_ap
     assert any("Exports include the two pending records" in item.value for item in at.info)
     assert len(at.get("download_button")) == 4
     save(at, scope="demo", note="Synthetic geometry checked")
+    assert any(item.value == warning for item in at.warning)
     assert not any("No saved review yet" in item.value for item in at.info)
     button(at, "Generate synthetic demo").click().run()
     assert all(not r.history for r in at.session_state["fv_review_demo_bundle"].records)
     assert any("No saved review yet" in item.value for item in at.info)
+    assert any(item.value == warning for item in at.warning)
+    save(at, scope="demo", note="Synthetic review before clearing")
     button(at, "Clear synthetic demo").click().run()
+    assert any(item.value == warning for item in at.warning)
     assert not at.image and not at.get("download_button") and not at.exception
     assert "fv_review_demo_bundle" not in at.session_state

@@ -13,6 +13,10 @@ def clear():
 
 def render():
     st.warning(NOTICE)
+    st.warning(
+        "Session-only reviews: Generating a new demo or clearing the current demo removes "
+        "saved Human Review entries. Export your reviews before continuing."
+    )
     with st.container(horizontal=True, gap="small", key="fv-demo-actions"):
         generate = st.button("Generate synthetic demo", type="primary")
         if st.button("Clear synthetic demo"):
