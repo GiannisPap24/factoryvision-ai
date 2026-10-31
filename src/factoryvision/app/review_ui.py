@@ -100,6 +100,11 @@ def render(scope, source, category=None):
             st.error(str(exc))
     reviewed = sum(r.decision != review.Decision.NOT_REVIEWED for r in bundle.records)
     st.write(f"Reviewed: {reviewed} · Pending: {len(bundle.records) - reviewed}")
+    if scope == "demo" and not any(r.history for r in bundle.records):
+        st.info(
+            "No saved review yet. Exports include the two pending records: NOT_REVIEWED, "
+            "empty notes, null review timestamps and no revision history."
+        )
     st.table(
         [
             {
