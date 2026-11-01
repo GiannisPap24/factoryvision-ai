@@ -1,6 +1,7 @@
 """Workbench source-only contracts through native widgets; synthetic pixels only."""
 
 import pytest
+from test_app import app as app
 from test_app import local_event_loop_ipc as local_event_loop_ipc
 from test_launch_readiness import PAGES
 from test_launch_readiness import source_app as source_app
@@ -24,11 +25,12 @@ def test_all_workspaces_keep_native_router_and_source_only_state(source_app, cat
             assert not at.metric
 
 
+@pytest.mark.parametrize("page", ["Image inspection", "Compare"])
 @pytest.mark.parametrize("category", ["Cashew", "MetalParts (experimental)"])
-def test_preview_without_models_then_clear_and_navigation(source_app, category):
+def test_preview_without_models_then_clear_and_navigation(source_app, category, page):
     at, _ = source_app
     at.run().sidebar.selectbox[0].set_value(category).run()
-    at.sidebar.radio[0].set_value("Image inspection").run()
+    at.sidebar.radio[0].set_value(page).run()
     metal = category != "Cashew"
     run = "Run MetalParts inspection" if metal else "Run inspection"
     clear = "Clear MetalParts image and results" if metal else "Clear image and results"
@@ -44,9 +46,49 @@ def test_preview_without_models_then_clear_and_navigation(source_app, category):
     assert at.file_uploader[0].value is None and not at.checkbox[0].value
     assert not at.sidebar.warning
     at.file_uploader[0].set_value(("synthetic.png", build_demo().images[1], "image/png")).run()
-    at.sidebar.radio[0].set_value("Compare").run()
+    at.sidebar.radio[0].set_value(
+        "Compare" if page == "Image inspection" else "Image inspection"
+    ).run()
     assert at.file_uploader[0].value is None and not at.checkbox[0].value
     assert not at.sidebar.warning and not at.exception
+
+
+def test_comparison_view_changes_only_presentation(app, monkeypatch):
+    """Existing synthetic adapters: switching views cannot request another inference."""
+    from test_inference import encoded
+
+    at, engine = app
+    calls = []
+    inspect_many = engine.inspect_many
+
+    def run(payload, selected):
+        calls.append(tuple(selected))
+        return inspect_many(payload, selected)
+
+    monkeypatch.setattr(engine, "inspect_many", run)
+    at.run().sidebar.radio[0].set_value("Compare").run()
+    at.multiselect[0].set_value(["spatial_mean", "feature_memory"]).run()
+    at.file_uploader[0].set_value(("synthetic.png", encoded(), "image/png")).run()
+    at.checkbox[0].check().run()
+    button(at, "Run inspection").click().run()
+    results = at.session_state["results"]
+    arrays = [result.spatial.copy() for result in results]
+    selector = next(r for r in at.radio if r.label == "View for all models")
+    assert selector.value == "Overlay"
+    for label in selector.options:
+        next(r for r in at.radio if r.label == selector.label).set_value(label).run()
+        assert not at.exception
+        assert at.session_state["results"] is results
+        assert [result.model_id for result in results] == ["spatial_mean", "feature_memory"]
+        assert all(
+            (result.spatial == before).all() for result, before in zip(results, arrays, strict=True)
+        )
+        assert len(at.image) == (2 if label == "Reconstruction / reference" else 3)
+    assert calls == [("spatial_mean", "feature_memory")]
+    at.checkbox[0].uncheck().run()
+    assert "results" not in at.session_state
+    assert not any(r.label == selector.label for r in at.radio)
+    assert button(at, "Run inspection").disabled
 
 
 @pytest.mark.parametrize("payload", [b"", b"invalid synthetic bytes"])

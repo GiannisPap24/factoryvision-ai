@@ -28,10 +28,13 @@ def feature_service(root):
     return MetalPartsFeatureService(root)
 
 
-def show_result(result):
+def show_result(result, display=None):
     feature = result.model_id == "metalparts_feature_memory"
-    units = "descriptor RMS distance" if feature else "MSE"
     st.subheader("Feature-Memory Detector" if feature else "Convolutional Autoencoder")
+    view = panels(result)
+    presentation.result_images(view, display, reference=False, key=result.model_id)
+    presentation.legend(view["ceiling"])
+    st.markdown("**Model diagnostics**")
     left, right = st.columns(2)
     left.metric(
         "Maximum feature distance" if feature else "Continuous reconstruction score",
@@ -42,20 +45,6 @@ def show_result(result):
         result.score_label + ". No validated threshold or binary decision. "
         "Raw scores have different units across methods and cannot be compared directly."
     )
-    view = panels(result)
-    map_tab, overlay_tab, reconstruction_tab = st.tabs(["Anomaly map", "Overlay", "Reconstruction"])
-    with map_tab:
-        original, heatmap = st.columns(2)
-        original.image(view["original"], caption="Original RGB", width="stretch")
-        heatmap.image(view["heatmap"], caption="Relative " + units, width="stretch")
-    with overlay_tab:
-        st.image(view["overlay"], caption="45% heatmap overlay", width="stretch")
-    with reconstruction_tab:
-        if view["reconstruction"] is not None:
-            st.image(view["reconstruction"], caption="Reconstructed RGB", width="stretch")
-        else:
-            st.info("Feature memory provides a spatial distance map, not an RGB reconstruction.")
-    presentation.legend(view["ceiling"])
     st.caption(
         "Native map; display reduced to at most 1024 pixels per side. Blur, edges "
         "and tile seams can produce error unrelated to defects."
@@ -111,8 +100,6 @@ def inspect(engine, compare=False):
             "I confirm this is a permitted MetalParts image, not an official test image.",
             key="metal_ack",
         )
-        if upload is None and compare:
-            st.info("Upload a permitted image to begin. Inference runs only on request.")
         payload = upload.getvalue() if upload is not None else None
         identity = (
             hashlib.sha256(payload).hexdigest() if payload else None,
@@ -133,10 +120,7 @@ def inspect(engine, compare=False):
                         "MetalParts requires at least 256 pixels on each side; "
                         "no automatic upscaling."
                     )
-                image.thumbnail((640, 640))
-                if compare:
-                    with st.expander("Input preview"):
-                        st.image(image, caption="Original RGB before inference", width="content")
+                image.thumbnail((1024, 1024))
                 valid = True
             except InputRejected as exc:
                 st.error(str(exc))
@@ -145,7 +129,7 @@ def inspect(engine, compare=False):
         if st.button(
             "Run MetalParts inspection",
             type="primary",
-            width="content" if compare else "stretch",
+            width="stretch",
             disabled=not (
                 valid and acknowledge and selected and all(s["available"] for s in statuses)
             ),
@@ -163,6 +147,8 @@ def inspect(engine, compare=False):
                 st.error(str(exc))
             except (RuntimeError, MemoryError):
                 presentation.inference_failure()
+        if compare and st.session_state.get("metal_results"):
+            st.markdown("[View comparison results](#comparison-results)")
         for status in statuses:
             if not status["available"]:
                 st.error(status["reason"])
@@ -177,20 +163,24 @@ def inspect(engine, compare=False):
                 "Category is not detected automatically. Official test0–test6 images and "
                 "transformed copies are prohibited."
             )
-    if preview_slot is not None:
-        with preview_slot.container():
+    results = st.session_state.get("metal_results", ())
+    with preview_slot.container():
+        if results and not compare:
+            show_result(results[0])
+        else:
             presentation.input_viewer(image if valid else None)
     with output:
-        if st.session_state.get("metal_results"):
-            results = st.session_state["metal_results"]
-            for column, result in zip(st.columns(len(results)), results, strict=True):
-                with column:
-                    show_result(result)
-
-        if not st.session_state.get("metal_results") and compare:
-            st.subheader("Spatial evidence")
-            st.info("No inspection yet. Run a permitted input to view native-resolution evidence.")
-        review_ui.render("single", st.session_state.get("metal_results"), "metalparts")
+        if compare:
+            if results:
+                display = presentation.comparison_view()
+                for column, result in zip(st.columns(len(results)), results, strict=True):
+                    with column.container(border=True, key="fv-card-result-" + result.model_id):
+                        show_result(result, display)
+            else:
+                st.info(
+                    "No model output yet. Upload a permitted image and explicitly run inspection."
+                )
+        review_ui.render("single", results or None, "metalparts")
 
 
 def research(root):
