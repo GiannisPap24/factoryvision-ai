@@ -71,6 +71,10 @@
 .st-key-fv-shell :is(button,a,summary,input,textarea):focus-visible {outline:3px solid #101B2B;outline-offset:3px;}
 .st-key-fv-shell [class*="st-key-fv-card-"],.st-key-fv-inspection-setup {background:var(--fv-surface);border-radius:8px;}
 .st-key-fv-card-start {border-top:4px solid var(--fv-teal);}
+.st-key-fv-card-research-status {border-top:3px solid var(--fv-teal);}
+.st-key-fv-shell [class*="st-key-fv-table-research-"] table {font-size:.875rem;}
+.st-key-fv-shell [class*="st-key-fv-table-research-"] td {font-variant-numeric:tabular-nums;}
+.st-key-fv-shell [class*="st-key-fv-table-research-"] :is(td,th) {overflow-wrap:normal;word-break:normal;}
 .st-key-fv-shell [class*="st-key-fv-card-catalog-"] {border-top:3px solid var(--fv-teal);}
 .st-key-fv-shell [class*="st-key-fv-card-catalog-"] hr {margin:.35rem 0;}
 .st-key-fv-demo-images img {background:var(--fv-demoBg);max-height:280px;}

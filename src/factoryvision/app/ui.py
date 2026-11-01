@@ -20,38 +20,123 @@ def service():
 
 
 def research():
-    st.subheader("Recorded research evidence")
-    st.caption("Historical Cashew evaluation • 50 normal + 100 anomalous images • Milestone 2B")
-    st.dataframe(
-        {
-            "Method": ["Autoencoder", "Spatial mean"],
-            "Image AUROC": [0.937600, 0.736800],
-            "Image AP": [0.943219, 0.841216],
-            "Recall at frozen threshold": [0.52, 0.15],
-            "False positives / 50 normal": [3, 0],
-            "Pixel AUROC": [0.818119, 0.895301],
-            "Pixel AP": [0.080936, 0.267302],
-        }
-    )
-    st.markdown(
-        "AUROC measures ranking across thresholds; AP summarizes precision and recall. "
-        "Recall here uses the frozen normal-calibration threshold. Pixel metrics measure "
-        "localization across image pixels, where background imbalance matters. "
-        "The autoencoder missed 48 of 100 anomalies; spatial mean missed 85. "
-        "Good image ranking does not imply precise defect localization."
-    )
+    st.subheader("Recorded Cashew evidence")
+    with st.container(border=True, key="fv-card-research-status", gap="small"):
+        st.markdown("**HISTORICAL · Official test now observed**")
+        st.write(
+            "One frozen evaluation · Milestone 2B · Model card dated 24 October 2026. "
+            "150 images: 100 anomalous and 50 normal. These are recorded results, "
+            "not a new evaluation or evidence of production readiness."
+        )
+        st.warning(
+            "Autoencoder missed 48 of 100 anomalies; spatial mean missed 85. "
+            "Zero observed false positives for spatial mean does not establish zero risk."
+        )
+    with st.container(border=True, key="fv-card-research-ranking", gap="small"):
+        st.subheader("Ranking and localization")
+        st.caption("Published precision · AUROC and AP are not accuracy or defect probabilities.")
+        presentation.table(
+            {
+                "Metric": ["Image AUROC", "Image AP", "Pixel AUROC", "Pixel AP"],
+                "Autoencoder": ["0.937600", "0.943219", "0.818119", "0.080936"],
+                "Spatial mean": ["0.736800", "0.841216", "0.895301", "0.267302"],
+            },
+            "research-cashew-ranking",
+        )
+        st.write(
+            "The autoencoder ranks images better on this test; spatial mean ranks pixels "
+            "better. Good image ranking does not imply precise defect localization or "
+            "overall neural-model superiority."
+        )
+        with st.expander("How to read these metrics"):
+            st.write(
+                "AUROC measures ranking across thresholds. AP is non-interpolated average "
+                "precision, not trapezoidal PR area. Image prevalence is 66.7% anomalous; "
+                "AP and precision do not transfer directly to a low-defect production line."
+            )
+            st.write(
+                "Pixel metrics pool 2,457,600 resized pixels, including normal images, "
+                "with 27,672 positives. Correlated pixels and background imbalance limit "
+                "interpretation. No AUPRO or thresholded pixel metrics are claimed."
+            )
+    with st.container(border=True, key="fv-card-research-threshold", gap="small"):
+        st.subheader("Outcomes at frozen thresholds")
+        presentation.table(
+            {
+                "Metric": [
+                    "TN / FP / FN / TP",
+                    "Precision",
+                    "Recall",
+                    "F1",
+                    "Normal false-positive rate",
+                ],
+                "Autoencoder": ["47 / 3 / 48 / 52", "0.945455", "0.520000", "0.670968", "0.060000"],
+                "Spatial mean": [
+                    "50 / 0 / 85 / 15",
+                    "1.000000",
+                    "0.150000",
+                    "0.260870",
+                    "0.000000",
+                ],
+            },
+            "research-cashew-threshold",
+        )
+        st.caption(
+            "TN: true negative · FP: false positive · FN: false negative · TP: true positive. "
+            "Observed false positives: 3 versus 0 among 50 normals."
+        )
+        with st.expander("Exact thresholds and methodology"):
+            st.write("Autoencoder: **0.0031531278509646654**")
+            st.write("Spatial mean: **0.017185416119173163**")
+            st.write(
+                "315 normal fitting images; 67 normal validation images; 68 separate normal "
+                "calibration images. Linear 95th percentile; strict score > threshold. "
+                "These empirical thresholds do not guarantee a production false-alarm rate."
+            )
+            st.write(
+                "Both methods use 128 × 128 RGB with bilinear antialiased resizing and "
+                "raw mean squared RGB residuals. Masks use nearest-neighbor resizing. "
+                "Identical test membership; protocol, artifacts and thresholds frozen before "
+                "prediction. No test-driven postprocessing, retraining or recalibration."
+            )
+    with st.expander("Uncertainty and study limitations", expanded=True):
+        st.write(
+            "One category, one seed and one observed test set. Physical-item and acquisition "
+            "independence is not established; near-duplicate uncertainty remains. Square "
+            "resizing may hide small defects; residuals can emphasize edges and background. "
+            "No camera, factory-shift or industrial-readiness validation is established."
+        )
+        st.caption(
+            "AE-minus-mean image AUROC difference: 0.2008 (conditional paired-bootstrap "
+            "95% interval 0.110195 to 0.291805); AP difference: 0.102003 "
+            "(0.032783 to 0.167381). The 1,000 image-stratified resamples assume image "
+            "independence; physical-item/acquisition independence is unverified."
+        )
+    st.subheader("Development evidence and evaluation gates")
     st.info(
-        "Feature-memory and student–teacher: official Cashew defect metrics are not established. "
-        "Their development diagnostics do not establish comparable test accuracy."
+        "DEVELOPMENT ONLY · Feature-memory and student–teacher: official Cashew defect "
+        "metrics are not established. Artificial-probe diagnostics do not establish "
+        "real-defect accuracy and cannot be compared with the official-test results above."
     )
     st.warning(
         "PCB1: BLOCKED — confirmed source overlap. PCB2: INCONCLUSIVE — "
         "56 similarity pairs remain unresolved; no independent human adjudication."
     )
-    st.caption(
-        "Source: docs/model-card.md and runs/cashew-eval-v1/metrics.json. "
-        "These figures are recorded evidence, not new evaluation results."
-    )
+    with st.expander("Sources and historical provenance"):
+        st.write(
+            "Packaged authority: model_cards/model-card.md (Milestone 2B). "
+            "Source-distribution counterpart: docs/model-card.md. Historical run reference: "
+            "runs/cashew-eval-v1/metrics.json; research assets are not included in this package."
+        )
+        st.caption(
+            "Historical Cashew runtime: Python 3.12.15, torch 2.13.0+cpu, Windows AMD64. "
+            "This provenance is separate from the current application runtime."
+        )
+        st.write(
+            "Development sources: model_cards/feature-model-card.md and "
+            "model_cards/student-model-card.md. Open Model Catalog for frozen artifact "
+            "identities, model cards and the verified evidence index."
+        )
 
 
 def show_result(result, display=None):
