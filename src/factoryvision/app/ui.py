@@ -288,13 +288,16 @@ def render(engine, metal_engine=None):
         page_title="FactoryVision AI · Industrial Precision",
         page_icon="◈",
         layout="wide",
-        initial_sidebar_state="auto",
     )
     presentation.styling()
-    st.sidebar.header("FactoryVision AI")
-    st.sidebar.caption("Industrial Precision")
-    navigation_notice = st.sidebar.empty()
-    category = st.sidebar.selectbox("Category", ["Cashew", "MetalParts (experimental)"])
+    # Keep navigation in document flow: collapsed native sidebars retain focusable widgets.
+    layout = st.container(horizontal=True, gap="medium", key="fv-layout")
+    navigation = layout.container(key="fv-nav")
+    content = layout.container(key="fv-shell")
+    navigation.subheader("FactoryVision AI")
+    navigation.caption("Industrial Precision")
+    navigation_notice = navigation.empty()
+    category = navigation.selectbox("Category", ["Cashew", "MetalParts (experimental)"])
     labels = {
         "Overview": "Overview",
         "Image inspection": "Inspect",
@@ -305,8 +308,9 @@ def render(engine, metal_engine=None):
         "Research results": "Research",
         "Synthetic demo": "Demo",
     }
-    with st.sidebar.container(key="fv-nav"):
-        page = st.radio("Workspace", list(labels), format_func=labels.get, key="workspace_page")
+    page = navigation.radio(
+        "Workspace", list(labels), format_func=labels.get, key="workspace_page", horizontal=True
+    )
     presentation.switch_category(category)
     previous = st.session_state.get("active_page")
     if previous != page:
@@ -319,10 +323,10 @@ def render(engine, metal_engine=None):
         presentation.clear_inspection()
         demo_ui.clear()
         st.session_state["active_page"] = page
-    st.sidebar.divider()
-    st.sidebar.markdown("**Research prototype**")
-    st.sidebar.caption("Local CPU · No cloud inference")
-    st.sidebar.caption("PCB1: BLOCKED · PCB2: INCONCLUSIVE")
+    navigation.divider()
+    navigation.markdown("**Research prototype**")
+    navigation.caption("Local CPU · No cloud inference")
+    navigation.caption("PCB1: BLOCKED · PCB2: INCONCLUSIVE")
     titles = {
         "Overview": (
             "Overview",
@@ -357,7 +361,7 @@ def render(engine, metal_engine=None):
             "Original geometry. Validation only. No model inference.",
         ),
     }
-    with st.container(key="fv-shell"):
+    with content:
         presentation.header()
         st.title(titles[page][0])
         st.caption(titles[page][1])

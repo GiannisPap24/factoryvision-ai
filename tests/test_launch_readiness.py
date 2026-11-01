@@ -28,6 +28,10 @@ PAGES = (
 )
 
 
+def navigation_warnings(at):
+    return [item for item in at.warning if item.value.startswith("Before navigating:")]
+
+
 @pytest.fixture
 def source_app(tmp_path, monkeypatch):
     def forbidden(*args, **kwargs):
@@ -53,25 +57,25 @@ def test_first_action_tracks_verified_availability(source_app, monkeypatch, read
             ],
         )
     at.run()
-    assert not at.exception and not at.sidebar.warning
+    assert not at.exception and not navigation_warnings(at)
     label = "Start inspection" if ready else "Open synthetic demo"
     assert button(at, label).proto.type == "primary"
     if not ready:
         assert not any(b.label in ("Start inspection", "Compare models") for b in at.button)
         assert any("no neural inference" in item.value for item in at.info)
         button(at, "Open Model Catalog").click().run()
-        assert at.sidebar.radio[0].value == "Model Catalog" and len(at.table[0].value) == 6
-        at.sidebar.radio[0].set_value("Overview").run()
+        assert at.radio("workspace_page").value == "Model Catalog" and len(at.table[0].value) == 6
+        at.radio("workspace_page").set_value("Overview").run()
     button(at, label).click().run()
-    assert at.sidebar.radio[0].value == ("Image inspection" if ready else "Synthetic demo")
+    assert at.radio("workspace_page").value == ("Image inspection" if ready else "Synthetic demo")
     assert not at.exception and "results" not in at.session_state
 
 
 @pytest.mark.parametrize("page", PAGES)
 def test_empty_source_routes_do_not_warn_of_nonexistent_work(source_app, page):
     at, _ = source_app
-    at.run().sidebar.radio[0].set_value(page).run()
-    assert not at.exception and not at.sidebar.warning
+    at.run().radio("workspace_page").set_value(page).run()
+    assert not at.exception and not navigation_warnings(at)
     assert "results" not in at.session_state and "synthetic_demo" not in at.session_state
 
 
@@ -82,31 +86,31 @@ def test_saved_demo_review_warned_before_each_workspace_transition(source_app, p
     button(at, "Open synthetic demo").click().run()
     button(at, "Generate synthetic demo").click().run()
     # Warning is present on the same run that first produces data, before navigation.
-    assert "synthetic demo" in at.sidebar.warning[0].value
-    assert "unsaved edits" in at.sidebar.warning[0].value
+    assert "synthetic demo" in navigation_warnings(at)[0].value
+    assert "unsaved edits" in navigation_warnings(at)[0].value
     saved = save(at, "demo", note="Synthetic navigation check")
-    at.sidebar.radio[0].set_value(page).run()
+    at.radio("workspace_page").set_value(page).run()
     assert not at.exception
     if page == "Synthetic demo":
         assert at.session_state["fv_review_demo_bundle"] is saved
     else:
         assert "synthetic_demo" not in at.session_state
         assert "fv_review_demo_bundle" not in at.session_state
-        assert not at.sidebar.warning
+        assert not navigation_warnings(at)
 
 
 @pytest.mark.parametrize("category", ["Cashew", "MetalParts (experimental)"])
 def test_category_change_clears_review_demo_and_consent(source_app, category):
     at, _ = source_app
     at.run()
-    at.sidebar.selectbox[0].set_value(category).run()
+    at.selectbox[0].set_value(category).run()
     button(at, "Open synthetic demo").click().run()
     button(at, "Generate synthetic demo").click().run()
     save(at, "demo")
-    assert "category" in at.sidebar.warning[0].value
+    assert "category" in navigation_warnings(at)[0].value
     target = "Cashew" if category != "Cashew" else "MetalParts (experimental)"
-    at.sidebar.selectbox[0].set_value(target).run()
-    assert not at.exception and not at.sidebar.warning
+    at.selectbox[0].set_value(target).run()
+    assert not at.exception and not navigation_warnings(at)
     assert "synthetic_demo" not in at.session_state
     assert "fv_review_demo_bundle" not in at.session_state
     assert not at.session_state["cashew_ack"] and not at.session_state["metal_ack"]
