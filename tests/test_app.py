@@ -70,9 +70,9 @@ def test_metalparts_selection_explicit_run_and_clear(app, tmp_path, monkeypatch)
 
     monkeypatch.setattr(metal, "_load", load)
     at = AppTest.from_function(metal_entry, args=(cashew, metal), default_timeout=10).run()
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
     assert not at.exception and not calls
-    at.sidebar.radio[0].set_value("Image inspection").run()
+    at.radio("workspace_page").set_value("Image inspection").run()
     assert at.button[1].disabled
     monkeypatch.setattr(metalparts_ui.st, "file_uploader", lambda *a, **k: io.BytesIO(payload()[1]))
     at.run().checkbox[0].check().run()
@@ -80,9 +80,9 @@ def test_metalparts_selection_explicit_run_and_clear(app, tmp_path, monkeypatch)
     at.button[1].click().run()
     assert not at.exception and len(calls) == 1 and len(at.metric) == 2
     assert at.session_state["metal_result"].threshold is None
-    at.sidebar.selectbox[0].set_value("Cashew").run()
+    at.selectbox[0].set_value("Cashew").run()
     assert "metal_result" not in at.session_state
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
     at.checkbox[0].check().run().button[1].click().run()
     at.button[0].click().run()
     assert "metal_result" not in at.session_state
@@ -97,11 +97,11 @@ def test_metalparts_errors_and_research(app, tmp_path, monkeypatch):
     _, cashew = app
     metal = MetalPartsService(tmp_path)
     at = AppTest.from_function(metal_entry, args=(cashew, metal), default_timeout=10).run()
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
     assert not at.exception and any(
         "Missing weights are expected" in item.value for item in at.info
     )
-    at.sidebar.radio[0].set_value("Image inspection").run()
+    at.radio("workspace_page").set_value("Image inspection").run()
     monkeypatch.setattr(metalparts_ui.st, "file_uploader", lambda *a, **k: io.BytesIO(b"bad"))
     at.run()
     assert at.error and at.button[1].disabled
@@ -112,7 +112,7 @@ def test_metalparts_errors_and_research(app, tmp_path, monkeypatch):
     monkeypatch.setattr(metalparts_ui.st, "file_uploader", lambda *a, **k: io.BytesIO(payload()[1]))
     at.run().checkbox[0].check().run().button[1].click().run()
     assert at.error and "metal_result" not in at.session_state
-    at.sidebar.radio[0].set_value("Research results").run()
+    at.radio("workspace_page").set_value("Research results").run()
     assert not at.exception and any("NOT INDEPENDENT" in w.value for w in at.warning)
 
 
@@ -140,9 +140,9 @@ def test_navigation_and_explicit_inference(app, monkeypatch):
     at, engine = app
     at.run()
     assert not at.exception and at.table
-    at.sidebar.radio[0].set_value("Research results").run()
-    assert not at.exception and "Recorded" in at.subheader[0].value
-    at.sidebar.radio[0].set_value("Compare").run()
+    at.radio("workspace_page").set_value("Research results").run()
+    assert not at.exception and any("Recorded" in item.value for item in at.subheader)
+    at.radio("workspace_page").set_value("Compare").run()
     assert at.button[1].disabled and "results" not in at.session_state
     monkeypatch.setattr(ui.st, "file_uploader", lambda *a, **k: io.BytesIO(encoded()))
     at.run()
@@ -162,7 +162,7 @@ def test_navigation_and_explicit_inference(app, monkeypatch):
 
 def test_input_and_model_failures(app, monkeypatch):
     at, engine = app
-    at.run().sidebar.radio[0].set_value("Image inspection").run()
+    at.run().radio("workspace_page").set_value("Image inspection").run()
     monkeypatch.setattr(ui.st, "file_uploader", lambda *a, **k: io.BytesIO(b"bad"))
     at.run()
     assert at.error and at.button[1].disabled
@@ -237,8 +237,8 @@ def test_metalparts_comparison_selection(app, tmp_path, monkeypatch):
     monkeypatch.setattr(metalparts_ui, "feature_service", lambda root: Feature())
     monkeypatch.setattr(metalparts_ui.st, "file_uploader", lambda *a, **k: io.BytesIO(payload()[1]))
     at = AppTest.from_function(metal_entry, args=(cashew, metal), default_timeout=10).run()
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
-    at.sidebar.radio[0].set_value("Compare").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.radio("workspace_page").set_value("Compare").run()
     at.multiselect[0].set_value(["Convolutional Autoencoder", "Feature-Memory Detector"]).run()
     at.checkbox[0].check().run()
     assert not calls
@@ -256,7 +256,7 @@ def test_metalparts_comparison_selection(app, tmp_path, monkeypatch):
 @pytest.mark.parametrize("error", [RuntimeError, MemoryError])
 def test_cpu_failure_is_actionable_and_does_not_expose_paths(app, monkeypatch, error):
     at, engine = app
-    at.run().sidebar.radio[0].set_value("Image inspection").run()
+    at.run().radio("workspace_page").set_value("Image inspection").run()
     monkeypatch.setattr(ui.st, "file_uploader", lambda *a, **k: io.BytesIO(encoded()))
     at.run().checkbox[0].check().run().button[1].click().run()
     assert "results" in at.session_state
@@ -273,15 +273,15 @@ def test_cpu_failure_is_actionable_and_does_not_expose_paths(app, monkeypatch, e
 
 def test_category_switch_releases_upload_and_consent(app, monkeypatch):
     at, _ = app
-    at.run().sidebar.radio[0].set_value("Image inspection").run()
+    at.run().radio("workspace_page").set_value("Image inspection").run()
     monkeypatch.setattr(ui.st, "file_uploader", lambda *a, **k: io.BytesIO(encoded()))
     at.run().checkbox[0].check().run().button[1].click().run()
     generation = at.session_state["upload_generation"]
     at.session_state[f"upload_{generation}"] = "synthetic retained upload"
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
     assert not at.exception and "results" not in at.session_state
     assert f"upload_{generation}" not in at.session_state
-    at.sidebar.selectbox[0].set_value("Cashew").run()
+    at.selectbox[0].set_value("Cashew").run()
     assert not at.checkbox[0].value and at.button[1].disabled
     assert "results" not in at.session_state
 
@@ -297,7 +297,7 @@ def test_fresh_checkout_explains_missing_models_without_loading(tmp_path, monkey
     assert not at.exception
     assert any("Model files missing" in item.label for item in at.expander)
     assert any("docs/reproduction.md" in item.value for item in at.markdown)
-    at.sidebar.radio[0].set_value("Image inspection").run()
+    at.radio("workspace_page").set_value("Image inspection").run()
     assert at.button[1].disabled and at.error and not at.exception
 
 
@@ -316,8 +316,8 @@ def test_metalparts_runtime_failure_is_contained(app, tmp_path, monkeypatch):
 
     monkeypatch.setattr(metal, "inspect", fail)
     at = AppTest.from_function(metal_entry, args=(cashew, metal), default_timeout=10).run()
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
-    at.sidebar.radio[0].set_value("Image inspection").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.radio("workspace_page").set_value("Image inspection").run()
     monkeypatch.setattr(metalparts_ui.st, "file_uploader", lambda *a, **k: io.BytesIO(payload()[1]))
     at.run().checkbox[0].check().run().button[1].click().run()
     assert not at.exception and "metal_results" not in at.session_state
@@ -334,7 +334,7 @@ def batch_open(app, monkeypatch, payloads):
     from factoryvision.app import batch_ui
 
     at, engine = app
-    at.run().sidebar.radio[0].set_value("Batch inspection").run()
+    at.run().radio("workspace_page").set_value("Batch inspection").run()
     monkeypatch.setattr(
         batch_ui.st, "file_uploader", lambda *a, **k: [BatchUpload(p) for p in payloads]
     )
@@ -383,11 +383,11 @@ def test_batch_explicit_once_details_and_input_resets(app, monkeypatch):
     at.number_input[0].set_value(3).run()
     assert "batch_report" not in at.session_state
     assert "batch_exports" not in at.session_state
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
     assert not at.exception and "batch_report" not in at.session_state
     assert "batch_exports" not in at.session_state
     assert not at.checkbox[0].value
-    at.sidebar.radio[0].set_value("Image inspection").run()
+    at.radio("workspace_page").set_value("Image inspection").run()
     assert "batch_plan" not in at.session_state
     assert "batch_exports" not in at.session_state
 
@@ -484,13 +484,13 @@ def test_fresh_catalog_and_demo_never_infer_or_mix_report_state(tmp_path, monkey
     monkeypatch.setattr(engine, "_load", forbidden)
     monkeypatch.setattr(BatchService, "run", forbidden)
     at = AppTest.from_function(entry, args=(engine,), default_timeout=10).run()
-    at.sidebar.radio[0].set_value("Model Catalog").run()
+    at.radio("workspace_page").set_value("Model Catalog").run()
     assert not at.exception and at.error and len(at.table[0].value) == 6
     assert any("Unavailable" in x.value for x in at.code)
     for model in MODEL_IDS:
         at.selectbox(key="catalog_model_cashew").set_value(model).run()
         assert not at.exception
-    at.sidebar.radio[0].set_value("Synthetic demo").run()
+    at.radio("workspace_page").set_value("Synthetic demo").run()
     assert not at.exception and "synthetic_demo" not in at.session_state
     assert not at.get("download_button") and any(x.value == NOTICE for x in at.warning)
     next(b for b in at.button if b.label == "Generate synthetic demo").click().run()
@@ -501,23 +501,23 @@ def test_fresh_catalog_and_demo_never_infer_or_mix_report_state(tmp_path, monkey
     assert all(key not in at.session_state for key in ("batch_report", "batch_exports", "results"))
     at.run()
     assert at.session_state["synthetic_demo"] is bundle
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
     assert "synthetic_demo" not in at.session_state and not at.get("download_button")
     next(b for b in at.button if b.label == "Generate synthetic demo").click().run()
     next(b for b in at.button if b.label == "Clear synthetic demo").click().run()
     assert "synthetic_demo" not in at.session_state
     next(b for b in at.button if b.label == "Generate synthetic demo").click().run()
-    at.sidebar.radio[0].set_value("Model Catalog").run()
+    at.radio("workspace_page").set_value("Model Catalog").run()
     assert "synthetic_demo" not in at.session_state and at.error and not at.exception
     at.selectbox(key="catalog_model_metalparts").set_value("metalparts_feature_memory").run()
     assert not at.exception
-    at.sidebar.radio[0].set_value("Batch inspection").run()
+    at.radio("workspace_page").set_value("Batch inspection").run()
     assert at.button[1].disabled and not at.get("download_button") and not at.exception
 
 
 def test_catalog_verified_status_uses_existing_adapter(app):
     at, _ = app
-    at.run().sidebar.radio[0].set_value("Model Catalog").run()
+    at.run().radio("workspace_page").set_value("Model Catalog").run()
     assert not at.exception and at.success
     assert not any(x.value == "Unavailable" for x in at.code)
 
@@ -536,7 +536,7 @@ def test_reports_navigation_preserves_exports_without_inference(app, monkeypatch
     source = at.session_state["batch_report"]
     exports = at.session_state["batch_exports"]
     assert len(calls) == 2
-    at.sidebar.radio[0].set_value("Reports").run()
+    at.radio("workspace_page").set_value("Reports").run()
     assert not at.exception and at.session_state["batch_report"] is source
     assert at.session_state["batch_exports"] is exports
     assert len([b for b in at.get("download_button") if "Download research " in b.label]) == 2
@@ -544,7 +544,7 @@ def test_reports_navigation_preserves_exports_without_inference(app, monkeypatch
     assert len(calls) == 2
     at.run()
     assert at.session_state["batch_exports"].csv == exports.csv and len(calls) == 2
-    at.sidebar.radio[0].set_value("Batch inspection").run()
+    at.radio("workspace_page").set_value("Batch inspection").run()
     assert not at.exception and at.session_state["batch_report"] is source
     assert not any(b.label == "Run batch inspection" for b in at.button)
     assert len(calls) == 2
@@ -556,13 +556,13 @@ def test_reports_navigation_preserves_exports_without_inference(app, monkeypatch
 def test_report_is_invalidated_on_category_or_unrelated_navigation(app, monkeypatch):
     at, _ = batch_open(app, monkeypatch, [encoded()])
     at.checkbox[0].check().run().button[1].click().run()
-    at.sidebar.radio[0].set_value("Reports").run()
-    at.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+    at.radio("workspace_page").set_value("Reports").run()
+    at.selectbox[0].set_value("MetalParts (experimental)").run()
     assert not at.exception and "batch_report" not in at.session_state
     assert "batch_exports" not in at.session_state and not at.get("download_button")
     next(b for b in at.button if b.label == "Open Batch Inspection").click().run()
-    assert at.sidebar.radio[0].value == "Batch inspection"
-    at.sidebar.radio[0].set_value("Overview").run()
+    assert at.radio("workspace_page").value == "Batch inspection"
+    at.radio("workspace_page").set_value("Overview").run()
     assert "batch_plan" not in at.session_state
 
 
@@ -571,17 +571,17 @@ def test_inspect_compare_transition_requires_new_explicit_run(app, monkeypatch):
     monkeypatch.setattr(ui.st, "file_uploader", lambda *a, **k: io.BytesIO(encoded()))
     at.run()
     next(b for b in at.button if b.label == "Start inspection").click().run()
-    assert at.sidebar.radio[0].value == "Image inspection"
+    assert at.radio("workspace_page").value == "Image inspection"
     assert at.multiselect[0].proto.max_selections == 1
     at.checkbox[0].check().run().button[1].click().run()
     assert len(at.session_state["results"]) == 1
-    at.sidebar.radio[0].set_value("Compare").run()
+    at.radio("workspace_page").set_value("Compare").run()
     assert "results" not in at.session_state and not at.checkbox[0].value
     at.multiselect[0].set_value(list(MODEL_IDS)).run()
     assert "results" not in at.session_state
     at.checkbox[0].check().run().button[1].click().run()
     assert len(at.session_state["results"]) == 4
-    at.sidebar.radio[0].set_value("Image inspection").run()
+    at.radio("workspace_page").set_value("Image inspection").run()
     assert "results" not in at.session_state and len(at.multiselect[0].value) == 1
 
 
@@ -589,14 +589,15 @@ def test_overview_actions_reports_empty_and_model_cards(app):
     at, _ = app
     at.run()
     next(b for b in at.button if b.label == "Compare models").click().run()
-    assert at.sidebar.radio[0].value == "Compare" and not at.exception
-    at.sidebar.radio[0].set_value("Overview").run()
+    assert at.radio("workspace_page").value == "Compare" and not at.exception
+    at.radio("workspace_page").set_value("Overview").run()
     next(b for b in at.button if b.label == "Open demo").click().run()
     assert (
-        at.sidebar.radio[0].value == "Synthetic demo" and "synthetic_demo" not in at.session_state
+        at.radio("workspace_page").value == "Synthetic demo"
+        and "synthetic_demo" not in at.session_state
     )
-    at.sidebar.radio[0].set_value("Reports").run()
+    at.radio("workspace_page").set_value("Reports").run()
     assert not at.exception and not at.get("download_button")
-    at.sidebar.radio[0].set_value("Model Catalog").run()
+    at.radio("workspace_page").set_value("Model Catalog").run()
     cards = [b for b in at.get("download_button") if b.label == "Download model card"]
     assert len(cards) == 6 and not at.exception

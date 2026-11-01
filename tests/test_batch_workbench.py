@@ -45,8 +45,8 @@ def test_stopped_batch_keeps_success_evidence_review_and_exports(app, monkeypatc
     assert any("pending records" in i.value for i in at.info)
     bundle = at.session_state["batch_exports"]
     reviews = save(at, scope="batch")
-    at.sidebar.radio[0].set_value("Reports").run()
-    at.sidebar.radio[0].set_value("Batch inspection").run()
+    at.radio("workspace_page").set_value("Reports").run()
+    at.radio("workspace_page").set_value("Batch inspection").run()
     assert not at.exception and len(calls) == 2
     assert at.session_state["batch_report"] is source
     assert at.session_state["batch_exports"] is bundle

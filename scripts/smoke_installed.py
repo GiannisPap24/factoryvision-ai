@@ -86,11 +86,11 @@ assert json.loads(json_bytes(demo.report))["inference_executed"] is False
 assert csv_bytes(demo.report) == csv_bytes(build_demo().report)
 app = AppTest.from_file(ui.__file__, default_timeout=15).run()
 assert not app.exception
-app.sidebar.radio[0].set_value("Model Catalog").run()
+app.radio("workspace_page").set_value("Model Catalog").run()
 assert not app.exception and app.error and app.table
 app.selectbox(key="registry_category").set_value("pcb1").run()
 assert not app.exception and any("BLOCKED" in text.value for text in app.text)
-app.sidebar.radio[0].set_value("Synthetic demo").run()
+app.radio("workspace_page").set_value("Synthetic demo").run()
 assert not app.exception and any(NOTICE in warning.value for warning in app.warning)
 next(button for button in app.button if button.label == "Generate synthetic demo").click().run()
 assert not app.exception and len(app.get("download_button")) == 4
@@ -103,10 +103,10 @@ reviews = app.session_state["fv_review_demo_bundle"].records
 assert reviews[0].decision == Decision.NEEDS_FURTHER_REVIEW
 assert reviews[0].evidence.score is None and reviews[1].history == ()
 assert review_json(reviews) == review_json(reviews)
-app.sidebar.selectbox[0].set_value("MetalParts (experimental)").run()
+app.selectbox[0].set_value("MetalParts (experimental)").run()
 assert "synthetic_demo" not in app.session_state
 assert "fv_review_demo_bundle" not in app.session_state
-app.sidebar.radio[0].set_value("Batch inspection").run()
+app.radio("workspace_page").set_value("Batch inspection").run()
 assert not app.exception and not app.get("download_button")
 print(
     "PASS: installed six-model catalog, missing artifacts, demo, human review, exports and resets."

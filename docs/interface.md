@@ -10,8 +10,8 @@ work without model files. Research presents recorded results with their limitati
 
 Navigation uses navy, controls blue and teal, and semantic feedback uses blue,
 green, amber or red. Fonts and theme assets are local. Purple-family colors are
-excluded from application-controlled styling. Narrow screens collapse navigation
-and stack columns; tables retain horizontal scrolling where needed.
+excluded from application-controlled styling. Narrow screens wrap the visible
+navigation above the workspace and stack columns; tables retain horizontal scrolling where needed.
 
 ## Scientific maps
 
@@ -38,8 +38,9 @@ review of visible filenames, browser chrome, paths and image metadata.
 ## Inspection Workbench V2 — first implementation slice
 
 Overview, the shared shell and single-image inspection follow the reviewed local
-UX-1R direction. The native sidebar remains the single eight-workspace navigation
-control and the authority for category selection. A navy workspace header and
+UX-1R direction. One always-rendered native content rail holds the eight-workspace
+radio and Category selector. It wraps above the workspace on narrow screens;
+there are no actionable controls in a collapsed sidebar. A navy workspace header and
 packaged `app/workbench.css` provide the shared visual foundation; no remote font,
 JavaScript component or additional frontend is used. The header stays inside the
 native content region, rather than replacing Streamlit browser/sidebar controls.
@@ -51,22 +52,22 @@ available. Real inference actions appear only when verified methods are availabl
 
 Single-image inspection places the validated RGB preview on the left and setup
 on the right, stacking preview first on narrow screens. Category stays in the
-sidebar; its current value is repeated in setup. Preview validation does not load
+navigation rail; its current value is repeated in setup. Preview validation does not load
 models or run inference. No weights means no anomaly output. Both categories keep
 the original limits, consent and explicit execution gates; MetalParts also keeps
 its minimum image size and exploratory-only restrictions. Clear releases upload
 widget state, results, review state and consent through the existing cleanup helper.
 Empty and invalid files show validation errors and cannot retain a previous preview.
 
-Native sidebar collapse/expand, keyboard operation and contextual loss notices are
-retained. Closing the sidebar does not clear work. Workspace/category changes
+Native keyboard operation and contextual loss notices are retained. Resizing or
+focusing navigation does not clear work. Workspace/category changes
 retain their original cleanup rules, including the completed Batch/Reports exception.
 Batch Inspection and Reports use the UX-4 presentation below; Research retains
 its existing content. All export schemas and serializers are unchanged. Catalog and Demo use the compact UX-2B presentation
 described in [Model Catalog and synthetic demo](model-catalog-demo.md), with
 the same scientific and session contracts.
 The design prototype banner is not part of the application. Native widget spacing,
-sidebar geometry and controls intentionally differ from the static design reference.
+navigation geometry and controls intentionally differ from the static design reference.
 
 The bounded density polish uses Streamlit 1.66 theme padding in both the source
 and packaged themes. Setup uses compact native container gaps and a wider desktop
@@ -76,9 +77,9 @@ its existing callback and precedes Run. Mobile Overview actions stack vertically
 only the empty preview is shortened. Uploaded image geometry is preserved inside
 the viewer using contain sizing.
 
-The native sidebar supports its own click/Enter controls. Escape does not reliably
-close it or restore focus as in the design prototype; no DOM script overrides that
-behavior. Keyboard focus styling and navigation cleanup remain native.
+The content navigation replaces the prototype's collapsible menu to avoid hidden
+keyboard-actionable sidebar controls. Category and workspace selection remain
+native widgets, with a single authority and no injected script or custom router.
 
 ## Image Viewer and Compare (UX-3)
 
