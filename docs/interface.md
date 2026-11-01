@@ -61,7 +61,7 @@ Empty and invalid files show validation errors and cannot retain a previous prev
 Native sidebar collapse/expand, keyboard operation and contextual loss notices are
 retained. Closing the sidebar does not clear work. Workspace/category changes
 retain their original cleanup rules, including the completed Batch/Reports exception.
-Compare, Batch Inspection, Reports and Research keep their existing content,
+Batch Inspection, Reports and Research keep their existing content,
 exports and serializers. Catalog and Demo use the compact UX-2B presentation
 described in [Model Catalog and synthetic demo](model-catalog-demo.md), with
 the same scientific and session contracts.
@@ -73,8 +73,34 @@ and packaged themes. Setup uses compact native container gaps and a wider deskto
 column; Run spans that column. Detailed input limits remain in native disclosures,
 with upload validation, consent and unavailable-model gates unchanged. Clear keeps
 its existing callback and precedes Run. Mobile Overview actions stack vertically;
-only the empty preview is shortened, not uploaded image geometry.
+only the empty preview is shortened. Uploaded image geometry is preserved inside
+the viewer using contain sizing.
 
 The native sidebar supports its own click/Enter controls. Escape does not reliably
 close it or restore focus as in the design prototype; no DOM script overrides that
 behavior. Keyboard focus styling and navigation cleanup remain native.
+
+## Image Viewer and Compare (UX-3)
+
+Inspect and Compare share a large input preview beside compact setup controls.
+Preview decoding remains separate from inference, including when all models are
+unavailable. A completed single inspection replaces the preview with the result
+viewer. Original, Heatmap, Overlay and Reconstruction / reference are distinct
+native tabs; images precede model diagnostics. Unsupported reconstructions have
+an explicit unavailable explanation.
+
+Compare uses one view selector for all selected models, in selection order, with
+at most two result cards per row. A link beneath Run jumps to the results.
+Mobile stacks the cards and wraps the selector. Unsupported reconstructions use
+a labelled empty panel to retain alignment with other methods.
+Changing the view only changes presentation; it does not rerun inference or clear
+results. Each model retains its own map legend, score units, frozen threshold or
+unavailable decision, measured timing and artifact identity. Raw scores cannot
+rank different methods; relative map colors are not a shared calibrated scale.
+
+Viewers contain the complete image without cropping or stretching its geometry.
+Input previews are reduced to at most 1024 pixels per side; result display pixels,
+per-map maximum normalization and the 45% overlay remain unchanged. Desktop image
+surfaces are 400 pixels high (440 for input), adapting to 280 pixels on mobile.
+These display bounds do not alter numerical arrays, inference inputs or exports.
+No zoom/pan interaction or new inference capability is introduced.

@@ -29,13 +29,11 @@ def input_viewer(image=None):
                 "is separate from inference.</p><p>No model output, score or anomaly map.</p></div>"
             )
         else:
-            st.image(image, caption="Validated RGB · preview only", width="content")
+            st.image(image, caption="Validated RGB · preview only", width="stretch")
         st.caption("Original RGB before inference · Session only")
 
 
 def inspection_layout(compare):
-    if compare:
-        return st.container(border=True), st.container(), None
     viewer, setup = st.columns([1.8, 1], gap="medium")
     preview = viewer.empty()
     return (
@@ -43,6 +41,54 @@ def inspection_layout(compare):
         st.container(),
         preview,
     )
+
+
+VIEW_LABELS = ("Original", "Heatmap", "Overlay", "Reconstruction / reference")
+
+
+def result_images(view, display=None, *, reference=True, key="result"):
+    """Present existing display pixels; no scoring, normalization or image edits."""
+
+    def show(label):
+        if label == "Reconstruction / reference":
+            if view["reconstruction"] is not None:
+                st.image(view["reconstruction"], caption="Reconstructed RGB", width="stretch")
+            elif reference and view["reference"] is not None:
+                st.image(
+                    view["reference"], caption="Frozen spatial mean reference", width="stretch"
+                )
+            else:
+                st.html(
+                    '<div class="fv-unavailable-spatial">'
+                    "<strong>No RGB reconstruction</strong>"
+                    "<p>This model produces anomaly features, not an RGB reconstruction.</p>"
+                    "</div>"
+                )
+                st.caption("Reconstruction unavailable for this method")
+        else:
+            name, caption = {
+                "Original": ("original", "Original RGB"),
+                "Heatmap": ("heatmap", "Relative anomaly intensity"),
+                "Overlay": ("overlay", "45% heatmap overlay"),
+            }[label]
+            st.image(view[name], caption=caption, width="stretch")
+
+    with st.container(key="fv-spatial-viewer-" + key, gap="xsmall"):
+        if display is None:
+            for tab, label in zip(st.tabs(VIEW_LABELS), VIEW_LABELS, strict=True):
+                with tab:
+                    show(label)
+        else:
+            show(display)
+
+
+def comparison_view():
+    st.subheader("Side-by-side evidence", anchor="comparison-results")
+    st.caption(
+        "Same input · Selection order · Each map has its own relative scale. "
+        "Raw scores use different units and cannot rank models."
+    )
+    return st.radio("View for all models", VIEW_LABELS, index=2, horizontal=True)
 
 
 def table(data, key):

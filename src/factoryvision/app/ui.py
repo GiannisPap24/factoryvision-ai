@@ -54,13 +54,16 @@ def research():
     )
 
 
-def show_result(result):
+def show_result(result, display=None):
     view = panels(result)
     with st.container(border=True, key="fv-card-result-" + result.model_id):
         st.subheader(result.model_name)
         from factoryvision.inference.model_catalog import METHODS
 
         st.caption(METHODS[result.model_id][0])
+        presentation.result_images(view, display, key=result.model_id)
+        presentation.legend(view["ceiling"])
+        st.markdown("**Model diagnostics**")
         columns = st.columns(3)
         columns[0].metric("Anomaly score", f"{result.score:.8f}")
         columns[1].metric(
@@ -75,27 +78,6 @@ def show_result(result):
             st.warning("Above frozen threshold — elevated anomaly score; inspect the output.")
         else:
             st.info("At or below frozen threshold — this does not establish defect absence.")
-        map_tab, overlay_tab, reconstruction_tab = st.tabs(
-            ["Anomaly map", "Overlay", "Reconstruction / reference"]
-        )
-        with map_tab:
-            left, right = st.columns(2)
-            left.image(view["original"], caption="Original RGB", width="stretch")
-            right.image(view["heatmap"], caption="Relative anomaly intensity", width="stretch")
-        with overlay_tab:
-            st.image(view["overlay"], caption="45% heatmap overlay", width="stretch")
-        with reconstruction_tab:
-            if view["reconstruction"] is not None:
-                st.image(
-                    view["reconstruction"], caption="Autoencoder reconstruction", width="stretch"
-                )
-            elif view["reference"] is not None:
-                st.image(
-                    view["reference"], caption="Frozen spatial mean reference", width="stretch"
-                )
-            else:
-                st.info("This model produces anomaly features, not an RGB reconstruction.")
-        presentation.legend(view["ceiling"])
         with st.expander("Score precision, timing and model identity"):
             st.write(f"Raw score: {result.score:.10g} · threshold: {result.threshold}")
             st.caption(
@@ -134,8 +116,6 @@ def inspect(engine, statuses, compare=False):
             "I confirm this is a permitted Cashew image, not an official test image.",
             key="cashew_ack",
         )
-        if upload is None and compare:
-            st.info("Choose a model and upload an image to begin. Inference runs only on request.")
         payload = upload.getvalue() if upload is not None else None
         identity = (
             hashlib.sha256(payload).hexdigest() if payload else None,
@@ -150,10 +130,7 @@ def inspect(engine, statuses, compare=False):
         if payload is not None:
             try:
                 preview = decode_upload(payload)
-                preview.thumbnail((640, 640))
-                if compare:
-                    with st.expander("Input preview"):
-                        st.image(preview, caption="Original RGB before inference", width="content")
+                preview.thumbnail((1024, 1024))
                 valid = True
             except InputRejected as exc:
                 st.error(str(exc))
@@ -161,7 +138,7 @@ def inspect(engine, statuses, compare=False):
         if st.button(
             "Run inspection",
             type="primary",
-            width="content" if compare else "stretch",
+            width="stretch",
             disabled=not (valid and chosen and acknowledged),
         ):
             st.session_state.pop("results", None)
@@ -172,6 +149,8 @@ def inspect(engine, statuses, compare=False):
                 st.error(str(exc))
             except (RuntimeError, MemoryError):
                 presentation.inference_failure()
+        if compare and st.session_state.get("results"):
+            st.markdown("[View comparison results](#comparison-results)")
         if not available:
             st.error(
                 "No verified local model artifacts are available. "
@@ -195,21 +174,25 @@ def inspect(engine, statuses, compare=False):
             else "Preview only until an explicit run. "
             "Changing image, model or consent clears results."
         )
-    if preview_slot is not None:
-        with preview_slot.container():
+    results = st.session_state.get("results", ())
+    with preview_slot.container():
+        if results and not compare:
+            show_result(results[0])
+        else:
             presentation.input_viewer(preview if valid else None)
     with output:
-        results = st.session_state.get("results", ())
-        if not results and compare:
-            st.subheader("Spatial evidence")
-            st.info(
-                "No inspection yet. Select a model, upload a permitted image and run inspection."
-            )
-        for offset in range(0, len(results), 2):
-            row = results[offset : offset + 2]
-            for column, result in zip(st.columns(len(row)), row, strict=True):
-                with column:
-                    show_result(result)
+        if compare:
+            if results:
+                display = presentation.comparison_view()
+                for offset in range(0, len(results), 2):
+                    row = results[offset : offset + 2]
+                    for column, result in zip(st.columns(len(row)), row, strict=True):
+                        with column:
+                            show_result(result, display)
+            else:
+                st.info(
+                    "No model output yet. Upload a permitted image and explicitly run inspection."
+                )
         from factoryvision.app import review_ui
 
         review_ui.render("single", results or None, "cashew")
