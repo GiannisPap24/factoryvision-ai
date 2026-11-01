@@ -46,17 +46,42 @@ def render(source: BatchReport) -> bool:
         st.error("Batch stopped. Failed and skipped images have no anomaly decision.")
     else:
         st.warning("Batch complete with issues. Review rejected and failed images below.")
+    with st.container(border=True, key="fv-report-exports", gap="xsmall"):
+        st.subheader("Export research results")
+        left, right = st.columns(2)
+        filename = "factoryvision-" + report.report_id
+        left.download_button(
+            "Download research CSV",
+            bundle.csv,
+            file_name=filename + ".csv",
+            mime="text/csv; charset=utf-8",
+            key="csv-" + report.report_id,
+            on_click="ignore",
+        )
+        right.download_button(
+            "Download research JSON",
+            bundle.json,
+            file_name=filename + ".json",
+            mime="application/json",
+            key="json-" + report.report_id,
+            on_click="ignore",
+        )
+        st.caption(
+            "Downloads contain safe image IDs, scalar results and research provenance only. "
+            "No filenames, images or EXIF. Exporting does not rerun inference. "
+            "The app writes no report files automatically; your browser saves only on request."
+        )
     st.write(f"Category: {report.model.category} · Model: {report.model.name}")
     st.caption("Report: " + report.report_id)
     count = report.summary
     for column, label, value in zip(
         st.columns(4),
-        ("Inspected", "Rejected / failed", "Skipped", "Batch processing"),
+        ("Inspected", "Rejected", "Failed", "Skipped"),
         (
             count.inspected,
-            count.rejected + count.failed,
+            count.rejected,
+            count.failed,
             count.skipped,
-            f"{report.batch_duration_ms / 1000:.3f} s",
         ),
         strict=True,
     ):
@@ -76,6 +101,7 @@ def render(source: BatchReport) -> bool:
         )
     else:
         st.caption("Model inference timing: unavailable; no successful images.")
+    st.caption(f"Batch processing: {report.batch_duration_ms / 1000:.3f} s")
     st.caption(TIMING_SCOPE)
     st.write(report.model.scientific_status)
     with st.expander("Model provenance and score semantics"):
@@ -94,6 +120,11 @@ def render(source: BatchReport) -> bool:
             else f"Frozen research threshold: {report.model.frozen_threshold:.17g} "
             "(score > threshold)"
         )
+    st.subheader("Image outcomes")
+    st.caption(
+        "Inspected: prediction available. Rejected: input invalid. "
+        "Failed: inspection error. Skipped: not executed after a stop."
+    )
     presentation.table(
         [
             {
@@ -114,27 +145,4 @@ def render(source: BatchReport) -> bool:
     with st.expander("Scientific limitations", expanded=False):
         for limitation in LIMITATIONS:
             st.write(limitation)
-    left, right = st.columns(2)
-    filename = "factoryvision-" + report.report_id
-    left.download_button(
-        "Download research CSV",
-        bundle.csv,
-        file_name=filename + ".csv",
-        mime="text/csv; charset=utf-8",
-        key="csv-" + report.report_id,
-        on_click="ignore",
-    )
-    right.download_button(
-        "Download research JSON",
-        bundle.json,
-        file_name=filename + ".json",
-        mime="application/json",
-        key="json-" + report.report_id,
-        on_click="ignore",
-    )
-    st.caption(
-        "Downloads contain safe image IDs, scalar results and research provenance only. "
-        "No filenames, images or EXIF. Exporting does not rerun inference. "
-        "The app writes no report files automatically; your browser saves only on request."
-    )
     return True

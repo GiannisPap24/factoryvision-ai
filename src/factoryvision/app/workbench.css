@@ -84,6 +84,8 @@
 .st-key-fv-input-viewer {background:var(--fv-nav);color:var(--fv-navText);border-radius:8px;padding:16px;}
 .st-key-fv-input-viewer p,.st-key-fv-input-viewer h2 {color:var(--fv-navText);}
 .st-key-fv-input-viewer img {height:440px;}
+.st-key-fv-batch-setup,.st-key-fv-batch-inputs,.st-key-fv-report-exports {background:var(--fv-surface);}
+.st-key-fv-report-exports {border-top:3px solid var(--fv-teal);}
 .st-key-fv-shell [class*="st-key-fv-spatial-viewer-"] img {height:400px;background:var(--fv-nav);}
 .fv-unavailable-spatial {height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:var(--fv-workspace);border:1px dashed var(--fv-border);border-radius:6px;}
 .st-key-fv-shell [class*="st-key-fv-card-result-"] {min-width:0;}

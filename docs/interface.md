@@ -61,8 +61,8 @@ Empty and invalid files show validation errors and cannot retain a previous prev
 Native sidebar collapse/expand, keyboard operation and contextual loss notices are
 retained. Closing the sidebar does not clear work. Workspace/category changes
 retain their original cleanup rules, including the completed Batch/Reports exception.
-Batch Inspection, Reports and Research keep their existing content,
-exports and serializers. Catalog and Demo use the compact UX-2B presentation
+Batch Inspection and Reports use the UX-4 presentation below; Research retains
+its existing content. All export schemas and serializers are unchanged. Catalog and Demo use the compact UX-2B presentation
 described in [Model Catalog and synthetic demo](model-catalog-demo.md), with
 the same scientific and session contracts.
 The design prototype banner is not part of the application. Native widget spacing,
@@ -104,3 +104,26 @@ per-map maximum normalization and the 45% overlay remain unchanged. Desktop imag
 surfaces are 400 pixels high (440 for input), adapting to 280 pixels on mobile.
 These display bounds do not alter numerical arrays, inference inputs or exports.
 No zoom/pan interaction or new inference capability is introduced.
+
+## Batch Inspection and Reports (UX-4)
+
+Batch setup and input status sit in adjacent native panels on desktop and stack
+on mobile. Setup keeps one compatible model, the existing image limit, upload,
+consent, clear and explicit Run controls. Validation counts and ordered thumbnails
+are input status, not inspection progress. Progress uses actual completed-row
+callbacks from the existing sequential batch service.
+
+A completed snapshot exposes three native tabs: **Summary & exports**, **Image
+evidence** and **Human review**. Summary distinguishes inspected, rejected, failed
+and skipped rows and keeps validated research CSV/JSON downloads near the status.
+Image evidence uses the accepted four-view viewer with compact retained previews;
+only successful predictions have evidence or a review form. Human Review exports
+remain separate and include pending records before any review is saved. Save is
+explicit; unsaved edits are not exported. No score, schema or history changes.
+
+A visible session notice explains that Batch Inspection and Reports retain the
+snapshot and saved reviews. Leaving that pair, changing category or clearing
+removes them; refresh, expiry or restart may also discard them. Export results and
+saved review history before leaving. Returning from Reports shows a read-only
+snapshot until Clear batch; it never resumes inference. Stopped batches retain
+successful earlier rows without describing the whole batch as successful.

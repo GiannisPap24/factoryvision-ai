@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 
 import streamlit as st
 
+from factoryvision.app import presentation
 from factoryvision.inference import review
 from factoryvision.inference.reporting import ReportInvalid, create_report
 
@@ -58,6 +59,12 @@ def render(scope, source, category=None):
         "Do not enter private information. Common paths/contact details/credentials are rejected; "
         "this is not comprehensive sensitive-data detection."
     )
+    if scope == "batch":
+        st.info(
+            "Save each review explicitly. Unsaved edits are not exported and may be lost "
+            "when switching results. Export saved history before clearing or leaving "
+            "Batch Inspection and Reports."
+        )
     index = st.selectbox(
         "Result to review",
         range(len(bundle.records)),
@@ -105,7 +112,12 @@ def render(scope, source, category=None):
             "No saved review yet. Exports include the two pending records: NOT_REVIEWED, "
             "empty notes, null review timestamps and no revision history."
         )
-    st.table(
+    if scope == "batch" and not any(r.history for r in bundle.records):
+        st.info(
+            "No saved review yet. Review exports include pending records with empty notes, "
+            "null timestamps and no revision history."
+        )
+    presentation.table(
         [
             {
                 "Image": r.evidence.image_id,
@@ -115,7 +127,8 @@ def render(scope, source, category=None):
                 "UTC time": r.reviewed_at_utc or "Not reviewed",
             }
             for r in bundle.records
-        ]
+        ],
+        "human-review-" + scope,
     )
     st.caption(
         "Set NOT_REVIEWED with an empty note to return to pending. "
