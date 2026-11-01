@@ -187,6 +187,7 @@ def research(root):
     comparison(root)
     with st.expander("Earlier autoencoder training and development diagnostics"):
         development_history(root)
+    st.caption("PCB1: BLOCKED · PCB2: INCONCLUSIVE · No independent target evaluation is cleared.")
 
 
 def development_history(root):
@@ -208,30 +209,36 @@ def development_history(root):
     except (OSError, ValueError):
         st.info("Local research summary is unavailable.")
         return
-    st.caption(f"Untrained validation MSE: {summary['training']['initial_validation_loss']:.8f}")
-    st.dataframe(
+    st.caption(f"Untrained validation MSE: {summary['training']['initial_validation_loss']}")
+    st.caption(
+        "Recorded normal reconstruction losses, not detection accuracy. "
+        "Scroll tables for full precision."
+    )
+    presentation.table(
         [
             {
                 "Epoch": r["epoch"],
-                "Fitting MSE": r["train_loss"],
-                "Validation MSE": r["validation_loss"],
+                "Fitting MSE": str(r["train_loss"]),
+                "Validation MSE": str(r["validation_loss"]),
             }
             for r in summary["training"]["epochs"]
-        ]
+        ],
+        "research-metal-training",
     )
     metrics = summary["metrics"]
-    st.dataframe(
+    presentation.table(
         [
             {
                 "Level": name,
-                "AUROC": metrics[name]["auroc"],
-                "Average precision": metrics[name]["average_precision"],
+                "AUROC": str(metrics[name]["auroc"]),
+                "Average precision": str(metrics[name]["average_precision"]),
                 "Positive": metrics[name]["positive"],
                 "Negative": metrics[name]["negative"],
-                "Prevalence": metrics[name]["prevalence"],
+                "Prevalence": str(metrics[name]["prevalence"]),
             }
             for name in ("image", "pixel")
-        ]
+        ],
+        "research-metal-development",
     )
     st.caption(
         "Pixel metrics include every native pixel using 65,536 fixed bins: exact for "
@@ -311,7 +318,7 @@ def render(page, engine):
 
 
 def comparison(root):
-    st.subheader("Frozen MetalParts comparison")
+    st.subheader("Recorded MetalParts comparison")
     try:
         summary = json.loads(
             files("factoryvision.inference")
@@ -321,46 +328,104 @@ def comparison(root):
     except (OSError, ValueError):
         st.info("Local feature-memory comparison is unavailable.")
         return
-    st.warning(summary["label"])
-    st.write(
-        "One fixed feature memory fitted on the same 144 normal fitting images. "
-        "The comparison reuses 36 validation normals and 51 previously observed "
-        "source anomalies. The backbone is frozen; memory fitting uses no gradient training."
-    )
-    rows = []
-    for method, label in [("autoencoder", "Autoencoder"), ("feature_memory", "Feature memory")]:
-        data = summary[method]
-        rows.append(
-            {
-                "Method": label,
-                "Image AUROC": data["image"]["auroc"],
-                "Image AP": data["image"]["average_precision"],
-                "Pixel AUROC": data["pixel"]["auroc"],
-                "Pixel AP": data["pixel"]["average_precision"],
-                "Median CPU seconds": data["latency_seconds"]["median"],
-            }
+    with st.container(border=True, key="fv-card-research-status", gap="small"):
+        st.markdown("**EXPLORATORY · Independent target evaluation NOT CLEARED**")
+        st.warning(summary["label"])
+        st.write(
+            "87 source-domain images: 36 validation normals and 51 previously observed "
+            "anomalies. The normals already influenced checkpoint selection. Physical-item "
+            "and capture independence is unresolved. No binary threshold exists."
         )
-    st.dataframe(rows)
-    st.caption(
-        "AUROC measures ranking across thresholds; AP summarizes precision and recall. "
-        "Pixel metrics describe localization, with severe background imbalance."
-    )
-    st.caption(
-        "Native pixels; identical fixed bin width 1/65535, no clipping or per-image "
-        "normalization. Positive prevalence: 58.62% of images, 0.02427% of pixels. "
-        "These prevalences are constant-score AP references. Timings come from separate "
-        "recorded runs; feature comparison overlapped local verification work."
-    )
-    st.write(
-        "Feature memory ranks this observed set better in aggregate, but localization "
-        "AP is lower on 10 of 51 anomalous images. Both methods place their maximum "
-        "outside the defect mask on 22 images. Higher aggregate metrics do not remove "
-        "shared failures or establish an independent winner."
-    )
-    st.warning(
-        "Source images may share physical objects; the normals already influenced AE "
-        "checkpoint selection and anomalies were previously observed. Unresolved official "
-        "train/test similarity candidates remain. Independent target evaluation: NOT CLEARED."
+    with st.container(border=True, key="fv-card-research-ranking", gap="small"):
+        st.subheader("Observed ranking and localization")
+        st.caption("Historical values · AP means average precision · No independent-winner claim.")
+        presentation.table(
+            {
+                "Metric": ["Image AUROC", "Image AP", "Pixel AUROC", "Pixel AP"],
+                **{
+                    label: [
+                        str(summary[method][level][metric])
+                        for level in ("image", "pixel")
+                        for metric in ("auroc", "average_precision")
+                    ]
+                    for method, label in (
+                        ("autoencoder", "Autoencoder"),
+                        ("feature_memory", "Feature memory"),
+                    )
+                },
+            },
+            "research-metal-ranking",
+        )
+        st.caption("Full recorded precision. On narrow screens, scroll the table horizontally.")
+        st.write(
+            "Feature memory ranks this observed set better in aggregate, but localization "
+            "AP is lower on 10 of 51 anomalous images. Both methods place their maximum "
+            "outside the defect mask on 22 images. "
+            "Aggregate rankings do not remove shared failures."
+        )
+    with st.expander("Methodology and interpretation", expanded=True):
+        st.write(
+            "Both methods use the same 144 normal fitting images. The autoencoder learns "
+            "normal reconstruction; feature memory uses a frozen ResNet18 backbone and "
+            "6,912 normal-source descriptors, with no gradient training. Raw scores use "
+            "different units and aggregation; they cannot directly rank methods."
+        )
+        st.write(
+            "AUROC measures ranking across thresholds; AP summarizes precision and recall. "
+            "All 349,870,500 native pixels are included, with 84,903 positives. Pixel "
+            "localization has severe background imbalance. Positive prevalence: 58.62% "
+            "of images, 0.02427% of pixels (rounded constant-score AP references)."
+        )
+        st.caption(
+            "Native pixel rankings use 65,536 bins with fixed width 1/65535, no clipping "
+            "or per-image normalization. Exact for quantized scores; approximate for "
+            "unquantized rankings. Quantization tie frequency differs across methods."
+        )
+    with st.expander("Uncertainty and scientific limits", expanded=True):
+        st.warning(
+            "Source images may share physical objects. Normals influenced AE checkpoint "
+            "selection; anomalies were already observed. Unresolved official train/test "
+            "similarity candidates remain. Independent target evaluation: NOT CLEARED."
+        )
+        st.write(
+            "Dependent images and pixels do not support independent confidence intervals. "
+            "No official test0–test6 payload was opened for this comparison. Source-domain "
+            "ranking does not establish shifted-domain performance. Blur, lighting, edges "
+            "and tile seams can dominate scores; defects can also be reconstructed well."
+        )
+    with st.expander("Provenance and recorded runtime"):
+        source = MetalPartsSource()
+        st.markdown(f"[AmazonScience/RobustAD source]({source.uri}) · **{source.license_id}**")
+        st.caption(source.attribution)
+        st.caption(f"Pinned revision: {source.revision}")
+        st.write(
+            "Sources: metalparts_comparison.json (Milestone 3F), metalparts_research.json "
+            "(earlier 3E diagnostics), model_cards/metalparts-model-card.md and "
+            "model_cards/metalparts-feature-model-card.md. Open Model Catalog for frozen "
+            "artifact, split and protocol identities."
+        )
+        st.warning(
+            "Separate historical runs; feature comparison overlapped local verification "
+            "work. These timings are not a controlled speed comparison or live-line throughput."
+        )
+        presentation.table(
+            [
+                {
+                    "Method": label,
+                    "Median CPU seconds": str(summary[method]["latency_seconds"]["median"]),
+                    "p95 CPU seconds": str(summary[method]["latency_seconds"]["p95"]),
+                }
+                for method, label in (
+                    ("autoencoder", "Autoencoder"),
+                    ("feature_memory", "Feature memory"),
+                )
+            ],
+            "research-metal-timing",
+        )
+    st.subheader("Historical visual diagnostics")
+    st.info(
+        "Research images are not included in the source package. Local examples appear "
+        "only when their existing assets pass verification; no model output is generated here."
     )
     st.caption(
         "Below are the same four examples selected before scoring. Method-specific "
