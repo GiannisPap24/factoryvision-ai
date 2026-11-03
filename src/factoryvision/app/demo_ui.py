@@ -15,7 +15,8 @@ def render():
     st.warning(NOTICE)
     st.warning(
         "Session-only reviews: Generating a new demo or clearing the current demo removes "
-        "saved Human Review entries. Export your reviews before continuing."
+        "saved Human Review entries and unsaved edits. "
+        "Save any edits and export your reviews before continuing."
     )
     with st.container(horizontal=True, gap="small", key="fv-demo-actions"):
         generate = st.button("Generate synthetic demo", type="primary")

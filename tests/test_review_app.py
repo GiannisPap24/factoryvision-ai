@@ -18,9 +18,14 @@ def button(at, label):
     return next(b for b in at.button if b.label == label)
 
 
+def review_widget(at, kind, label):
+    return next(widget for widget in getattr(at, kind) if widget.label == label)
+
+
 def save(at, scope="single", decision=rv.Decision.NEEDS_FURTHER_REVIEW, note="Check edge", index=0):
-    at.selectbox(key=f"fv_review_{scope}_decision_{index}").set_value(decision)
-    at.text_area(key=f"fv_review_{scope}_note_{index}").set_value(note)
+    assert review_widget(at, "selectbox", "Result to review").value == index
+    review_widget(at, "selectbox", "Human decision").set_value(decision)
+    review_widget(at, "text_area", "Review note (optional)").set_value(note)
     button(at, "Save human review").click().run()
     assert not at.exception
     return at.session_state[f"fv_review_{scope}_bundle"]
@@ -104,7 +109,7 @@ def test_batch_row_isolation_and_reports_keep_review(app, monkeypatch):
     assert [r.evidence.image_id for r in first.records] == ["Image 001", "Image 003"]
     assert first.records[1].history == ()
     monkeypatch.setattr(engine, "inspect", lambda *a: pytest.fail("Unexpected inference"))
-    at.selectbox(key="fv_review_batch_selection").set_value(1).run()
+    review_widget(at, "selectbox", "Result to review").set_value(1).run()
     assert at.text_area[0].value == ""
     second = save(at, "batch", rv.Decision.AGREES_WITH_RESULT, "Aligned", 1)
     assert second.records[0] is first.records[0]
@@ -205,7 +210,7 @@ def test_compare_four_cashew_reviews_are_independent(app, monkeypatch):
     bundle = save(at)
     assert len(bundle.records) == 4
     assert all(not r.history for r in bundle.records[1:])
-    at.selectbox(key="fv_review_single_selection").set_value(3).run()
+    review_widget(at, "selectbox", "Result to review").set_value(3).run()
     changed = save(at, index=3, decision=rv.Decision.AGREES_WITH_RESULT)
     assert changed.records[:3] == bundle.records[:3]
     assert len(at.metric) == 12
@@ -247,9 +252,101 @@ def test_compare_two_metalparts_reviews_keep_null_flags(app, tmp_path, monkeypat
     button(at, "Run MetalParts inspection").click().run()
     bundle = save(at)
     assert len(bundle.records) == 2 and not at.error
-    at.selectbox(key="fv_review_single_selection").set_value(1).run()
+    review_widget(at, "selectbox", "Result to review").set_value(1).run()
     changed = save(at, index=1)
     assert changed.records[0] is bundle.records[0]
     assert all(r.evidence.threshold is r.evidence.research_flag is None for r in changed.records)
     at.multiselect[0].set_value(["Feature-Memory Detector"]).run()
     assert "fv_review_single_bundle" not in at.session_state
+
+
+def replacement_review(scope, category):
+    """Fabricated sources; native renderer and explicit replacement/clear controls."""
+    from dataclasses import replace
+    from types import SimpleNamespace
+
+    import streamlit as st
+    from test_reporting import snapshot
+
+    from factoryvision.app import review_ui
+    from factoryvision.demo import build_demo
+
+    if st.button("Clear fixture source"):
+        st.session_state.pop("fixture_source", None)
+    if st.button("Replace fixture source"):
+        if scope == "demo":
+            source = build_demo().report
+        elif scope == "batch":
+            source = snapshot()
+            source = replace(
+                source,
+                rows=source.rows + (replace(source.rows[0], image_id="Image 002"),),
+                elapsed_ms=10.0,
+            )
+        else:
+            models = (
+                ("autoencoder", "spatial_mean")
+                if category == "cashew"
+                else ("metalparts_autoencoder", "metalparts_feature_memory")
+            )
+            source = tuple(
+                SimpleNamespace(
+                    model_id=model,
+                    **{
+                        name: getattr(snapshot(category, model).rows[0], name)
+                        for name in ("score", "threshold", "above_threshold", "artifact_sha256")
+                    },
+                )
+                for model in models
+            )
+        st.session_state["fixture_source"] = source
+    review_ui.render(scope, st.session_state.get("fixture_source"), category)
+
+
+@pytest.mark.parametrize(
+    "scope,category",
+    [("demo", None), ("single", "cashew"), ("single", "metalparts"), ("batch", None)],
+)
+def test_source_replacement_resets_fields_selection_and_keys(scope, category):
+    from streamlit.testing.v1 import AppTest
+
+    at = AppTest.from_function(replacement_review, args=(scope, category)).run()
+    generations = set()
+    for cycle in range(3):
+        button(at, "Replace fixture source").click().run()
+        assert not at.exception and not at.error
+        selection = review_widget(at, "selectbox", "Result to review")
+        decision = review_widget(at, "selectbox", "Human decision")
+        note = review_widget(at, "text_area", "Review note (optional)")
+        bundle = at.session_state[f"fv_review_{scope}_bundle"]
+        assert selection.value == 0 and decision.value == rv.Decision.NOT_REVIEWED
+        assert note.value == "" and all(not r.history for r in bundle.records)
+        assert b"Previous observation" not in rv.json_bytes(bundle.records)
+        assert bundle.generation not in generations
+        generations.add(bundle.generation)
+        # Replacement removes obsolete native widget keys, not just the record bundle.
+        keys = {key for key in at.session_state if key.startswith(f"fv_review_{scope}_")}
+        if cycle == 0:
+            key_count = len(keys)
+        assert len(keys) == key_count
+        assert all(not any(old in key for old in generations - {bundle.generation}) for key in keys)
+        selection.set_value(1).run()
+        saved = save(at, scope, note="Previous observation", index=1)
+        assert saved.generation == bundle.generation
+        exports = (rv.json_bytes(saved.records), rv.csv_bytes(saved.records))
+        field_keys = (review_widget(at, "selectbox", "Human decision").key, at.text_area[0].key)
+        at.run()
+        assert at.session_state[f"fv_review_{scope}_bundle"] is saved
+        assert review_widget(at, "selectbox", "Result to review").value == 1
+        assert (rv.json_bytes(saved.records), rv.csv_bytes(saved.records)) == exports
+        assert field_keys == (
+            review_widget(at, "selectbox", "Human decision").key,
+            at.text_area[0].key,
+        )
+        invalid = save(at, scope, note="C:/private/image.png", index=1)
+        assert at.error and invalid is saved and invalid.generation == bundle.generation
+        assert (rv.json_bytes(invalid.records), rv.csv_bytes(invalid.records)) == exports
+        if cycle == 1:
+            button(at, "Clear fixture source").click().run()
+            assert not at.text_area and not at.get("download_button")
+            assert not any(k.startswith(f"fv_review_{scope}_") for k in at.session_state)

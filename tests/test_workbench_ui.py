@@ -12,6 +12,123 @@ from test_review_app import button, save
 from factoryvision.demo import build_demo
 
 
+@pytest.fixture
+def fabricated_inspection_app(app, monkeypatch):
+    """Native Inspect/Compare controls with fabricated records, no model execution."""
+    import numpy as np
+    from streamlit.testing.v1 import AppTest
+    from test_app import metal_entry
+
+    from factoryvision.app import metalparts_ui
+    from factoryvision.inference.reporting import model_info
+    from factoryvision.inference.service import InspectionResult
+
+    _, engine = app
+    calls = []
+
+    def result(payload, model_id):
+        calls.append(model_id)
+        category = "metalparts" if model_id.startswith("metalparts") else "cashew"
+        info = model_info(category, model_id)
+        score = 0.12345678901234566
+        return InspectionResult(
+            model_id,
+            info.name,
+            info.score_label,
+            score,
+            info.frozen_threshold,
+            None if info.frozen_threshold is None else score > info.frozen_threshold,
+            np.zeros((256, 256), dtype=np.float32),
+            np.zeros((256, 256, 3), dtype=np.uint8),
+            None,
+            None,
+            0.01,
+            0.01,
+            0.01,
+            0.03,
+            info.registered_artifact_sha256,
+        )
+
+    class Metal:
+        root = engine.root
+
+        def __init__(self, model_id):
+            self.model_id = model_id
+
+        def status(self):
+            return dict(available=True, reason="Fabricated result adapter")
+
+        def inspect(self, payload):
+            return result(payload, self.model_id)
+
+    monkeypatch.setattr(engine, "inspect", result)
+    monkeypatch.setattr(
+        metalparts_ui, "feature_service", lambda root: Metal("metalparts_feature_memory")
+    )
+    at = AppTest.from_function(
+        metal_entry, args=(engine, Metal("metalparts_autoencoder")), default_timeout=10
+    ).run()
+    return at, calls
+
+
+@pytest.mark.parametrize("category", ["Cashew", "MetalParts (experimental)"])
+@pytest.mark.parametrize("page", ["Image inspection", "Compare"])
+def test_rerun_notice_precedes_run_and_preserves_explicit_review_lifecycle(
+    fabricated_inspection_app, category, page
+):
+    from test_review_app import review_widget
+
+    from factoryvision.app.review_ui import RERUN_NOTICE
+    from factoryvision.inference import review
+
+    at, calls = fabricated_inspection_app
+    at.selectbox[0].set_value(category).run()
+    at.radio("workspace_page").set_value(page).run()
+    run = "Run inspection" if category == "Cashew" else "Run MetalParts inspection"
+    clear = (
+        "Clear image and results" if category == "Cashew" else "Clear MetalParts image and results"
+    )
+
+    def notice_before_run():
+        notices = [w for w in at.warning if w.value == RERUN_NOTICE]
+        assert len(notices) == 1
+        elements = list(at.main)
+        assert elements.index(notices[0]) < elements.index(button(at, run))
+
+    assert not any(w.value == RERUN_NOTICE for w in at.warning)
+    at.file_uploader[0].set_value(("synthetic.png", build_demo().images[0], "image/png")).run()
+    at.checkbox[0].check().run()
+    assert not any(w.value == RERUN_NOTICE for w in at.warning)
+    button(at, run).click().run()
+    # This must pass on the first result render, before any review is saved or rerun occurs.
+    notice_before_run()
+    assert len(calls) == 1 and not at.exception
+    pending = at.session_state["fv_review_single_bundle"]
+    assert all(not r.history for r in pending.records)
+    saved = save(at, note="Synthetic history to export")
+    notice_before_run()
+    assert len(at.get("download_button")) == 2
+    exports = (review.json_bytes(saved.records), review.csv_bytes(saved.records))
+    at.run()
+    assert at.session_state["fv_review_single_bundle"] is saved
+    assert (review.json_bytes(saved.records), review.csv_bytes(saved.records)) == exports
+    assert len(calls) == 1
+    notice_before_run()
+    button(at, run).click().run()
+    fresh = at.session_state["fv_review_single_bundle"]
+    assert fresh.source is not saved.source and fresh.generation != saved.generation
+    assert len(calls) == 2 and not at.exception
+    assert all(not r.history and not r.comment for r in fresh.records)
+    assert review_widget(at, "selectbox", "Human decision").value == review.Decision.NOT_REVIEWED
+    assert review_widget(at, "text_area", "Review note (optional)").value == ""
+    assert b"Synthetic history to export" not in review.json_bytes(fresh.records)
+    notice_before_run()
+    button(at, clear).click().run()
+    assert not any(w.value == RERUN_NOTICE for w in at.warning)
+    assert "fv_review_single_bundle" not in at.session_state
+    assert button(at, run).disabled and len(calls) == 2
+
+
 @pytest.mark.parametrize(
     "score,threshold",
     [
@@ -236,7 +353,8 @@ def test_demo_validation_display_and_pending_exports_preserve_contract(source_ap
 
     warning = (
         "Session-only reviews: Generating a new demo or clearing the current demo removes "
-        "saved Human Review entries. Export your reviews before continuing."
+        "saved Human Review entries and unsaved edits. "
+        "Save any edits and export your reviews before continuing."
     )
     at, _ = source_app
     at.run().radio("workspace_page").set_value("Synthetic demo").run()

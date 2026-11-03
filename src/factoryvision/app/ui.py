@@ -6,7 +6,7 @@ from pathlib import Path
 import streamlit as st
 import torch
 
-from factoryvision.app import batch_ui, catalog_ui, demo_ui, metalparts_ui, presentation
+from factoryvision.app import batch_ui, catalog_ui, demo_ui, metalparts_ui, presentation, review_ui
 from factoryvision.inference.batch import BatchService
 from factoryvision.inference.service import InspectionService, ModelUnavailable
 from factoryvision.inference.uploads import InputRejected, decode_upload
@@ -220,6 +220,7 @@ def inspect(engine, statuses, compare=False):
             except InputRejected as exc:
                 st.error(str(exc))
         st.button("Clear image and results", on_click=presentation.clear_inspection)
+        rerun_notice = st.empty()
         if st.button(
             "Run inspection",
             type="primary",
@@ -260,6 +261,9 @@ def inspect(engine, statuses, compare=False):
             "Changing image, model or consent clears results."
         )
     results = st.session_state.get("results", ())
+    # Fill the pre-Run slot after execution so even the first result warns before another Run.
+    if results:
+        rerun_notice.warning(review_ui.RERUN_NOTICE)
     with preview_slot.container():
         if results and not compare:
             show_result(results[0])
@@ -278,8 +282,6 @@ def inspect(engine, statuses, compare=False):
                 st.info(
                     "No model output yet. Upload a permitted image and explicitly run inspection."
                 )
-        from factoryvision.app import review_ui
-
         review_ui.render("single", results or None, "cashew")
 
 
