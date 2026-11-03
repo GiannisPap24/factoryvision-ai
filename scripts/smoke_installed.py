@@ -95,8 +95,12 @@ assert not app.exception and any(NOTICE in warning.value for warning in app.warn
 next(button for button in app.button if button.label == "Generate synthetic demo").click().run()
 assert not app.exception and len(app.get("download_button")) == 4
 assert app.session_state["synthetic_demo"][2] == json_bytes(demo.report)
-app.selectbox(key="fv_review_demo_decision_0").set_value(Decision.NEEDS_FURTHER_REVIEW)
-app.text_area(key="fv_review_demo_note_0").set_value("Installed synthetic review")
+next(w for w in app.selectbox if w.label == "Human decision").set_value(
+    Decision.NEEDS_FURTHER_REVIEW
+)
+next(w for w in app.text_area if w.label == "Review note (optional)").set_value(
+    "Installed synthetic review"
+)
 next(button for button in app.button if button.label == "Save human review").click().run()
 assert not app.exception
 reviews = app.session_state["fv_review_demo_bundle"].records

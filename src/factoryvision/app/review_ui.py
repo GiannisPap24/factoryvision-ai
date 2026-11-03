@@ -1,6 +1,7 @@
 """Session-only review controls shared by inspection, batch and synthetic demo."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
+from uuid import uuid4
 
 import streamlit as st
 
@@ -8,11 +9,20 @@ from factoryvision.app import presentation
 from factoryvision.inference import review
 from factoryvision.inference.reporting import ReportInvalid, create_report
 
+RERUN_NOTICE = (
+    "Running inspection again, even with the same image, replaces the current results "
+    "and clears saved Human Review history and unsaved edits. "
+    "Save any edits and download Human Review exports before running again."
+)
+
 
 @dataclass(frozen=True)
 class Bundle:
     source: object = field(repr=False)
     records: tuple[review.ReviewRecord, ...]
+    # Fresh native widget identities per source, including after clear/reopen.
+    # This UI-only token is never exported and stays stable through Save/reruns.
+    generation: str = field(default_factory=lambda: uuid4().hex)
 
 
 def clear(scope=None):
@@ -65,6 +75,7 @@ def render(scope, source, category=None):
             "when switching results. Export saved history before clearing or leaving "
             "Batch Inspection and Reports."
         )
+    widget_prefix = prefix + bundle.generation + "_"
     index = st.selectbox(
         "Result to review",
         range(len(bundle.records)),
@@ -73,7 +84,7 @@ def render(scope, source, category=None):
             + " · "
             + (bundle.records[i].evidence.model_id or "Synthetic validation")
         ),
-        key=prefix + "selection",
+        key=widget_prefix + "selection",
     )
     record = bundle.records[index]
     evidence = record.evidence
@@ -83,25 +94,25 @@ def render(scope, source, category=None):
     st.caption(
         "Agreement concerns the displayed evidence; it is not a defect label or product acceptance."
     )
-    with st.form(prefix + "form_" + str(index)):
+    with st.form(widget_prefix + "form_" + str(index)):
         decision = st.selectbox(
             "Human decision",
             list(review.Decision),
             index=list(review.Decision).index(record.decision),
-            key=prefix + f"decision_{index}",
+            key=widget_prefix + f"decision_{index}",
         )
         note = st.text_area(
             "Review note (optional)",
             value=record.comment,
             max_chars=review.MAX_COMMENT,
-            key=prefix + f"note_{index}",
+            key=widget_prefix + f"note_{index}",
         )
         saved = st.form_submit_button("Save human review")
     if saved:
         try:
             changed = review.revise(record, decision, note, review.utc_now())
             records = bundle.records[:index] + (changed,) + bundle.records[index + 1 :]
-            bundle = Bundle(source, records)
+            bundle = replace(bundle, records=records)
             st.session_state[prefix + "bundle"] = bundle
         except review.ReviewInvalid as exc:
             st.error(str(exc))

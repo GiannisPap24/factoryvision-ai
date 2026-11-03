@@ -126,6 +126,7 @@ def inspect(engine, compare=False):
                 st.error(str(exc))
         statuses = [options[name].status() for name in selected]
         st.button("Clear MetalParts image and results", on_click=presentation.clear_inspection)
+        rerun_notice = st.empty()
         if st.button(
             "Run MetalParts inspection",
             type="primary",
@@ -164,6 +165,9 @@ def inspect(engine, compare=False):
                 "transformed copies are prohibited."
             )
     results = st.session_state.get("metal_results", ())
+    # The slot precedes Run, including on the render that creates the first result.
+    if results:
+        rerun_notice.warning(review_ui.RERUN_NOTICE)
     with preview_slot.container():
         if results and not compare:
             show_result(results[0])
