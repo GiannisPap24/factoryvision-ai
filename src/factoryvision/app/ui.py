@@ -164,7 +164,7 @@ def show_result(result, display=None):
         else:
             st.info("At or below frozen threshold — this does not establish defect absence.")
         with st.expander("Score precision, timing and model identity"):
-            st.write(f"Raw score: {result.score:.10g} · threshold: {result.threshold}")
+            st.write(f"Raw score: {result.score!r} · threshold: {result.threshold!r}")
             st.caption(
                 f"Preprocess {result.preprocessing_ms:.1f} ms · artifact verification/loading "
                 f"{result.artifact_check_load_ms:.1f} ms · total {result.total_ms:.1f} ms"
