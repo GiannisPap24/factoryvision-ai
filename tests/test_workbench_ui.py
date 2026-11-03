@@ -1,5 +1,7 @@
 """Workbench source-only contracts through native widgets; synthetic pixels only."""
 
+from dataclasses import replace
+
 import pytest
 from test_app import app as app
 from test_app import local_event_loop_ipc as local_event_loop_ipc
@@ -8,6 +10,58 @@ from test_launch_readiness import source_app as source_app
 from test_review_app import button, save
 
 from factoryvision.demo import build_demo
+
+
+@pytest.mark.parametrize(
+    "score,threshold",
+    [
+        (0.0, 0.0),
+        (0.12345678901234566, 0.0031531278509646654),
+        (0.0031531278509646654, 0.0031531278509646654),
+        (0.003153127850964666, 0.0031531278509646654),
+        (1e-20, 1e-21),
+        (1e20, 1e21),
+        (0.12345678901234566, None),
+    ],
+)
+def test_precision_disclosure_preserves_finite_values_and_compact_summary(app, score, threshold):
+    """Fabricated boundary values exercise display only, without changing frozen metadata."""
+    from streamlit.testing.v1 import AppTest
+    from test_app import result_entry
+    from test_inference import encoded
+
+    _, engine = app
+    result = replace(
+        engine.inspect(encoded(), "autoencoder"),
+        score=score,
+        threshold=threshold,
+        above_threshold=None if threshold is None else score > threshold,
+    )
+    spatial = result.spatial.tobytes()
+    original = result.original.tobytes()
+    at = AppTest.from_function(result_entry, args=(result,)).run()
+    assert not at.exception
+    disclosure = next(
+        e for e in at.expander if e.label == "Score precision, timing and model identity"
+    )
+    text = next(m.value for m in disclosure.markdown if m.value.startswith("Raw score: "))
+    shown_score, shown_threshold = text.removeprefix("Raw score: ").split(" · threshold: ")
+    assert float(shown_score) == score
+    if threshold is None:
+        assert shown_threshold == "None"
+        assert any("no binary decision" in w.value for w in at.warning)
+    else:
+        assert float(shown_threshold) == threshold
+        assert (float(shown_score) > float(shown_threshold)) == result.above_threshold
+    assert [(m.label, m.value) for m in at.metric[:2]] == [
+        ("Anomaly score", f"{score:.8f}"),
+        ("Frozen threshold", "Unavailable" if threshold is None else f"{threshold:.8f}"),
+    ]
+    assert any("scores are not probabilities" in c.value for c in at.caption)
+    at.run()
+    assert not at.exception
+    assert result.score == score and result.threshold == threshold
+    assert result.spatial.tobytes() == spatial and result.original.tobytes() == original
 
 
 @pytest.mark.parametrize("category", ["Cashew", "MetalParts (experimental)"])
@@ -87,6 +141,8 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
     """Existing synthetic adapters: switching views cannot request another inference."""
     from test_inference import encoded
 
+    from factoryvision.inference import review
+
     at, engine = app
     calls = []
     inspect_many = engine.inspect_many
@@ -102,6 +158,8 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
     at.checkbox[0].check().run()
     button(at, "Run inspection").click().run()
     results = at.session_state["results"]
+    review_records = at.session_state["fv_review_single_bundle"].records
+    review_exports = (review.csv_bytes(review_records), review.json_bytes(review_records))
     arrays = [result.spatial.copy() for result in results]
     selector = next(r for r in at.radio if r.label == "View for all models")
     assert selector.value == "Overlay"
@@ -114,6 +172,14 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
             (result.spatial == before).all() for result, before in zip(results, arrays, strict=True)
         )
         assert len(at.image) == (2 if label == "Reconstruction / reference" else 3)
+        disclosures = [m.value for m in at.markdown if m.value.startswith("Raw score: ")]
+        assert len(disclosures) == len(results)
+        for text, result in zip(disclosures, results, strict=True):
+            score_text, threshold_text = text.removeprefix("Raw score: ").split(" · threshold: ")
+            assert float(score_text) == result.score
+            assert float(threshold_text) == result.threshold
+        records = at.session_state["fv_review_single_bundle"].records
+        assert (review.csv_bytes(records), review.json_bytes(records)) == review_exports
     assert calls == [("spatial_mean", "feature_memory")]
     at.checkbox[0].uncheck().run()
     assert "results" not in at.session_state

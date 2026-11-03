@@ -2,10 +2,70 @@
 
 from dataclasses import replace
 
+import pytest
 from test_app import app as app
 from test_app import batch_open, encoded
 from test_app import local_event_loop_ipc as local_event_loop_ipc
+from test_launch_readiness import source_app as source_app
 from test_review_app import button, save
+
+
+@pytest.mark.parametrize("category", ["cashew", "metalparts"])
+@pytest.mark.parametrize(
+    "score",
+    [0.0, 0.12345678901234566, 0.0031531278509646654, 0.003153127850964666, 1e-20, 1e20],
+)
+def test_batch_and_reports_precision_keeps_snapshot_and_exports(source_app, category, score):
+    """Fabricated completed snapshots; source-only services cannot run inference."""
+    from test_reporting import snapshot
+
+    from factoryvision.demo import build_demo
+    from factoryvision.inference import reporting
+    from factoryvision.inference.batch import Detail
+
+    model_id = "autoencoder" if category == "cashew" else "metalparts_autoencoder"
+    source = snapshot(category, model_id)
+    row = source.rows[0]
+    png = build_demo().images[0]
+    row = replace(
+        row,
+        score=score,
+        above_threshold=None if row.threshold is None else score > row.threshold,
+        model_name="Fabricated precision fixture",
+        score_label="Synthetic display check",
+        detail=Detail(png, png, png, 1.0),
+    )
+    source = replace(source, rows=(row,))
+    report = reporting.create_report(source)
+    expected_exports = (reporting.csv_bytes(report), reporting.json_bytes(report))
+    at, _ = source_app
+    at.run().selectbox[0].set_value(
+        "Cashew" if category == "cashew" else "MetalParts (experimental)"
+    ).run()
+    at.radio("workspace_page").set_value("Batch inspection").run()
+    at.session_state["batch_report"] = source
+    at.session_state["batch_archive_view"] = True
+    at.run()
+    for page in ("Batch inspection", "Reports", "Batch inspection"):
+        at.radio("workspace_page").set_value(page).run()
+        assert not at.exception
+        text = next(m.value for m in at.markdown if m.value.startswith("Score: "))
+        score_text, remainder = text.removeprefix("Score: ").split(" · Frozen threshold: ")
+        threshold_text, timing = remainder.split(" · CPU inference: ")
+        assert float(score_text) == row.score
+        if row.threshold is None:
+            assert threshold_text == "None" and row.above_threshold is None
+            assert any("no validated threshold" in m.value for m in at.markdown)
+        else:
+            assert float(threshold_text) == row.threshold
+            assert (float(score_text) > float(threshold_text)) == row.above_threshold
+        assert timing == "2.12 ms"
+        assert any("not a defect probability" in c.value for c in at.caption)
+        assert at.session_state["batch_report"] is source
+        exports = at.session_state["batch_exports"]
+        assert exports.source is source
+        assert (exports.csv, exports.json) == expected_exports
+        assert row.detail.original == row.detail.heatmap == row.detail.overlay == png
 
 
 def test_stopped_batch_keeps_success_evidence_review_and_exports(app, monkeypatch):

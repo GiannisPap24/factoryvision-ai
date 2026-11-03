@@ -51,9 +51,8 @@ def detail(row):
     st.write(row.interpretation)
     st.caption(row.score_label + " · not a defect probability")
     st.write(
-        f"Score: {row.score:.10g} · Frozen threshold: "
-        + ("None" if row.threshold is None else f"{row.threshold:.10g}")
-        + f" · CPU inference: {row.inference_ms:.2f} ms"
+        f"Score: {row.score!r} · Frozen threshold: {row.threshold!r}"
+        f" · CPU inference: {row.inference_ms:.2f} ms"
     )
     presentation.legend(row.detail.ceiling)
     st.caption(
