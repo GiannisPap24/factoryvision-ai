@@ -4,6 +4,11 @@ from importlib.resources import files
 
 import streamlit as st
 
+SYNTHETIC_IMAGE_ALTS = (
+    "Teal rectangle on a dark background",
+    "Yellow circle on a dark background",
+)
+
 
 def styling():
     # Packaged, constant CSS only; no user content, external assets or JavaScript.
@@ -29,7 +34,9 @@ def input_viewer(image=None):
                 "is separate from inference.</p><p>No model output, score or anomaly map.</p></div>"
             )
         else:
-            st.image(image, caption="Validated RGB · preview only", width="stretch")
+            st.image(
+                image, caption="Validated RGB · preview only", width="stretch", alt="Input image"
+            )
         st.caption("Original RGB before inference · Session only")
 
 
@@ -52,10 +59,18 @@ def result_images(view, display=None, *, reference=True, key="result"):
     def show(label):
         if label == "Reconstruction / reference":
             if view["reconstruction"] is not None:
-                st.image(view["reconstruction"], caption="Reconstructed RGB", width="stretch")
+                st.image(
+                    view["reconstruction"],
+                    caption="Reconstructed RGB",
+                    width="stretch",
+                    alt="Model RGB reconstruction",
+                )
             elif reference and view["reference"] is not None:
                 st.image(
-                    view["reference"], caption="Frozen spatial mean reference", width="stretch"
+                    view["reference"],
+                    caption="Frozen spatial mean reference",
+                    width="stretch",
+                    alt="Frozen spatial reference image",
                 )
             else:
                 st.html(
@@ -66,12 +81,16 @@ def result_images(view, display=None, *, reference=True, key="result"):
                 )
                 st.caption("Reconstruction unavailable for this method")
         else:
-            name, caption = {
-                "Original": ("original", "Original RGB"),
-                "Heatmap": ("heatmap", "Relative anomaly intensity"),
-                "Overlay": ("overlay", "45% heatmap overlay"),
+            name, caption, alt = {
+                "Original": ("original", "Original RGB", "Input image"),
+                "Heatmap": ("heatmap", "Relative anomaly intensity", "Relative anomaly map"),
+                "Overlay": (
+                    "overlay",
+                    "45% heatmap overlay",
+                    "Input image with relative anomaly map",
+                ),
             }[label]
-            st.image(view[name], caption=caption, width="stretch")
+            st.image(view[name], caption=caption, width="stretch", alt=alt)
 
     with st.container(key="fv-spatial-viewer-" + key, gap="xsmall"):
         if display is None:
@@ -174,7 +193,12 @@ def overview(category, statuses):
         # Original thumbnails only. Do not create a Demo session or review/export bundle.
         with st.container(horizontal=True, gap="small", key="fv-sample-strip"):
             for number, image in enumerate(build_demo().images, 1):
-                st.image(image, caption=f"Synthetic example {number}", width=96)
+                st.image(
+                    image,
+                    caption=f"Synthetic example {number}",
+                    width=96,
+                    alt=SYNTHETIC_IMAGE_ALTS[number - 1],
+                )
         st.caption("Original geometry · No dataset or model weights required")
     with right.container(border=True, key="fv-card-workflow"):
         st.subheader("A simple first run")

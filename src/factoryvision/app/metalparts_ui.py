@@ -64,6 +64,7 @@ def show_result(result, display=None):
 
 
 def inspect(engine, compare=False):
+    readiness = st.empty()
     controls, output, preview_slot = presentation.inspection_layout(compare)
     image = None
     with controls:
@@ -125,6 +126,11 @@ def inspect(engine, compare=False):
             except InputRejected as exc:
                 st.error(str(exc))
         statuses = [options[name].status() for name in selected]
+        if any(not status["available"] for status in statuses):
+            readiness.caption(
+                "Inference unavailable · A selected model is unavailable; "
+                "preview remains available."
+            )
         st.button("Clear MetalParts image and results", on_click=presentation.clear_inspection)
         rerun_notice = st.empty()
         if st.button(

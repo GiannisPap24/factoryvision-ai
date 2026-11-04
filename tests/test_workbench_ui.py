@@ -12,6 +12,93 @@ from test_review_app import button, save
 from factoryvision.demo import build_demo
 
 
+@pytest.mark.parametrize(
+    ("category", "page"),
+    [
+        ("Cashew", "Compare"),
+        ("MetalParts (experimental)", "Image inspection"),
+        ("MetalParts (experimental)", "Compare"),
+    ],
+)
+@pytest.mark.parametrize("availability", ["available", "unavailable", "mixed"])
+def test_model_readiness_precedes_preview_and_setup(app, monkeypatch, category, page, availability):
+    from streamlit.testing.v1 import AppTest
+    from test_app import metal_entry
+
+    from factoryvision.app import metalparts_ui
+
+    _, engine = app
+    status_calls = []
+
+    def available(model_id):
+        return availability == "available" or (
+            availability == "mixed" and model_id in {"autoencoder", "feature"}
+        )
+
+    monkeypatch.setattr(
+        engine,
+        "statuses",
+        lambda: [
+            dict(
+                id=key, name=spec["name"], available=available(key), reason="Synthetic availability"
+            )
+            for key, spec in engine.specs.items()
+        ],
+    )
+
+    class Metal:
+        root = engine.root
+
+        def __init__(self, model_id):
+            self.model_id = model_id
+
+        def status(self):
+            status_calls.append(self.model_id)
+            return dict(available=available(self.model_id), reason="Synthetic availability")
+
+    monkeypatch.setattr(metalparts_ui, "feature_service", lambda root: Metal("feature"))
+    at = AppTest.from_function(metal_entry, args=(engine, Metal("metal")), default_timeout=10)
+    at.run().selectbox[0].set_value(category).run()
+    at.radio("workspace_page").set_value(page).run()
+    run = "Run inspection" if category == "Cashew" else "Run MetalParts inspection"
+
+    def check(expected):
+        assert not at.exception
+        notices = [c for c in at.caption if c.value.startswith("Inference unavailable")]
+        assert len(notices) == int(expected)
+        if expected:
+            elements = list(at.main)
+            preview = next(m for m in at.markdown if m.value == "**Input preview**")
+            setup = next(h for h in at.subheader if h.value.startswith("Inspection "))
+            assert elements.index(notices[0]) < min(elements.index(preview), elements.index(setup))
+
+    unavailable = availability == "unavailable" or (
+        availability == "mixed" and category != "Cashew"
+    )
+    check(unavailable)
+    at.file_uploader[0].set_value(("synthetic.png", build_demo().images[0], "image/png")).run()
+    at.checkbox[0].check().run()
+    assert at.image and button(at, run).disabled == unavailable
+    check(unavailable)
+    if category != "Cashew":
+        status_calls.clear()
+        at.run()
+        assert status_calls == ["metal"]
+        if availability == "mixed":
+            at.multiselect[0].set_value(["Feature-Memory Detector"]).run()
+            check(False)
+            assert not button(at, run).disabled
+            if page == "Compare":
+                at.multiselect[0].set_value(
+                    ["Convolutional Autoencoder", "Feature-Memory Detector"]
+                ).run()
+                check(True)
+                assert button(at, run).disabled
+        at.multiselect[0].set_value([]).run()
+        check(False)
+        assert button(at, run).disabled
+
+
 @pytest.fixture
 def fabricated_inspection_app(app, monkeypatch):
     """Native Inspect/Compare controls with fabricated records, no model execution."""

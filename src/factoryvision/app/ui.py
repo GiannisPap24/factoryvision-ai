@@ -173,7 +173,7 @@ def show_result(result, display=None):
 
 
 def inspect(engine, statuses, compare=False):
-    if not compare and not any(row["available"] for row in statuses):
+    if not any(row["available"] for row in statuses):
         st.caption("Inference unavailable · No verified local model artifacts")
     controls, output, preview_slot = presentation.inspection_layout(compare)
     preview = None

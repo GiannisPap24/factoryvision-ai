@@ -207,6 +207,7 @@ def test_single_inspection_presents_exact_accepted_images(monkeypatch, model_id,
     from factoryvision.app import metalparts_ui, ui
 
     images = []
+    semantics = []
 
     class Surface:
         def __enter__(self):
@@ -223,6 +224,7 @@ def test_single_inspection_presents_exact_accepted_images(monkeypatch, model_id,
 
         def image(self, image, **kwargs):
             images.append(image)
+            semantics.append((kwargs["caption"], kwargs["alt"]))
 
         def __getattr__(self, name):
             return lambda *args, **kwargs: self
@@ -261,6 +263,8 @@ def test_single_inspection_presents_exact_accepted_images(monkeypatch, model_id,
     if auxiliary == "reconstruction" or (auxiliary == "reference" and module is ui):
         names.append(auxiliary)
     assert len(images) == len(names)
+    assert all(caption and alt and caption != alt for caption, alt in semantics)
+    assert len({alt for _, alt in semantics}) == len(names)
     for image, name in zip(images, names, strict=True):
         assert image.tobytes() == expected[name].tobytes()
         assert image.size == expected[name].size

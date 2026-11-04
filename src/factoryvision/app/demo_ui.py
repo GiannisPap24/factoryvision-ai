@@ -38,11 +38,20 @@ def render():
     demo, csv_export, json_export = bundle
     st.markdown("[Review & exports](#demo-review-exports)")
     with st.container(key="fv-demo-images"):
-        for column, image, row in zip(
-            st.columns(2), demo.images, demo.report.rows[:2], strict=True
+        for column, image, row, alt in zip(
+            st.columns(2),
+            demo.images,
+            demo.report.rows[:2],
+            presentation.SYNTHETIC_IMAGE_ALTS,
+            strict=True,
         ):
             with column.container(border=True, gap="xsmall"):
-                st.image(image, caption=row.image_id + " · Generated geometry", width="stretch")
+                st.image(
+                    image,
+                    caption=row.image_id + " · Generated geometry",
+                    width="stretch",
+                    alt=f"{row.image_id}: {alt}",
+                )
                 st.caption(f"{row.width} × {row.height} RGB · Valid input")
     validation, exports = st.columns([1.6, 1], gap="medium")
     with validation.container(border=True, key="fv-card-demo-validation", gap="xsmall"):

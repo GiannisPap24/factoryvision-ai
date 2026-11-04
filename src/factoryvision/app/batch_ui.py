@@ -199,7 +199,12 @@ def render(category, cashew, metal, feature):
                             st.columns(4), plan.items[offset : offset + 4], strict=False
                         ):
                             if item.preview:
-                                column.image(item.preview, caption=item.image_id, width="content")
+                                column.image(
+                                    item.preview,
+                                    caption=item.image_id,
+                                    width="content",
+                                    alt=f"{item.image_id} validated input preview",
+                                )
         status = engine.status(category, selected)
         if not status["available"]:
             st.error("Selected model unavailable. Restore its original verified local artifacts.")
@@ -230,9 +235,8 @@ def render(category, cashew, metal, feature):
                 st.session_state["batch_report"] = report
                 st.rerun()
             except Exception:
-                st.error(
-                    "Batch interrupted by an unexpected execution error. Clear before retrying."
-                )
+                # Render the terminal controls from the existing no-replay guard immediately.
+                st.rerun()
     if "batch_report" in st.session_state:
         st.button("Open quality report", on_click=presentation.navigate, args=("Reports",))
         results(st.session_state["batch_report"])
