@@ -43,12 +43,12 @@ def test_batch_and_reports_precision_keeps_snapshot_and_exports(source_app, cate
     at.run().selectbox[0].set_value(
         "Cashew" if category == "cashew" else "MetalParts (experimental)"
     ).run()
-    at.radio("workspace_page").set_value("Batch inspection").run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
     at.session_state["batch_report"] = source
     at.session_state["batch_archive_view"] = True
     at.run()
     for page in ("Batch inspection", "Reports", "Batch inspection"):
-        at.radio("workspace_page").set_value(page).run()
+        at.selectbox("workspace_page").set_value(page).run()
         assert not at.exception
         text = next(m.value for m in at.markdown if m.value.startswith("Score: "))
         score_text, remainder = text.removeprefix("Score: ").split(" · Frozen threshold: ")
@@ -63,6 +63,15 @@ def test_batch_and_reports_precision_keeps_snapshot_and_exports(source_app, cate
         assert timing == "2.12 ms"
         assert any("not a defect probability" in c.value for c in at.caption)
         assert at.session_state["batch_report"] is source
+        outcomes = next(table.value for table in at.table if "Score" in table.value.columns)
+        shown = outcomes.iloc[0]
+        assert isinstance(shown["Score"], str)
+        assert float(shown["Score"]) == row.score
+        assert float(shown["Model inference ms"]) == row.inference_ms
+        if row.threshold is None:
+            assert shown["Frozen threshold"] == "null"
+        else:
+            assert float(shown["Frozen threshold"]) == row.threshold
         exports = at.session_state["batch_exports"]
         assert exports.source is source
         assert (exports.csv, exports.json) == expected_exports
@@ -106,8 +115,12 @@ def test_stopped_batch_keeps_success_evidence_review_and_exports(app, monkeypatc
     assert any("pending records" in i.value for i in at.info)
     bundle = at.session_state["batch_exports"]
     reviews = save(at, scope="batch")
-    at.radio("workspace_page").set_value("Reports").run()
-    at.radio("workspace_page").set_value("Batch inspection").run()
+    next(b for b in at.button if b.key and b.key.startswith("fv-expand-")).click().run()
+    assert not at.exception and len(calls) == 2
+    assert at.session_state["batch_exports"] is bundle
+    assert at.session_state["fv_review_batch_bundle"] is reviews
+    at.selectbox("workspace_page").set_value("Reports").run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
     assert not at.exception and len(calls) == 2
     assert at.session_state["batch_report"] is source
     assert at.session_state["batch_exports"] is bundle
@@ -142,7 +155,7 @@ def test_interrupted_terminal_state_is_immediate_and_clear_allows_one_new_run(
 
     at, _ = fabricated_inspection_app
     at.selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value("Batch inspection").run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
     payload = build_demo().images[0]
     uploads = [(f"synthetic-{i}.png", payload, "image/png") for i in range(3)]
     uploads.append(("synthetic-invalid.png", b"invalid", "image/png"))
@@ -182,7 +195,7 @@ def test_interrupted_terminal_state_is_immediate_and_clear_allows_one_new_run(
     report = at.session_state["batch_report"]
     assert [r.status for r in report.rows] == ["inspected", "inspected", "inspected", "rejected"]
     saved = save(at, scope="batch", note="Synthetic retained completed review")
-    at.radio("workspace_page").set_value("Reports").run()
-    at.radio("workspace_page").set_value("Batch inspection").run()
+    at.selectbox("workspace_page").set_value("Reports").run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
     assert len(calls) == 2 and at.session_state["batch_report"] is report
     assert at.session_state["fv_review_batch_bundle"] is saved

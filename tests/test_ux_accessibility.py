@@ -15,7 +15,7 @@ from factoryvision.demo import build_demo
 def test_meaningful_images_are_named_without_upload_filenames(source_app, category, page):
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value(page).run()
+    at.selectbox("workspace_page").set_value(page).run()
     if page == "Synthetic demo":
         button(at, "Generate synthetic demo").click().run()
     elif page in {"Image inspection", "Compare", "Batch inspection"}:
@@ -31,3 +31,15 @@ def test_meaningful_images_are_named_without_upload_filenames(source_app, catego
     before = [(image.url, image.caption, image.alt) for image in images]
     at.run()
     assert [(i.url, i.caption, i.alt) for e in at.image for i in e.proto.imgs] == before
+    opener = next(b for b in at.button if b.key and b.key.startswith("fv-expand-"))
+    opener.click().run()
+    assert not at.exception
+    expanded = [i for e in at.image for i in e.proto.imgs]
+    assert [(i.url, i.caption, i.alt) for i in expanded[:-1]] == before
+    assert (expanded[-1].caption, expanded[-1].alt) == before[0][1:]
+    # Overview thumbnails are marshalled at 96px; expansion uses their original pixels.
+    if page != "Overview":
+        assert expanded[-1].url == before[0][0]
+    assert not any(
+        at.session_state.get(key) for key in ("results", "metal_results", "batch_report")
+    )

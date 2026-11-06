@@ -2,12 +2,14 @@
 
 import json
 import socket
+from importlib.resources import files
 from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
 
 import factoryvision
 from factoryvision.app import ui
+from factoryvision.app.typography import font_styles
 from factoryvision.demo import NOTICE, build_demo, csv_bytes, json_bytes
 from factoryvision.inference.batch import BatchService
 from factoryvision.inference.metalparts import MetalPartsService
@@ -27,6 +29,11 @@ from factoryvision.robustness.development_admission import (
 from factoryvision.robustness.reporting import json_bytes as robustness_json
 
 assert "site-packages" in str(factoryvision.__file__)
+font_assets = files("factoryvision.app").joinpath("fonts")
+assert font_assets.joinpath("LICENSE.txt").is_file()
+font_css = font_styles()
+assert font_css.count("@font-face") == 6 and "data:font/ttf;base64," in font_css
+assert "https://" not in font_css and "http://" not in font_css
 assert not list(Path.cwd().iterdir()), "Smoke working directory must be empty."
 connect = socket.socket.connect
 
@@ -86,11 +93,11 @@ assert json.loads(json_bytes(demo.report))["inference_executed"] is False
 assert csv_bytes(demo.report) == csv_bytes(build_demo().report)
 app = AppTest.from_file(ui.__file__, default_timeout=15).run()
 assert not app.exception
-app.radio("workspace_page").set_value("Model Catalog").run()
+app.selectbox("workspace_page").set_value("Model Catalog").run()
 assert not app.exception and app.error and app.table
 app.selectbox(key="registry_category").set_value("pcb1").run()
 assert not app.exception and any("BLOCKED" in text.value for text in app.text)
-app.radio("workspace_page").set_value("Synthetic demo").run()
+app.selectbox("workspace_page").set_value("Synthetic demo").run()
 assert not app.exception and any(NOTICE in warning.value for warning in app.warning)
 next(button for button in app.button if button.label == "Generate synthetic demo").click().run()
 assert not app.exception and len(app.get("download_button")) == 4
@@ -110,7 +117,7 @@ assert review_json(reviews) == review_json(reviews)
 app.selectbox[0].set_value("MetalParts (experimental)").run()
 assert "synthetic_demo" not in app.session_state
 assert "fv_review_demo_bundle" not in app.session_state
-app.radio("workspace_page").set_value("Batch inspection").run()
+app.selectbox("workspace_page").set_value("Batch inspection").run()
 assert not app.exception and not app.get("download_button")
 print(
     "PASS: installed six-model catalog, missing artifacts, demo, human review, exports and resets."

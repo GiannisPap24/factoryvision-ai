@@ -226,6 +226,10 @@ def test_single_inspection_presents_exact_accepted_images(monkeypatch, model_id,
             images.append(image)
             semantics.append((kwargs["caption"], kwargs["alt"]))
 
+        def button(self, *args, **kwargs):
+            # The collapsed presentation does not activate its expanded-image dialog.
+            return False
+
         def __getattr__(self, name):
             return lambda *args, **kwargs: self
 

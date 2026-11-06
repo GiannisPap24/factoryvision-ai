@@ -34,7 +34,7 @@ def save(at, scope="single", decision=rv.Decision.NEEDS_FURTHER_REVIEW, note="Ch
 def single_open(app, monkeypatch):
     at, engine = app
     monkeypatch.setattr(ui.st, "file_uploader", lambda *a, **k: io.BytesIO(encoded()))
-    at.run().radio("workspace_page").set_value("Image inspection").run()
+    at.run().selectbox("workspace_page").set_value("Image inspection").run()
     at.checkbox[0].check().run()
     button(at, "Run inspection").click().run()
     assert not at.exception and not at.error
@@ -77,7 +77,7 @@ def test_single_stale_state_is_invalidated(app, monkeypatch, change):
     elif change == "category":
         at.selectbox[0].set_value("MetalParts (experimental)").run()
     elif change == "navigation":
-        at.radio("workspace_page").set_value("Compare").run()
+        at.selectbox("workspace_page").set_value("Compare").run()
     elif change == "consent":
         at.checkbox[0].uncheck().run()
     else:
@@ -114,9 +114,9 @@ def test_batch_row_isolation_and_reports_keep_review(app, monkeypatch):
     second = save(at, "batch", rv.Decision.AGREES_WITH_RESULT, "Aligned", 1)
     assert second.records[0] is first.records[0]
     assert at.session_state["batch_report"] is original
-    at.radio("workspace_page").set_value("Reports").run()
+    at.selectbox("workspace_page").set_value("Reports").run()
     assert at.session_state["fv_review_batch_bundle"] is second
-    at.radio("workspace_page").set_value("Batch inspection").run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
     assert at.session_state["fv_review_batch_bundle"] is second
     button(at, "Clear batch").click().run()
     assert "fv_review_batch_bundle" not in at.session_state
@@ -156,9 +156,9 @@ def test_source_only_demo_no_training_or_dataset_access(tmp_path, monkeypatch):
     monkeypatch.setattr(BatchService, "run", forbidden)
     engine = InspectionService(tmp_path)
     at = AppTest.from_function(entry, args=(engine,), default_timeout=10).run()
-    at.radio("workspace_page").set_value("Image inspection").run()
+    at.selectbox("workspace_page").set_value("Image inspection").run()
     assert button(at, "Run inspection").disabled and not at.get("download_button")
-    at.radio("workspace_page").set_value("Synthetic demo").run()
+    at.selectbox("workspace_page").set_value("Synthetic demo").run()
     button(at, "Generate synthetic demo").click().run()
     first = save(at, "demo", note="Synthetic validation observation")
     assert all(r.evidence.origin == "synthetic_demo" for r in first.records)
@@ -203,7 +203,7 @@ def test_compare_four_cashew_reviews_are_independent(app, monkeypatch):
 
     at, _ = app
     monkeypatch.setattr(ui.st, "file_uploader", lambda *a, **k: io.BytesIO(encoded()))
-    at.run().radio("workspace_page").set_value("Compare").run()
+    at.run().selectbox("workspace_page").set_value("Compare").run()
     at.multiselect[0].set_value(list(MODEL_IDS)).run()
     at.checkbox[0].check().run()
     button(at, "Run inspection").click().run()
@@ -246,7 +246,7 @@ def test_compare_two_metalparts_reviews_keep_null_flags(app, tmp_path, monkeypat
     monkeypatch.setattr(ui.st, "file_uploader", lambda *a, **k: io.BytesIO(payload()[1]))
     at = AppTest.from_function(metal_entry, args=(app[1], metal), default_timeout=10).run()
     at.selectbox[0].set_value("MetalParts (experimental)").run()
-    at.radio("workspace_page").set_value("Compare").run()
+    at.selectbox("workspace_page").set_value("Compare").run()
     at.multiselect[0].set_value(["Convolutional Autoencoder", "Feature-Memory Detector"]).run()
     at.checkbox[0].check().run()
     button(at, "Run MetalParts inspection").click().run()

@@ -1,6 +1,7 @@
 """Inspect distribution members and text without extracting or publishing them."""
 
 import argparse
+import hashlib
 import json
 import posixpath
 import re
@@ -16,6 +17,11 @@ SECRET = re.compile(
 )
 FORBIDDEN_ROOTS = {".git", "data", "runs", "reports", ".tmp", ".tools", ".uv-cache"}
 FORBIDDEN_SUFFIXES = {".pt", ".pth", ".png", ".jpg", ".jpeg", ".zip", ".exe", ".dll"}
+FONT_ROOT = "factoryvision/app/fonts/"
+# Trusted repository pins, never a manifest supplied by the inspected archive.
+FONT_MANIFEST = json.loads(
+    (Path(__file__).parents[1] / "src" / FONT_ROOT / "manifest.json").read_text(encoding="utf-8")
+)
 
 
 def inspect_distribution(archive: Path) -> dict:
@@ -43,6 +49,17 @@ def inspect_distribution(archive: Path) -> dict:
             or name.startswith(("/", "\\"))
         ):
             findings.append({"member": name, "rule": "forbidden-member"})
+        font_prefix = "src/" + FONT_ROOT if archive.suffix != ".whl" else FONT_ROOT
+        approved_fonts = {
+            font_prefix + file: digest for file, digest in FONT_MANIFEST["files"].items()
+        }
+        if name in approved_fonts:
+            if hashlib.sha256(payload).hexdigest() == approved_fonts[name]:
+                license_payload = contents.get(font_prefix + "LICENSE.txt", b"")
+                if hashlib.sha256(license_payload).hexdigest() != FONT_MANIFEST["licenseSha256"]:
+                    findings.append({"member": name, "rule": "missing-or-altered-font-license"})
+                continue
+            findings.append({"member": name, "rule": "font-integrity"})
         try:
             text = payload.decode("utf-8")
         except UnicodeDecodeError:

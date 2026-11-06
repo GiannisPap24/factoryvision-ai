@@ -59,7 +59,7 @@ def test_model_readiness_precedes_preview_and_setup(app, monkeypatch, category, 
     monkeypatch.setattr(metalparts_ui, "feature_service", lambda root: Metal("feature"))
     at = AppTest.from_function(metal_entry, args=(engine, Metal("metal")), default_timeout=10)
     at.run().selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value(page).run()
+    at.selectbox("workspace_page").set_value(page).run()
     run = "Run inspection" if category == "Cashew" else "Run MetalParts inspection"
 
     def check(expected):
@@ -170,7 +170,7 @@ def test_rerun_notice_precedes_run_and_preserves_explicit_review_lifecycle(
 
     at, calls = fabricated_inspection_app
     at.selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value(page).run()
+    at.selectbox("workspace_page").set_value(page).run()
     run = "Run inspection" if category == "Cashew" else "Run MetalParts inspection"
     clear = (
         "Clear image and results" if category == "Cashew" else "Clear MetalParts image and results"
@@ -196,6 +196,9 @@ def test_rerun_notice_precedes_run_and_preserves_explicit_review_lifecycle(
     notice_before_run()
     assert len(at.get("download_button")) == 2
     exports = (review.json_bytes(saved.records), review.csv_bytes(saved.records))
+    next(b for b in at.button if b.key and b.key.startswith("fv-expand-")).click().run()
+    assert not at.exception and len(calls) == 1
+    assert at.session_state["fv_review_single_bundle"] is saved
     at.run()
     assert at.session_state["fv_review_single_bundle"] is saved
     assert (review.json_bytes(saved.records), review.csv_bytes(saved.records)) == exports
@@ -274,20 +277,20 @@ def test_content_navigation_rerun_preserves_selection_results_and_saved_review(
 ):
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value("Synthetic demo").run()
+    at.selectbox("workspace_page").set_value("Synthetic demo").run()
     button(at, "Generate synthetic demo").click().run()
     saved = save(at, "demo", note="Synthetic navigation retention check")
     generated = at.session_state["synthetic_demo"]
     at.run()
     assert not at.exception
     assert at.main.selectbox[0].value == category
-    assert at.main.radio("workspace_page").value == "Synthetic demo"
+    assert at.main.selectbox("workspace_page").value == "Synthetic demo"
     assert at.session_state["synthetic_demo"] is generated
     assert at.session_state["fv_review_demo_bundle"] is saved
     assert len(navigation_warnings(at)) == 1
     assert not at.sidebar.radio and not at.sidebar.selectbox
     # An intentional transition still clears the same session scope.
-    at.main.radio("workspace_page").set_value("Overview").run()
+    at.main.selectbox("workspace_page").set_value("Overview").run()
     assert "synthetic_demo" not in at.session_state
     assert "fv_review_demo_bundle" not in at.session_state
 
@@ -297,15 +300,15 @@ def test_all_workspaces_keep_native_router_and_source_only_state(source_app, cat
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
     for page in PAGES:
-        at.radio("workspace_page").set_value(page).run()
+        at.selectbox("workspace_page").set_value(page).run()
         assert not at.exception
         assert (
-            len([r for r in at.radio if r.key == "workspace_page"]) == 1
-            and len(at.radio("workspace_page").options) == 8
+            len([r for r in at.selectbox if r.key == "workspace_page"]) == 1
+            and len(at.selectbox("workspace_page").options) == 8
         )
         assert not at.sidebar.radio and not at.sidebar.selectbox and not at.sidebar.button
         assert len([s for s in at.main.selectbox if s.label == "Category"]) == 1
-        assert at.main.radio("workspace_page").value == page
+        assert at.main.selectbox("workspace_page").value == page
         assert not navigation_warnings(at)
         assert "synthetic_demo" not in at.session_state and "results" not in at.session_state
         if page == "Overview":
@@ -318,7 +321,7 @@ def test_all_workspaces_keep_native_router_and_source_only_state(source_app, cat
 def test_preview_without_models_then_clear_and_navigation(source_app, category, page):
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value(page).run()
+    at.selectbox("workspace_page").set_value(page).run()
     metal = category != "Cashew"
     run = "Run MetalParts inspection" if metal else "Run inspection"
     clear = "Clear MetalParts image and results" if metal else "Clear image and results"
@@ -334,7 +337,7 @@ def test_preview_without_models_then_clear_and_navigation(source_app, category, 
     assert at.file_uploader[0].value is None and not at.checkbox[0].value
     assert not navigation_warnings(at)
     at.file_uploader[0].set_value(("synthetic.png", build_demo().images[1], "image/png")).run()
-    at.radio("workspace_page").set_value(
+    at.selectbox("workspace_page").set_value(
         "Compare" if page == "Image inspection" else "Image inspection"
     ).run()
     assert at.file_uploader[0].value is None and not at.checkbox[0].value
@@ -356,7 +359,7 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
         return inspect_many(payload, selected)
 
     monkeypatch.setattr(engine, "inspect_many", run)
-    at.run().radio("workspace_page").set_value("Compare").run()
+    at.run().selectbox("workspace_page").set_value("Compare").run()
     at.multiselect[0].set_value(["spatial_mean", "feature_memory"]).run()
     at.file_uploader[0].set_value(("synthetic.png", encoded(), "image/png")).run()
     at.checkbox[0].check().run()
@@ -396,7 +399,7 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
 def test_rejected_upload_has_no_stale_preview(source_app, category, payload):
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value("Image inspection").run()
+    at.selectbox("workspace_page").set_value("Image inspection").run()
     at.file_uploader[0].set_value(("synthetic.png", build_demo().images[0], "image/png")).run()
     assert at.image
     at.file_uploader[0].set_value(("rejected.png", payload, "image/png")).run()
@@ -408,7 +411,7 @@ def test_rejected_upload_has_no_stale_preview(source_app, category, payload):
 
 def test_catalog_groups_keep_all_cards_and_mixed_readiness(source_app, monkeypatch):
     at, engine = source_app
-    at.run().radio("workspace_page").set_value("Model Catalog").run()
+    at.run().selectbox("workspace_page").set_value("Model Catalog").run()
     assert sum("All unavailable locally" in item.value for item in at.markdown) == 2
     cards = [b for b in at.get("download_button") if b.label == "Download model card"]
     assert len(cards) == 6
@@ -444,8 +447,9 @@ def test_demo_validation_display_and_pending_exports_preserve_contract(source_ap
         "Save any edits and export your reviews before continuing."
     )
     at, _ = source_app
-    at.run().radio("workspace_page").set_value("Synthetic demo").run()
-    assert any(item.value == warning for item in at.warning)
+    at.run().selectbox("workspace_page").set_value("Synthetic demo").run()
+    assert not any(item.value == warning for item in at.warning)
+    assert button(at, "Clear synthetic demo").disabled
     assert not at.image and not at.get("download_button")
     button(at, "Generate synthetic demo").click().run()
     assert any(item.value == warning for item in at.warning)
@@ -469,6 +473,7 @@ def test_demo_validation_display_and_pending_exports_preserve_contract(source_ap
     assert any(item.value == warning for item in at.warning)
     save(at, scope="demo", note="Synthetic review before clearing")
     button(at, "Clear synthetic demo").click().run()
-    assert any(item.value == warning for item in at.warning)
+    assert not any(item.value == warning for item in at.warning)
+    assert button(at, "Clear synthetic demo").disabled
     assert not at.image and not at.get("download_button") and not at.exception
     assert "fv_review_demo_bundle" not in at.session_state

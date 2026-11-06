@@ -59,22 +59,28 @@ def test_first_action_tracks_verified_availability(source_app, monkeypatch, read
     at.run()
     assert not at.exception and not navigation_warnings(at)
     label = "Start inspection" if ready else "Open synthetic demo"
-    assert button(at, label).proto.type == "primary"
+    assert button(at, "Open synthetic demo").proto.type == "primary"
+    if ready:
+        assert button(at, label).proto.type == "secondary"
     if not ready:
         assert not any(b.label in ("Start inspection", "Compare models") for b in at.button)
-        assert any("no neural inference" in item.value for item in at.info)
+        assert any("no neural inference" in item.value for item in at.caption)
         button(at, "Open Model Catalog").click().run()
-        assert at.radio("workspace_page").value == "Model Catalog" and len(at.table[0].value) == 6
-        at.radio("workspace_page").set_value("Overview").run()
+        assert (
+            at.selectbox("workspace_page").value == "Model Catalog" and len(at.table[0].value) == 6
+        )
+        at.selectbox("workspace_page").set_value("Overview").run()
     button(at, label).click().run()
-    assert at.radio("workspace_page").value == ("Image inspection" if ready else "Synthetic demo")
+    assert at.selectbox("workspace_page").value == (
+        "Image inspection" if ready else "Synthetic demo"
+    )
     assert not at.exception and "results" not in at.session_state
 
 
 @pytest.mark.parametrize("page", PAGES)
 def test_empty_source_routes_do_not_warn_of_nonexistent_work(source_app, page):
     at, _ = source_app
-    at.run().radio("workspace_page").set_value(page).run()
+    at.run().selectbox("workspace_page").set_value(page).run()
     assert not at.exception and not navigation_warnings(at)
     assert "results" not in at.session_state and "synthetic_demo" not in at.session_state
 
@@ -89,7 +95,7 @@ def test_saved_demo_review_warned_before_each_workspace_transition(source_app, p
     assert "synthetic demo" in navigation_warnings(at)[0].value
     assert "unsaved edits" in navigation_warnings(at)[0].value
     saved = save(at, "demo", note="Synthetic navigation check")
-    at.radio("workspace_page").set_value(page).run()
+    at.selectbox("workspace_page").set_value(page).run()
     assert not at.exception
     if page == "Synthetic demo":
         assert at.session_state["fv_review_demo_bundle"] is saved

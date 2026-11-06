@@ -17,15 +17,24 @@ def render(coordinator, category):
         st.error(str(exc))
         return
     entries = tuple(record.catalog for record in records)
-    for column, group, label in zip(
-        st.columns([1.35, 1], gap="medium"),
+    with st.container(key="fv-catalog-summary", gap="xxsmall"):
+        st.markdown(
+            f"**Both categories · {len(entries)} registered methods · "
+            f"{sum(e.available for e in entries)} with verified local artifacts**"
+        )
+        st.caption(
+            "Registration, local availability and research evaluation are separate facts. "
+            "None of these methods is independently validated for industrial acceptance."
+        )
+    layout = st.container(horizontal=True, key="fv-catalog-grid", gap="medium")
+    for group, label in zip(
         ("cashew", "metalparts"),
         ("Cashew", "MetalParts"),
         strict=True,
     ):
         methods = tuple(e for e in entries if e.definition.identity.category == group)
         all_unavailable = not any(e.available for e in methods)
-        with column.container(border=True, key="fv-card-catalog-" + group, gap="xsmall"):
+        with layout.container(border=True, key="fv-card-catalog-" + group, gap="small"):
             st.subheader(label)
             st.caption(f"{len(methods)} registered methods")
             if all_unavailable:
