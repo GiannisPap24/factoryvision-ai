@@ -198,8 +198,11 @@
 .st-key-fv-batch-layout {display:grid;grid-template-columns:minmax(20rem,1fr) minmax(0,1.35fr);gap:16px;align-items:start;}
 .st-key-fv-batch-layout > * {min-width:0;border-color:var(--fv-border);}
 .st-key-fv-batch-setup {border-top:3px solid var(--fv-teal);}
-.st-key-fv-batch-thumbnails {display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+/* Collapse unused tracks and budget readable space for each native disclosure. */
+.st-key-fv-batch-thumbnails {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:12px;}
 .st-key-fv-batch-thumbnails > * {min-width:0;}
+/* Constrain only the preview element, never its shared viewer or disclosure. */
+.st-key-fv-batch-thumbnails [class*="st-key-fv-image-"] > [data-testid="stElementContainer"]:has([data-testid="stImage"]) {width:96px;max-width:100%;}
 .st-key-fv-batch-thumbnails img {height:96px;background:var(--fv-nav);}
 .st-key-fv-report-exports {border-color:var(--fv-border);}
 .st-key-fv-input-viewer {background:var(--fv-image);color:var(--fv-navText);border-radius:8px;padding:16px;}
@@ -245,7 +248,6 @@
 .st-key-fv-shell h1 {font-size:1.75rem;}
 .st-key-fv-shell table {font-size:.875rem;}
 .st-key-fv-shell table :is(th,td) {padding:10px 12px;}
-.st-key-fv-batch-thumbnails {grid-template-columns:repeat(2,minmax(0,1fr));}
 .st-key-fv-shell [class*="st-key-fv-table-"]:not([class*="st-key-fv-table-research-"]):focus-within {outline:3px solid var(--fv-focusLight);outline-offset:3px;}
 .fv-workbench-header {padding:12px 16px;gap:4px 16px;}
 .st-key-fv-overview-actions {flex-direction:column;align-items:stretch;}

@@ -220,6 +220,7 @@ def render(category, cashew, metal, feature):
                                         width="stretch",
                                         alt=f"{item.image_id} validated input preview",
                                         key="batch-preview-" + item.image_id,
+                                        action="Enlarge " + item.image_id,
                                     )
         st.markdown("**03 · Execute and review**")
         started = st.session_state.get("batch_started") == batch_id

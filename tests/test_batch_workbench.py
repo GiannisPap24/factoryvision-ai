@@ -11,6 +11,38 @@ from test_review_app import button, save
 from test_workbench_ui import fabricated_inspection_app as fabricated_inspection_app
 
 
+@pytest.mark.parametrize("count", [1, 2, 4, 6])
+def test_batch_preview_controls_keep_identity_without_repeating_image_description(
+    app, monkeypatch, count
+):
+    at, engine = batch_open(app, monkeypatch, [encoded(color=100 + i) for i in range(count)])
+    calls = []
+    monkeypatch.setattr(engine, "inspect", lambda *args: calls.append(args))
+    plan = at.session_state["batch_plan"]
+    assert plan.accepted == count
+    labels = [e.label for e in at.expander if e.label.endswith("Complete image")]
+    assert labels == [f"Enlarge Image {i:03} · Complete image" for i in range(1, count + 1)]
+    images = [i for element in at.image for i in element.proto.imgs]
+    assert len(images) == 4 * count
+    for index, item in enumerate(plan.items):
+        preview, whole, context, detail = images[index * 4 : index * 4 + 4]
+        assert preview.alt == f"{item.image_id} validated input preview"
+        assert [i.alt for i in (whole, context, detail)] == [
+            prefix + preview.alt
+            for prefix in (
+                "Complete view: ",
+                "Context for magnified detail: ",
+                "Magnified detail: ",
+            )
+        ]
+        assert all(i.caption == item.image_id for i in (preview, whole, context, detail))
+        assert preview.url == whole.url == context.url == detail.url
+    at.run()
+    assert not at.exception and not calls
+    assert at.session_state["batch_plan"] is plan
+    assert "batch_report" not in at.session_state
+
+
 @pytest.mark.parametrize("category", ["cashew", "metalparts"])
 @pytest.mark.parametrize(
     "score",
