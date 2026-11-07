@@ -12,6 +12,93 @@ from test_review_app import button, save
 from factoryvision.demo import build_demo
 
 
+@pytest.mark.parametrize(
+    ("category", "page"),
+    [
+        ("Cashew", "Compare"),
+        ("MetalParts (experimental)", "Image inspection"),
+        ("MetalParts (experimental)", "Compare"),
+    ],
+)
+@pytest.mark.parametrize("availability", ["available", "unavailable", "mixed"])
+def test_model_readiness_precedes_preview_and_setup(app, monkeypatch, category, page, availability):
+    from streamlit.testing.v1 import AppTest
+    from test_app import metal_entry
+
+    from factoryvision.app import metalparts_ui
+
+    _, engine = app
+    status_calls = []
+
+    def available(model_id):
+        return availability == "available" or (
+            availability == "mixed" and model_id in {"autoencoder", "feature"}
+        )
+
+    monkeypatch.setattr(
+        engine,
+        "statuses",
+        lambda: [
+            dict(
+                id=key, name=spec["name"], available=available(key), reason="Synthetic availability"
+            )
+            for key, spec in engine.specs.items()
+        ],
+    )
+
+    class Metal:
+        root = engine.root
+
+        def __init__(self, model_id):
+            self.model_id = model_id
+
+        def status(self):
+            status_calls.append(self.model_id)
+            return dict(available=available(self.model_id), reason="Synthetic availability")
+
+    monkeypatch.setattr(metalparts_ui, "feature_service", lambda root: Metal("feature"))
+    at = AppTest.from_function(metal_entry, args=(engine, Metal("metal")), default_timeout=10)
+    at.run().selectbox[0].set_value(category).run()
+    at.selectbox("workspace_page").set_value(page).run()
+    run = "Run inspection" if category == "Cashew" else "Run MetalParts inspection"
+
+    def check(expected):
+        assert not at.exception
+        notices = [c for c in at.caption if c.value.startswith("Inference unavailable")]
+        assert len(notices) == int(expected)
+        if expected:
+            elements = list(at.main)
+            preview = next(m for m in at.markdown if m.value == "**Input preview**")
+            setup = next(h for h in at.subheader if h.value.startswith("Inspection "))
+            assert elements.index(notices[0]) < min(elements.index(preview), elements.index(setup))
+
+    unavailable = availability == "unavailable" or (
+        availability == "mixed" and category != "Cashew"
+    )
+    check(unavailable)
+    at.file_uploader[0].set_value(("synthetic.png", build_demo().images[0], "image/png")).run()
+    at.checkbox[0].check().run()
+    assert at.image and button(at, run).disabled == unavailable
+    check(unavailable)
+    if category != "Cashew":
+        status_calls.clear()
+        at.run()
+        assert status_calls == ["metal"]
+        if availability == "mixed":
+            at.multiselect[0].set_value(["Feature-Memory Detector"]).run()
+            check(False)
+            assert not button(at, run).disabled
+            if page == "Compare":
+                at.multiselect[0].set_value(
+                    ["Convolutional Autoencoder", "Feature-Memory Detector"]
+                ).run()
+                check(True)
+                assert button(at, run).disabled
+        at.multiselect[0].set_value([]).run()
+        check(False)
+        assert button(at, run).disabled
+
+
 @pytest.fixture
 def fabricated_inspection_app(app, monkeypatch):
     """Native Inspect/Compare controls with fabricated records, no model execution."""
@@ -83,7 +170,7 @@ def test_rerun_notice_precedes_run_and_preserves_explicit_review_lifecycle(
 
     at, calls = fabricated_inspection_app
     at.selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value(page).run()
+    at.selectbox("workspace_page").set_value(page).run()
     run = "Run inspection" if category == "Cashew" else "Run MetalParts inspection"
     clear = (
         "Clear image and results" if category == "Cashew" else "Clear MetalParts image and results"
@@ -109,6 +196,11 @@ def test_rerun_notice_precedes_run_and_preserves_explicit_review_lifecycle(
     notice_before_run()
     assert len(at.get("download_button")) == 2
     exports = (review.json_bytes(saved.records), review.csv_bytes(saved.records))
+    assert any(e.label.endswith("Complete image") for e in at.expander)
+    # Native disclosures are client-only; rerender must preserve saved identity.
+    at.run()
+    assert not at.exception and len(calls) == 1
+    assert at.session_state["fv_review_single_bundle"] is saved
     at.run()
     assert at.session_state["fv_review_single_bundle"] is saved
     assert (review.json_bytes(saved.records), review.csv_bytes(saved.records)) == exports
@@ -187,20 +279,20 @@ def test_content_navigation_rerun_preserves_selection_results_and_saved_review(
 ):
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value("Synthetic demo").run()
+    at.selectbox("workspace_page").set_value("Synthetic demo").run()
     button(at, "Generate synthetic demo").click().run()
     saved = save(at, "demo", note="Synthetic navigation retention check")
     generated = at.session_state["synthetic_demo"]
     at.run()
     assert not at.exception
     assert at.main.selectbox[0].value == category
-    assert at.main.radio("workspace_page").value == "Synthetic demo"
+    assert at.main.selectbox("workspace_page").value == "Synthetic demo"
     assert at.session_state["synthetic_demo"] is generated
     assert at.session_state["fv_review_demo_bundle"] is saved
     assert len(navigation_warnings(at)) == 1
     assert not at.sidebar.radio and not at.sidebar.selectbox
     # An intentional transition still clears the same session scope.
-    at.main.radio("workspace_page").set_value("Overview").run()
+    at.main.selectbox("workspace_page").set_value("Overview").run()
     assert "synthetic_demo" not in at.session_state
     assert "fv_review_demo_bundle" not in at.session_state
 
@@ -210,15 +302,15 @@ def test_all_workspaces_keep_native_router_and_source_only_state(source_app, cat
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
     for page in PAGES:
-        at.radio("workspace_page").set_value(page).run()
+        at.selectbox("workspace_page").set_value(page).run()
         assert not at.exception
         assert (
-            len([r for r in at.radio if r.key == "workspace_page"]) == 1
-            and len(at.radio("workspace_page").options) == 8
+            len([r for r in at.selectbox if r.key == "workspace_page"]) == 1
+            and len(at.selectbox("workspace_page").options) == 8
         )
         assert not at.sidebar.radio and not at.sidebar.selectbox and not at.sidebar.button
         assert len([s for s in at.main.selectbox if s.label == "Category"]) == 1
-        assert at.main.radio("workspace_page").value == page
+        assert at.main.selectbox("workspace_page").value == page
         assert not navigation_warnings(at)
         assert "synthetic_demo" not in at.session_state and "results" not in at.session_state
         if page == "Overview":
@@ -231,7 +323,7 @@ def test_all_workspaces_keep_native_router_and_source_only_state(source_app, cat
 def test_preview_without_models_then_clear_and_navigation(source_app, category, page):
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value(page).run()
+    at.selectbox("workspace_page").set_value(page).run()
     metal = category != "Cashew"
     run = "Run MetalParts inspection" if metal else "Run inspection"
     clear = "Clear MetalParts image and results" if metal else "Clear image and results"
@@ -247,7 +339,7 @@ def test_preview_without_models_then_clear_and_navigation(source_app, category, 
     assert at.file_uploader[0].value is None and not at.checkbox[0].value
     assert not navigation_warnings(at)
     at.file_uploader[0].set_value(("synthetic.png", build_demo().images[1], "image/png")).run()
-    at.radio("workspace_page").set_value(
+    at.selectbox("workspace_page").set_value(
         "Compare" if page == "Image inspection" else "Image inspection"
     ).run()
     assert at.file_uploader[0].value is None and not at.checkbox[0].value
@@ -269,7 +361,7 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
         return inspect_many(payload, selected)
 
     monkeypatch.setattr(engine, "inspect_many", run)
-    at.run().radio("workspace_page").set_value("Compare").run()
+    at.run().selectbox("workspace_page").set_value("Compare").run()
     at.multiselect[0].set_value(["spatial_mean", "feature_memory"]).run()
     at.file_uploader[0].set_value(("synthetic.png", encoded(), "image/png")).run()
     at.checkbox[0].check().run()
@@ -288,7 +380,7 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
         assert all(
             (result.spatial == before).all() for result, before in zip(results, arrays, strict=True)
         )
-        assert len(at.image) == (2 if label == "Reconstruction / reference" else 3)
+        assert len(at.image) == 4 * (2 if label == "Reconstruction / reference" else 3)
         disclosures = [m.value for m in at.markdown if m.value.startswith("Raw score: ")]
         assert len(disclosures) == len(results)
         for text, result in zip(disclosures, results, strict=True):
@@ -309,7 +401,7 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
 def test_rejected_upload_has_no_stale_preview(source_app, category, payload):
     at, _ = source_app
     at.run().selectbox[0].set_value(category).run()
-    at.radio("workspace_page").set_value("Image inspection").run()
+    at.selectbox("workspace_page").set_value("Image inspection").run()
     at.file_uploader[0].set_value(("synthetic.png", build_demo().images[0], "image/png")).run()
     assert at.image
     at.file_uploader[0].set_value(("rejected.png", payload, "image/png")).run()
@@ -321,7 +413,7 @@ def test_rejected_upload_has_no_stale_preview(source_app, category, payload):
 
 def test_catalog_groups_keep_all_cards_and_mixed_readiness(source_app, monkeypatch):
     at, engine = source_app
-    at.run().radio("workspace_page").set_value("Model Catalog").run()
+    at.run().selectbox("workspace_page").set_value("Model Catalog").run()
     assert sum("All unavailable locally" in item.value for item in at.markdown) == 2
     cards = [b for b in at.get("download_button") if b.label == "Download model card"]
     assert len(cards) == 6
@@ -357,13 +449,14 @@ def test_demo_validation_display_and_pending_exports_preserve_contract(source_ap
         "Save any edits and export your reviews before continuing."
     )
     at, _ = source_app
-    at.run().radio("workspace_page").set_value("Synthetic demo").run()
-    assert any(item.value == warning for item in at.warning)
+    at.run().selectbox("workspace_page").set_value("Synthetic demo").run()
+    assert not any(item.value == warning for item in at.warning)
+    assert button(at, "Clear synthetic demo").disabled
     assert not at.image and not at.get("download_button")
     button(at, "Generate synthetic demo").click().run()
     assert any(item.value == warning for item in at.warning)
     demo, csv_export, json_export = at.session_state["synthetic_demo"]
-    assert len(at.image) == 2
+    assert len(at.image) == 8
     assert list(at.table[0].value["Validation"]) == ["Valid", "Valid", "Rejected"]
     assert list(at.table[0].value["Score"]) == ["Not computed"] * 3
     assert all(
@@ -382,6 +475,7 @@ def test_demo_validation_display_and_pending_exports_preserve_contract(source_ap
     assert any(item.value == warning for item in at.warning)
     save(at, scope="demo", note="Synthetic review before clearing")
     button(at, "Clear synthetic demo").click().run()
-    assert any(item.value == warning for item in at.warning)
+    assert not any(item.value == warning for item in at.warning)
+    assert button(at, "Clear synthetic demo").disabled
     assert not at.image and not at.get("download_button") and not at.exception
     assert "fv_review_demo_bundle" not in at.session_state

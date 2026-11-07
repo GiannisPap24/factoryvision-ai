@@ -8,6 +8,39 @@ from test_app import batch_open, encoded
 from test_app import local_event_loop_ipc as local_event_loop_ipc
 from test_launch_readiness import source_app as source_app
 from test_review_app import button, save
+from test_workbench_ui import fabricated_inspection_app as fabricated_inspection_app
+
+
+@pytest.mark.parametrize("count", [1, 2, 4, 6])
+def test_batch_preview_controls_keep_identity_without_repeating_image_description(
+    app, monkeypatch, count
+):
+    at, engine = batch_open(app, monkeypatch, [encoded(color=100 + i) for i in range(count)])
+    calls = []
+    monkeypatch.setattr(engine, "inspect", lambda *args: calls.append(args))
+    plan = at.session_state["batch_plan"]
+    assert plan.accepted == count
+    labels = [e.label for e in at.expander if e.label.endswith("Complete image")]
+    assert labels == [f"Enlarge Image {i:03} · Complete image" for i in range(1, count + 1)]
+    images = [i for element in at.image for i in element.proto.imgs]
+    assert len(images) == 4 * count
+    for index, item in enumerate(plan.items):
+        preview, whole, context, detail = images[index * 4 : index * 4 + 4]
+        assert preview.alt == f"{item.image_id} validated input preview"
+        assert [i.alt for i in (whole, context, detail)] == [
+            prefix + preview.alt
+            for prefix in (
+                "Complete view: ",
+                "Context for magnified detail: ",
+                "Magnified detail: ",
+            )
+        ]
+        assert all(i.caption == item.image_id for i in (preview, whole, context, detail))
+        assert preview.url == whole.url == context.url == detail.url
+    at.run()
+    assert not at.exception and not calls
+    assert at.session_state["batch_plan"] is plan
+    assert "batch_report" not in at.session_state
 
 
 @pytest.mark.parametrize("category", ["cashew", "metalparts"])
@@ -42,12 +75,12 @@ def test_batch_and_reports_precision_keeps_snapshot_and_exports(source_app, cate
     at.run().selectbox[0].set_value(
         "Cashew" if category == "cashew" else "MetalParts (experimental)"
     ).run()
-    at.radio("workspace_page").set_value("Batch inspection").run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
     at.session_state["batch_report"] = source
     at.session_state["batch_archive_view"] = True
     at.run()
     for page in ("Batch inspection", "Reports", "Batch inspection"):
-        at.radio("workspace_page").set_value(page).run()
+        at.selectbox("workspace_page").set_value(page).run()
         assert not at.exception
         text = next(m.value for m in at.markdown if m.value.startswith("Score: "))
         score_text, remainder = text.removeprefix("Score: ").split(" · Frozen threshold: ")
@@ -62,6 +95,15 @@ def test_batch_and_reports_precision_keeps_snapshot_and_exports(source_app, cate
         assert timing == "2.12 ms"
         assert any("not a defect probability" in c.value for c in at.caption)
         assert at.session_state["batch_report"] is source
+        outcomes = next(table.value for table in at.table if "Score" in table.value.columns)
+        shown = outcomes.iloc[0]
+        assert isinstance(shown["Score"], str)
+        assert float(shown["Score"]) == row.score
+        assert float(shown["Model inference ms"]) == row.inference_ms
+        if row.threshold is None:
+            assert shown["Frozen threshold"] == "null"
+        else:
+            assert float(shown["Frozen threshold"]) == row.threshold
         exports = at.session_state["batch_exports"]
         assert exports.source is source
         assert (exports.csv, exports.json) == expected_exports
@@ -105,8 +147,13 @@ def test_stopped_batch_keeps_success_evidence_review_and_exports(app, monkeypatc
     assert any("pending records" in i.value for i in at.info)
     bundle = at.session_state["batch_exports"]
     reviews = save(at, scope="batch")
-    at.radio("workspace_page").set_value("Reports").run()
-    at.radio("workspace_page").set_value("Batch inspection").run()
+    assert any(e.label.endswith("Complete image") for e in at.expander)
+    at.run()
+    assert not at.exception and len(calls) == 2
+    assert at.session_state["batch_exports"] is bundle
+    assert at.session_state["fv_review_batch_bundle"] is reviews
+    at.selectbox("workspace_page").set_value("Reports").run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
     assert not at.exception and len(calls) == 2
     assert at.session_state["batch_report"] is source
     assert at.session_state["batch_exports"] is bundle
@@ -130,3 +177,58 @@ def test_invalid_report_feedback_is_outside_result_tabs(app, monkeypatch):
         for tab in at.tabs
         for e in tab.error
     )
+
+
+@pytest.mark.parametrize("category", ["Cashew", "MetalParts (experimental)"])
+def test_interrupted_terminal_state_is_immediate_and_clear_allows_one_new_run(
+    fabricated_inspection_app, category, monkeypatch
+):
+    from factoryvision.demo import build_demo
+    from factoryvision.inference.batch import BatchService
+
+    at, _ = fabricated_inspection_app
+    at.selectbox[0].set_value(category).run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
+    payload = build_demo().images[0]
+    uploads = [(f"synthetic-{i}.png", payload, "image/png") for i in range(3)]
+    uploads.append(("synthetic-invalid.png", b"invalid", "image/png"))
+    at.file_uploader[0].set_value(uploads).run()
+    at.checkbox(key="batch_ack").check().run()
+    original = BatchService.run
+    calls = []
+    interrupt = True
+
+    def execute(self, plan, progress=None):
+        calls.append(plan.batch_id)
+        if interrupt:
+            raise ValueError("Synthetic backend detail must not be displayed")
+        return original(self, plan, progress)
+
+    monkeypatch.setattr(BatchService, "run", execute)
+    button(at, "Run batch inspection").click().run()
+    assert not at.exception and len(calls) == 1
+    assert button(at, "Run batch inspection").disabled
+    assert "batch_report" not in at.session_state and "batch_exports" not in at.session_state
+    marker = at.session_state["batch_started"]
+    errors = [e.value for e in at.error]
+    assert any("previous run" in e for e in errors)
+    assert all("Synthetic backend detail" not in e for e in errors)
+    for _ in range(2):
+        at.run()
+        assert button(at, "Run batch inspection").disabled and len(calls) == 1
+        assert at.session_state["batch_started"] == marker
+        assert [e.value for e in at.error] == errors
+    button(at, "Clear batch").click().run()
+    assert "batch_started" not in at.session_state and not at.checkbox(key="batch_ack").value
+    interrupt = False
+    at.file_uploader[0].set_value(uploads).run()
+    at.checkbox(key="batch_ack").check().run()
+    button(at, "Run batch inspection").click().run()
+    assert not at.exception and len(calls) == 2
+    report = at.session_state["batch_report"]
+    assert [r.status for r in report.rows] == ["inspected", "inspected", "inspected", "rejected"]
+    saved = save(at, scope="batch", note="Synthetic retained completed review")
+    at.selectbox("workspace_page").set_value("Reports").run()
+    at.selectbox("workspace_page").set_value("Batch inspection").run()
+    assert len(calls) == 2 and at.session_state["batch_report"] is report
+    assert at.session_state["fv_review_batch_bundle"] is saved

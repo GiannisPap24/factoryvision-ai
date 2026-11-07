@@ -28,6 +28,15 @@ component/notice review. Pretrained and derived-weight distribution remains unre
 
 ## Installed Python dependencies
 
+The UX8I typography assets are a separate bundled third-party component: original
+IBM Plex Sans TTFs from `@ibm/plex-sans@1.1.0`, internal font version 3.005, under
+SIL Open Font License 1.1. The IBM copyright, Reserved Font Name **Plex** and full
+license are retained with the files and included in package license metadata.
+No font was subsetted, renamed internally, converted or relicensed as MIT.
+See the [font inventory](../src/factoryvision/app/fonts/README.md) and its pinned
+hash manifest. These are interface fonts, not datasets, model weights or dependency
+wheels. They load locally without a font service or static directory endpoint.
+
 The locked Windows environment was inspected via installed distribution metadata
 and licence/notice file inventories: 60 third-party distributions plus this project.
 The public dependency table provides the per-package review summary.

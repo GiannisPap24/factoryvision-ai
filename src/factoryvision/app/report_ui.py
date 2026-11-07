@@ -46,6 +46,57 @@ def render(source: BatchReport) -> bool:
         st.error("Batch stopped. Failed and skipped images have no anomaly decision.")
     else:
         st.warning("Batch complete with issues. Review rejected and failed images below.")
+    with st.container(key="fv-report-summary", gap="small"):
+        st.write(f"Category: {report.model.category} · Model: {report.model.name}")
+        st.caption("Report: " + report.report_id)
+        count = report.summary
+        for column, label, value in zip(
+            st.columns(4),
+            ("Inspected", "Rejected", "Failed", "Skipped"),
+            (
+                count.inspected,
+                count.rejected,
+                count.failed,
+                count.skipped,
+            ),
+            strict=True,
+        ):
+            column.metric(label, value, border=True)
+        st.caption(
+            f"Selected: {count.selected} · Accepted inputs: {count.accepted} · "
+            f"Rejected: {count.rejected} · Failed: {count.failed}. "
+            "Accepted means upload validation passed, not product quality."
+        )
+        values = [r.inference_ms for r in report.rows if r.status == "inspected"]
+        if values:
+            import statistics
+
+            st.caption(
+                "Model inference per successful image: "
+                f"median {statistics.median(values):.2f} ms · "
+                f"min {min(values):.2f} ms · max {max(values):.2f} ms"
+            )
+        else:
+            st.caption("Model inference timing: unavailable; no successful images.")
+        st.caption(f"Batch processing: {report.batch_duration_ms / 1000:.3f} s")
+        st.caption(TIMING_SCOPE)
+        st.write(report.model.scientific_status)
+    with st.expander("Model provenance and score semantics"):
+        st.write(report.model.score_label)
+        st.write("Artifact version: SHA-256 of the registered frozen artifact")
+        st.code(report.model.registered_artifact_sha256, language=None)
+        st.caption(
+            "Artifact identity observed in successful results."
+            if values
+            else "Registered identity only; no successful inference verified an artifact."
+        )
+        st.caption("Installed catalog SHA-256: " + report.model.catalog_sha256)
+        st.write(
+            "No validated binary threshold."
+            if report.model.frozen_threshold is None
+            else f"Frozen research threshold: {report.model.frozen_threshold:.17g} "
+            "(score > threshold)"
+        )
     with st.container(border=True, key="fv-report-exports", gap="xsmall"):
         st.subheader("Export research results")
         left, right = st.columns(2)
@@ -71,55 +122,6 @@ def render(source: BatchReport) -> bool:
             "No filenames, images or EXIF. Exporting does not rerun inference. "
             "The app writes no report files automatically; your browser saves only on request."
         )
-    st.write(f"Category: {report.model.category} · Model: {report.model.name}")
-    st.caption("Report: " + report.report_id)
-    count = report.summary
-    for column, label, value in zip(
-        st.columns(4),
-        ("Inspected", "Rejected", "Failed", "Skipped"),
-        (
-            count.inspected,
-            count.rejected,
-            count.failed,
-            count.skipped,
-        ),
-        strict=True,
-    ):
-        column.metric(label, value, border=True)
-    st.caption(
-        f"Selected: {count.selected} · Accepted inputs: {count.accepted} · "
-        f"Rejected: {count.rejected} · Failed: {count.failed}. "
-        "Accepted means upload validation passed, not product quality."
-    )
-    values = [r.inference_ms for r in report.rows if r.status == "inspected"]
-    if values:
-        import statistics
-
-        st.caption(
-            f"Model inference per successful image: median {statistics.median(values):.2f} ms · "
-            f"min {min(values):.2f} ms · max {max(values):.2f} ms"
-        )
-    else:
-        st.caption("Model inference timing: unavailable; no successful images.")
-    st.caption(f"Batch processing: {report.batch_duration_ms / 1000:.3f} s")
-    st.caption(TIMING_SCOPE)
-    st.write(report.model.scientific_status)
-    with st.expander("Model provenance and score semantics"):
-        st.write(report.model.score_label)
-        st.write("Artifact version: SHA-256 of the registered frozen artifact")
-        st.code(report.model.registered_artifact_sha256, language=None)
-        st.caption(
-            "Artifact identity observed in successful results."
-            if values
-            else "Registered identity only; no successful inference verified an artifact."
-        )
-        st.caption("Installed catalog SHA-256: " + report.model.catalog_sha256)
-        st.write(
-            "No validated binary threshold."
-            if report.model.frozen_threshold is None
-            else f"Frozen research threshold: {report.model.frozen_threshold:.17g} "
-            "(score > threshold)"
-        )
     st.subheader("Image outcomes")
     st.caption(
         "Inspected: prediction available. Rejected: input invalid. "
@@ -130,18 +132,25 @@ def render(source: BatchReport) -> bool:
             {
                 "Image": row.image_id,
                 "Status": row.status,
-                "Score": row.score,
-                "Frozen threshold": row.threshold,
+                "Score": "null" if row.score is None else format(row.score, ".17g"),
+                "Frozen threshold": "null"
+                if row.threshold is None
+                else format(row.threshold, ".17g"),
                 "Research anomaly flag": row.research_anomaly_flag,
                 "Interpretation": row.interpretation,
-                "Model inference ms": row.inference_ms,
+                "Model inference ms": "null"
+                if row.inference_ms is None
+                else format(row.inference_ms, ".17g"),
                 "Error category": row.error_code,
             }
             for row in report.rows
         ],
         "report-results",
     )
-    st.caption("Scores retain full precision in CSV/JSON. null means unavailable, never zero.")
+    st.caption(
+        "Table scalars use round-trip precision; CSV/JSON retain the same values. "
+        "null means unavailable, never zero."
+    )
     with st.expander("Scientific limitations", expanded=False):
         for limitation in LIMITATIONS:
             st.write(limitation)

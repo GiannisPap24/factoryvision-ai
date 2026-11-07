@@ -34,13 +34,16 @@ def show_result(result, display=None):
     view = panels(result)
     presentation.result_images(view, display, reference=False, key=result.model_id)
     presentation.legend(view["ceiling"])
-    st.markdown("**Model diagnostics**")
-    left, right = st.columns(2)
-    left.metric(
-        "Maximum feature distance" if feature else "Continuous reconstruction score",
-        f"{result.score:.8f}",
+    presentation.diagnostics(
+        (
+            (
+                "Maximum feature distance" if feature else "Continuous reconstruction score",
+                f"{result.score:.8f}",
+            ),
+            ("CPU inference", f"{result.inference_ms:.1f} ms"),
+        ),
+        result.model_id,
     )
-    right.metric("CPU inference", f"{result.inference_ms:.1f} ms")
     st.caption(
         result.score_label + ". No validated threshold or binary decision. "
         "Raw scores have different units across methods and cannot be compared directly."
@@ -64,12 +67,13 @@ def show_result(result, display=None):
 
 
 def inspect(engine, compare=False):
+    readiness = st.empty()
     controls, output, preview_slot = presentation.inspection_layout(compare)
     image = None
     with controls:
-        st.subheader("Inspection controls" if compare else "Inspection setup")
+        st.subheader("Inspection setup", anchor="inspection-setup")
         st.caption("Category: MetalParts (experimental) · Change category in navigation")
-        st.warning(
+        st.caption(
             "Experimental source-domain models. Autoencoder trained; feature memory fitted with "
             "a frozen backbone. Independent defect performance is unestablished; "
             "no binary threshold."
@@ -78,6 +82,7 @@ def inspect(engine, compare=False):
             "Convolutional Autoencoder": engine,
             "Feature-Memory Detector": feature_service(engine.root),
         }
+        st.markdown("**01 · Model selection**")
         selected = st.multiselect(
             "MetalParts models",
             list(options),
@@ -90,6 +95,7 @@ def inspect(engine, compare=False):
             if compare
             else "Select one model, upload a permitted image and run inspection."
         )
+        st.markdown("**02 · Image and permission**")
         upload = st.file_uploader(
             "Choose a MetalParts image",
             type=["png", "jpg", "jpeg"],
@@ -125,6 +131,12 @@ def inspect(engine, compare=False):
             except InputRejected as exc:
                 st.error(str(exc))
         statuses = [options[name].status() for name in selected]
+        if any(not status["available"] for status in statuses):
+            readiness.caption(
+                "Inference unavailable · A selected model is unavailable; "
+                "preview remains available."
+            )
+        st.markdown("**03 · Run and review**")
         st.button("Clear MetalParts image and results", on_click=presentation.clear_inspection)
         rerun_notice = st.empty()
         if st.button(
@@ -150,9 +162,14 @@ def inspect(engine, compare=False):
                 presentation.inference_failure()
         if compare and st.session_state.get("metal_results"):
             st.markdown("[View comparison results](#comparison-results)")
-        for status in statuses:
-            if not status["available"]:
-                st.error(status["reason"])
+        if any(not status["available"] for status in statuses):
+            st.info(
+                "A selected model is unavailable. Preview remains available; inference is disabled."
+            )
+            with st.expander("Artifact verification details"):
+                for status in statuses:
+                    if not status["available"]:
+                        st.write(status["reason"])
         if any(not status["available"] for status in statuses):
             presentation.setup_help()
         with st.expander("Permitted inputs and limits"):
@@ -172,14 +189,11 @@ def inspect(engine, compare=False):
         if results and not compare:
             show_result(results[0])
         else:
-            presentation.input_viewer(image if valid else None)
+            presentation.input_viewer(image if valid else None, refined=True)
     with output:
         if compare:
             if results:
-                display = presentation.comparison_view()
-                for column, result in zip(st.columns(len(results)), results, strict=True):
-                    with column.container(border=True, key="fv-card-result-" + result.model_id):
-                        show_result(result, display)
+                presentation.comparison_panels(results, show_result)
             else:
                 st.info(
                     "No model output yet. Upload a permitted image and explicitly run inspection."
@@ -281,7 +295,12 @@ def development_history(root):
                     key: verified_asset(root, entry) for key, entry in example["assets"].items()
                 }
                 for label in ("original", "reconstruction", "heatmap", "overlay", "mask"):
-                    st.image(assets[label].read_bytes(), caption=label.title(), width="stretch")
+                    presentation.image_view(
+                        assets[label].read_bytes(),
+                        caption=label.title(),
+                        alt="Historical MetalParts " + label,
+                        key="research-" + example["sample_id"] + "-" + label,
+                    )
             except (OSError, ModelUnavailable):
                 st.info(
                     "This local development visualization is unavailable or failed verification."
@@ -450,6 +469,12 @@ def comparison(root):
                 ]:
                     column.caption(f"{label} · heatmap 0–{record['ceiling']:.6g} {units}")
                     path = verified_asset(root, record["assets"]["overlay"])
-                    column.image(path.read_bytes(), caption=label, width="stretch")
+                    with column:
+                        presentation.image_view(
+                            path.read_bytes(),
+                            caption=label,
+                            alt="Historical MetalParts overlay: " + label,
+                            key="research-comparison-" + example["sample_id"] + "-" + label,
+                        )
             except (OSError, ModelUnavailable):
                 st.info("Local comparison image unavailable or failed verification.")

@@ -4,43 +4,114 @@ from importlib.resources import files
 
 import streamlit as st
 
+from factoryvision.app.typography import font_styles
+
+SYNTHETIC_IMAGE_ALTS = (
+    "Teal rectangle on a dark background",
+    "Yellow circle on a dark background",
+)
+
 
 def styling():
-    # Packaged, constant CSS only; no user content, external assets or JavaScript.
-    st.html(files("factoryvision.app").joinpath("workbench.css").read_text(encoding="utf-8"))
-
-
-def header():
+    # Packaged, constant CSS/font bytes only; no user content or JavaScript.
     st.html(
-        '<div class="fv-workbench-header">'
-        "<strong>FactoryVision AI</strong><span>Inspection Workbench</span>"
-        "<small>Research · Local CPU</small></div>"
+        font_styles()
+        + files("factoryvision.app").joinpath("workbench.css").read_text(encoding="utf-8")
     )
 
 
-def input_viewer(image=None):
+def header():
+    with st.container(key="fv-app-header"):
+        st.html(
+            '<header class="fv-workbench-header">'
+            "<strong>FactoryVision AI</strong><span>Industrial Precision</span>"
+            "<small>Research · Local CPU</small></header>"
+        )
+
+
+def page_header(title, description, category):
+    with st.container(key="fv-page-header", gap="xxsmall"):
+        st.title(title)
+        st.caption(f"{category} · {description}")
+
+
+def image_view(image, *, caption, alt, key, width="stretch", action=None):
+    """Fit the complete image, with optional detail and persistent visual context."""
+    # Keep the original image object and native encoding contract in every view.
+    # Only the preview has a numeric width; detail magnification is CSS display scaling.
+    with st.container(key="fv-image-" + key, gap="xsmall"):
+        st.image(image, caption=caption, alt=alt, width=width)
+        with st.expander(
+            (action or "Enlarge: " + alt) + " · Complete image", key="fv-expand-" + key
+        ):
+            with st.container(key="fv-whole-" + key, gap="xsmall"):
+                st.image(image, caption=caption, alt="Complete view: " + alt, width="stretch")
+            with st.expander("Magnified detail: " + alt, key="fv-detail-" + key, type="compact"):
+                st.caption(
+                    "Display enlargement adds no image information. "
+                    "Tab into detail and use arrow keys to pan; Shift+Tab returns here."
+                )
+                with st.container(horizontal=True, key="fv-detail-layout-" + key):
+                    with st.container(key="fv-context-" + key, gap="xsmall"):
+                        st.caption("Whole-image context")
+                        st.image(
+                            image,
+                            caption=caption,
+                            alt="Context for magnified detail: " + alt,
+                            width="stretch",
+                        )
+                    with (
+                        st.container(key="fv-pan-" + key, height=300),
+                        st.container(key="fv-magnified-" + key),
+                    ):
+                        st.image(
+                            image,
+                            caption=caption,
+                            alt="Magnified detail: " + alt,
+                            width="stretch",
+                        )
+
+
+def input_viewer(image=None, *, refined=False):
     """Display already validated RGB pixels; never call an inference service."""
+    if image is None:
+        st.markdown("[Go to Inspection setup and upload](#inspection-setup)")
     with st.container(key="fv-input-viewer"):
         st.markdown("**Input preview**")
-        if image is None:
+        if image is None and refined:
+            st.html(
+                '<div class="fv-empty-viewer fv-empty-inspect">'
+                '<p class="fv-viewer-kicker">IMAGE WORKSPACE</p>'
+                "<h2>Start with an image</h2>"
+                "<p>Upload a permitted PNG or JPEG in Inspection setup. "
+                "Your validated image will appear here.</p>"
+                '<p class="fv-viewer-note">Preview works without model files. '
+                "No inference runs until you choose Run inspection.</p></div>"
+            )
+        elif image is None:
             st.html(
                 '<div class="fv-empty-viewer"><h2>Your image belongs here.</h2>'
                 "<p>Choose a permitted image in Inspection setup. A validated preview "
                 "is separate from inference.</p><p>No model output, score or anomaly map.</p></div>"
             )
         else:
-            st.image(image, caption="Validated RGB · preview only", width="stretch")
+            image_view(
+                image,
+                caption="Validated RGB · preview only",
+                alt="Input image",
+                key="input-preview",
+            )
         st.caption("Original RGB before inference · Session only")
 
 
 def inspection_layout(compare):
-    viewer, setup = st.columns([1.8, 1], gap="medium")
-    preview = viewer.empty()
-    return (
-        setup.container(border=True, key="fv-inspection-setup", gap="xsmall"),
-        st.container(),
-        preview,
-    )
+    # One native tree for both workflows; styling never changes widget identity.
+    layout = st.container(horizontal=True, key="fv-inspection-layout", gap="medium")
+    viewer = layout.container(key="fv-inspection-evidence", gap="xsmall")
+    controls = layout.container(border=True, key="fv-inspection-setup", gap="small")
+    # Keep the viewer in a persistent container across application reruns.
+    preview = viewer.container(key="fv-inspection-preview", gap="xsmall")
+    return controls, st.container(key="fv-inspection-output"), preview
 
 
 VIEW_LABELS = ("Original", "Heatmap", "Overlay", "Reconstruction / reference")
@@ -52,10 +123,18 @@ def result_images(view, display=None, *, reference=True, key="result"):
     def show(label):
         if label == "Reconstruction / reference":
             if view["reconstruction"] is not None:
-                st.image(view["reconstruction"], caption="Reconstructed RGB", width="stretch")
+                image_view(
+                    view["reconstruction"],
+                    caption="Reconstructed RGB",
+                    alt="Model RGB reconstruction",
+                    key=key + "-reconstruction",
+                )
             elif reference and view["reference"] is not None:
-                st.image(
-                    view["reference"], caption="Frozen spatial mean reference", width="stretch"
+                image_view(
+                    view["reference"],
+                    caption="Frozen spatial mean reference",
+                    alt="Frozen spatial reference image",
+                    key=key + "-reference",
                 )
             else:
                 st.html(
@@ -66,12 +145,16 @@ def result_images(view, display=None, *, reference=True, key="result"):
                 )
                 st.caption("Reconstruction unavailable for this method")
         else:
-            name, caption = {
-                "Original": ("original", "Original RGB"),
-                "Heatmap": ("heatmap", "Relative anomaly intensity"),
-                "Overlay": ("overlay", "45% heatmap overlay"),
+            name, caption, alt = {
+                "Original": ("original", "Original RGB", "Input image"),
+                "Heatmap": ("heatmap", "Relative anomaly intensity", "Relative anomaly map"),
+                "Overlay": (
+                    "overlay",
+                    "45% heatmap overlay",
+                    "Input image with relative anomaly map",
+                ),
             }[label]
-            st.image(view[name], caption=caption, width="stretch")
+            image_view(view[name], caption=caption, alt=alt, key=key + "-" + name)
 
     with st.container(key="fv-spatial-viewer-" + key, gap="xsmall"):
         if display is None:
@@ -83,12 +166,32 @@ def result_images(view, display=None, *, reference=True, key="result"):
 
 
 def comparison_view():
-    st.subheader("Side-by-side evidence", anchor="comparison-results")
-    st.caption(
-        "Same input · Selection order · Each map has its own relative scale. "
-        "Raw scores use different units and cannot rank models."
-    )
-    return st.radio("View for all models", VIEW_LABELS, index=2, horizontal=True)
+    with st.container(key="fv-comparison-toolbar", gap="xsmall"):
+        st.subheader("Side-by-side evidence", anchor="comparison-results")
+        st.caption(
+            "Same input · Selection order · Each map has its own relative scale. "
+            "Raw scores use different units and cannot rank models."
+        )
+        return st.radio("View for all models", VIEW_LABELS, index=2, horizontal=True)
+
+
+def comparison_panels(results, render_result):
+    """Keep complete method panels in selection order, with at most two per row."""
+    display = comparison_view()
+    with st.container(horizontal=True, key="fv-comparison-grid", gap="medium"):
+        for result in results:
+            with st.container(key="fv-comparison-method-" + result.model_id):
+                render_result(result, display)
+
+
+def diagnostics(values, key):
+    """Native metrics with enough room for full values at every panel width."""
+    with st.container(border=True, key="fv-diagnostics-" + key, gap="xsmall"):
+        st.markdown("**Model diagnostics**")
+        with st.container(horizontal=True, key="fv-metrics-" + key, gap="small"):
+            for index, (label, value) in enumerate(values):
+                with st.container(key=f"fv-metric-{key}-{index}"):
+                    st.metric(label, value)
 
 
 def table(data, key):
@@ -139,31 +242,29 @@ def clear_inspection():
 
 def overview(category, statuses):
     ready = sum(row["available"] for row in statuses)
-    left, right = st.columns([1.4, 1], gap="medium")
-    with left.container(border=True, key="fv-card-start"):
-        st.caption("START HERE · " + category)
-        st.subheader("Explore the inspection workflow")
+    layout = st.container(horizontal=True, key="fv-overview-layout", gap="medium")
+    with layout.container(border=True, key="fv-card-start", gap="small"):
+        st.caption("LOCAL INSPECTION WORKBENCH · " + category)
+        st.subheader("From image to evidence")
         st.write("Try validation, Human Review and exports with original synthetic examples.")
         with st.container(horizontal=True, gap="small", key="fv-overview-actions"):
-            if ready:
+            st.button(
+                "Open synthetic demo",
+                type="primary",
+                on_click=navigate,
+                args=("Synthetic demo",),
+            )
+            st.button("Open Model Catalog", on_click=navigate, args=("Model Catalog",))
+        if ready:
+            with st.container(horizontal=True, gap="small"):
                 st.button(
                     "Start inspection",
-                    type="primary",
                     on_click=navigate,
                     args=("Image inspection",),
                 )
                 st.button("Compare models", on_click=navigate, args=("Compare",))
-                st.button("Open demo", on_click=navigate, args=("Synthetic demo",))
-            else:
-                st.button(
-                    "Open synthetic demo",
-                    type="primary",
-                    on_click=navigate,
-                    args=("Synthetic demo",),
-                )
-            st.button("Open Model Catalog", on_click=navigate, args=("Model Catalog",))
         if not ready:
-            st.info(
+            st.caption(
                 "Missing weights are expected in a fresh checkout. The demo performs no "
                 "neural inference and produces no anomaly scores."
             )
@@ -174,10 +275,60 @@ def overview(category, statuses):
         # Original thumbnails only. Do not create a Demo session or review/export bundle.
         with st.container(horizontal=True, gap="small", key="fv-sample-strip"):
             for number, image in enumerate(build_demo().images, 1):
-                st.image(image, caption=f"Synthetic example {number}", width=96)
+                image_view(
+                    image,
+                    caption=f"Synthetic example {number}",
+                    width=96,
+                    alt=SYNTHETIC_IMAGE_ALTS[number - 1],
+                    key=f"overview-{number}",
+                    action=f"Expand {number}",
+                )
         st.caption("Original geometry · No dataset or model weights required")
-    with right.container(border=True, key="fv-card-workflow"):
-        st.subheader("A simple first run")
+    with layout.container(border=True, key="fv-card-workflow", gap="small"):
+        st.subheader("Local model readiness")
+        st.markdown(f"**{ready} of {len(statuses)} local methods ready · {category}**")
+        st.caption(
+            "Verified artifacts are required for inference. Synthetic Demo is always available."
+        )
+        with st.expander("Local model readiness", expanded=bool(ready)):
+            st.caption(
+                "Six registered methods across two categories. Registration is not readiness."
+            )
+            availability(statuses)
+        st.markdown("**Source-only installation**")
+        st.write(
+            "Preview permitted images, explore model provenance and review recorded research. "
+            "Model weights and datasets are separate local assets."
+        )
+    with st.container(horizontal=True, key="fv-workflow-grid", gap="medium"):
+        for key, title, description, action, page in (
+            (
+                "inspect",
+                "Inspect",
+                "One image, one method. Preview before explicit inference.",
+                "Open Inspect",
+                "Image inspection",
+            ),
+            (
+                "compare",
+                "Compare",
+                "One input, multiple methods. Review independently scaled maps.",
+                "Open Compare",
+                "Compare",
+            ),
+            (
+                "batch",
+                "Batch Inspection",
+                "Validate a bounded selection. Review every outcome.",
+                "Open Batch",
+                "Batch inspection",
+            ),
+        ):
+            with st.container(border=True, key="fv-card-workflow-" + key, gap="xsmall"):
+                st.subheader(title)
+                st.caption(description)
+                st.button(action, on_click=navigate, args=(page,), width="stretch")
+    with st.expander("First-session guide"):
         for number, title, body in (
             ("01", "Generate examples", "Open Demo, then generate the synthetic inputs."),
             ("02", "Review validation", "See valid and rejected inputs. No defect prediction."),
@@ -187,22 +338,20 @@ def overview(category, statuses):
                 "Practice Human Review and download synthetic JSON/CSV.",
             ),
         ):
-            st.markdown(f"**{number} · {title}**")
-            st.caption(body)
-    with st.expander("Local model readiness", expanded=bool(ready)):
-        st.caption("Six registered methods across two categories. Registration is not readiness.")
-        availability(statuses)
-    with st.container(border=True, key="fv-card-boundaries"):
+            with st.container(key="fv-workflow-step-" + number, gap="xxsmall"):
+                st.markdown(f"**{number} · {title}**")
+                st.write(body)
+    with st.container(key="fv-overview-boundaries", gap="xsmall"):
         st.markdown("**Research boundaries**")
+        st.write(
+            "Research demonstration. Not validated for industrial acceptance, "
+            "food safety or automated product-quality decisions."
+        )
         st.caption("PCB1: BLOCKED · PCB2: INCONCLUSIVE · RobustAD: NOT CLEARED")
         st.caption(
             "MetalParts: exploratory-only. Cashew official test already observed. "
             "Human Review is not verified ground truth. Real Cashew pilot: BLOCKED."
         )
-    st.warning(
-        "Research demonstration. Not validated for industrial acceptance, "
-        "food safety or automated product-quality decisions."
-    )
 
 
 def setup_help():

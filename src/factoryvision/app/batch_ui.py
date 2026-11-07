@@ -113,11 +113,13 @@ def render(category, cashew, metal, feature):
             st.rerun()
         results(st.session_state["batch_report"])
         return
-    setup, input_column = st.columns([1, 1.25], gap="medium")
-    inputs = input_column.container(border=True, key="fv-batch-inputs", gap="xsmall")
-    with setup.container(border=True, key="fv-batch-setup", gap="xsmall"):
+    layout = st.container(horizontal=True, key="fv-batch-layout", gap="medium")
+    setup = layout.container(border=True, key="fv-batch-setup", gap="small")
+    inputs = layout.container(border=True, key="fv-batch-inputs", gap="small")
+    with setup:
         st.subheader("Batch setup")
         st.caption("One compatible model · Explicit execution · Sequential CPU")
+        st.markdown("**01 · Model and limits**")
         with st.expander("Permitted inputs and processing limits"):
             st.warning(
                 "Research demonstration only. No industrial acceptance/rejection decisions. "
@@ -137,8 +139,18 @@ def render(category, cashew, metal, feature):
         limit = settings[1].number_input(
             "Batch image limit", min_value=1, max_value=MAX_IMAGES, value=20, step=1
         )
+        status = engine.status(category, selected)
+        if not status["available"]:
+            st.info(
+                "Selected model unavailable. Preview and validation remain available; "
+                "inference requires its original verified local artifacts."
+            )
+            presentation.setup_help()
+        else:
+            st.caption("Selected model artifacts verified; execution still requires permission.")
         if st.button("Clear batch"):
             clear()
+        st.markdown("**02 · Images and permission**")
         uploads = st.file_uploader(
             "Choose batch images",
             type=["png", "jpg", "jpeg"],
@@ -182,9 +194,13 @@ def render(category, cashew, metal, feature):
                 (len(plan.items), plan.accepted, len(plan.items) - plan.accepted),
                 strict=True,
             ):
-                column.metric(label, value, border=True)
+                column.metric(label, value)
             if not plan.items:
                 st.info("No images selected. Add permitted JPEG/PNG files in Batch setup.")
+                st.caption(
+                    "Validated previews and per-image input checks appear here. "
+                    "Validation does not run a model or establish product quality."
+                )
             if plan.items:
                 with st.expander("Selected batch preview", expanded=True):
                     presentation.table(
@@ -194,16 +210,19 @@ def render(category, cashew, metal, feature):
                         ],
                         "batch-inputs",
                     )
-                    for offset in range(0, len(plan.items), 4):
-                        for column, item in zip(
-                            st.columns(4), plan.items[offset : offset + 4], strict=False
-                        ):
+                    with st.container(horizontal=True, key="fv-batch-thumbnails", gap="small"):
+                        for item in plan.items:
                             if item.preview:
-                                column.image(item.preview, caption=item.image_id, width="content")
-        status = engine.status(category, selected)
-        if not status["available"]:
-            st.error("Selected model unavailable. Restore its original verified local artifacts.")
-            presentation.setup_help()
+                                with st.container(key="fv-thumbnail-" + item.image_id):
+                                    presentation.image_view(
+                                        item.preview,
+                                        caption=item.image_id,
+                                        width="stretch",
+                                        alt=f"{item.image_id} validated input preview",
+                                        key="batch-preview-" + item.image_id,
+                                        action="Enlarge " + item.image_id,
+                                    )
+        st.markdown("**03 · Execute and review**")
         started = st.session_state.get("batch_started") == batch_id
         if started and "batch_report" not in st.session_state:
             st.error(
@@ -230,9 +249,8 @@ def render(category, cashew, metal, feature):
                 st.session_state["batch_report"] = report
                 st.rerun()
             except Exception:
-                st.error(
-                    "Batch interrupted by an unexpected execution error. Clear before retrying."
-                )
+                # Render the terminal controls from the existing no-replay guard immediately.
+                st.rerun()
     if "batch_report" in st.session_state:
         st.button("Open quality report", on_click=presentation.navigate, args=("Reports",))
         results(st.session_state["batch_report"])

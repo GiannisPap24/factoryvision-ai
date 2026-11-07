@@ -11,7 +11,7 @@ from factoryvision.inference.service import InspectionService
 
 def test_evidence_filters_and_source_only_details(tmp_path):
     at = AppTest.from_function(entry, args=(InspectionService(tmp_path),), default_timeout=15).run()
-    at.radio("workspace_page").set_value("Model Catalog").run()
+    at.selectbox("workspace_page").set_value("Model Catalog").run()
     assert not at.exception and len(at.table[0].value) == 6
     assert len(at.selectbox(key="registry_evidence").options) == 8
     assert len(at.table[1].value) == 4
@@ -38,6 +38,6 @@ def test_tampered_registry_has_bounded_ui_error(tmp_path, monkeypatch):
 
     monkeypatch.setattr(catalog_ui, "registry_records", reject)
     at = AppTest.from_function(entry, args=(InspectionService(tmp_path),), default_timeout=15).run()
-    at.radio("workspace_page").set_value("Model Catalog").run()
+    at.selectbox("workspace_page").set_value("Model Catalog").run()
     assert not at.exception and any("could not be verified" in t.value for t in at.error)
     assert not at.get("download_button")

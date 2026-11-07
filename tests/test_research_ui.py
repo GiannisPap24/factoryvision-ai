@@ -9,7 +9,7 @@ from test_launch_readiness import source_app as source_app
 
 def test_cashew_metrics_match_published_card_and_thresholds(source_app):
     at, _ = source_app
-    at.run().radio("workspace_page").set_value("Research results").run()
+    at.run().selectbox("workspace_page").set_value("Research results").run()
     assert not at.exception
     card = files("factoryvision.app").joinpath("model_cards/model-card.md").read_text("utf-8")
     published = {
@@ -38,7 +38,7 @@ def test_cashew_metrics_match_published_card_and_thresholds(source_app):
 def test_metalparts_full_precision_matches_packaged_records(source_app):
     at, _ = source_app
     at.run().selectbox[0].set_value("MetalParts (experimental)").run()
-    at.radio("workspace_page").set_value("Research results").run()
+    at.selectbox("workspace_page").set_value("Research results").run()
     assert not at.exception
     package = files("factoryvision.inference")
     comparison = json.loads(package.joinpath("metalparts_comparison.json").read_text())

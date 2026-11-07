@@ -148,14 +148,17 @@ def show_result(result, display=None):
         st.caption(METHODS[result.model_id][0])
         presentation.result_images(view, display, key=result.model_id)
         presentation.legend(view["ceiling"])
-        st.markdown("**Model diagnostics**")
-        columns = st.columns(3)
-        columns[0].metric("Anomaly score", f"{result.score:.8f}")
-        columns[1].metric(
-            "Frozen threshold",
-            "Unavailable" if result.threshold is None else f"{result.threshold:.8f}",
+        presentation.diagnostics(
+            (
+                ("Anomaly score", f"{result.score:.8f}"),
+                (
+                    "Frozen threshold",
+                    "Unavailable" if result.threshold is None else f"{result.threshold:.8f}",
+                ),
+                ("CPU inference", f"{result.inference_ms:.1f} ms"),
+            ),
+            result.model_id,
         )
-        columns[2].metric("CPU inference", f"{result.inference_ms:.1f} ms")
         st.caption(result.score_label + " · scores are not probabilities")
         if result.above_threshold is None:
             st.warning("No valid frozen threshold: no binary decision is available.")
@@ -173,15 +176,14 @@ def show_result(result, display=None):
 
 
 def inspect(engine, statuses, compare=False):
-    if not compare and not any(row["available"] for row in statuses):
+    if not any(row["available"] for row in statuses):
         st.caption("Inference unavailable · No verified local model artifacts")
     controls, output, preview_slot = presentation.inspection_layout(compare)
     preview = None
     with controls:
-        st.subheader("Inspection controls" if compare else "Inspection setup")
+        st.subheader("Inspection setup", anchor="inspection-setup")
         st.caption("Category: Cashew · Change category in navigation")
-        if compare:
-            st.caption("1 · Select model   2 · Upload   3 · Run")
+        st.markdown("**01 · Model selection**")
         available = {s["id"]: s["name"] for s in statuses if s["available"]}
         chosen = st.multiselect(
             "Models",
@@ -191,6 +193,7 @@ def inspect(engine, statuses, compare=False):
             max_selections=None if compare else 1,
             key="compare_models" if compare else "inspect_model",
         )
+        st.markdown("**02 · Image and permission**")
         upload = st.file_uploader(
             "Choose a Cashew image",
             type=["png", "jpg", "jpeg"],
@@ -219,6 +222,7 @@ def inspect(engine, statuses, compare=False):
                 valid = True
             except InputRejected as exc:
                 st.error(str(exc))
+        st.markdown("**03 · Run and review**")
         st.button("Clear image and results", on_click=presentation.clear_inspection)
         rerun_notice = st.empty()
         if st.button(
@@ -238,7 +242,7 @@ def inspect(engine, statuses, compare=False):
         if compare and st.session_state.get("results"):
             st.markdown("[View comparison results](#comparison-results)")
         if not available:
-            st.error(
+            st.info(
                 "No verified local model artifacts are available. "
                 "Preview remains available; inference is disabled. "
                 "See Model Catalog for prerequisites."
@@ -268,16 +272,11 @@ def inspect(engine, statuses, compare=False):
         if results and not compare:
             show_result(results[0])
         else:
-            presentation.input_viewer(preview if valid else None)
+            presentation.input_viewer(preview if valid else None, refined=True)
     with output:
         if compare:
             if results:
-                display = presentation.comparison_view()
-                for offset in range(0, len(results), 2):
-                    row = results[offset : offset + 2]
-                    for column, result in zip(st.columns(len(row)), row, strict=True):
-                        with column:
-                            show_result(result, display)
+                presentation.comparison_panels(results, show_result)
             else:
                 st.info(
                     "No model output yet. Upload a permitted image and explicitly run inspection."
@@ -292,13 +291,15 @@ def render(engine, metal_engine=None):
         layout="wide",
     )
     presentation.styling()
+    frame = st.container(key="fv-workbench", gap="xxsmall")
+    with frame:
+        presentation.header()
+    # The full-width notice stays before category/workspace controls, including on mobile.
+    navigation_notice = frame.container(key="fv-session-notice").empty()
     # Keep navigation in document flow: collapsed native sidebars retain focusable widgets.
-    layout = st.container(horizontal=True, gap="medium", key="fv-layout")
-    navigation = layout.container(key="fv-nav")
+    layout = frame.container(horizontal=True, gap="medium", key="fv-layout")
+    navigation = layout.container(key="fv-nav", gap="small")
     content = layout.container(key="fv-shell")
-    navigation.subheader("FactoryVision AI")
-    navigation.caption("Industrial Precision")
-    navigation_notice = navigation.empty()
     category = navigation.selectbox("Category", ["Cashew", "MetalParts (experimental)"])
     labels = {
         "Overview": "Overview",
@@ -310,8 +311,8 @@ def render(engine, metal_engine=None):
         "Research results": "Research",
         "Synthetic demo": "Demo",
     }
-    page = navigation.radio(
-        "Workspace", list(labels), format_func=labels.get, key="workspace_page", horizontal=True
+    page = navigation.selectbox(
+        "Workspace", list(labels), format_func=labels.get, key="workspace_page"
     )
     presentation.switch_category(category)
     previous = st.session_state.get("active_page")
@@ -325,10 +326,6 @@ def render(engine, metal_engine=None):
         presentation.clear_inspection()
         demo_ui.clear()
         st.session_state["active_page"] = page
-    navigation.divider()
-    navigation.markdown("**Research prototype**")
-    navigation.caption("Local CPU · No cloud inference")
-    navigation.caption("PCB1: BLOCKED · PCB2: INCONCLUSIVE")
     titles = {
         "Overview": (
             "Overview",
@@ -364,9 +361,11 @@ def render(engine, metal_engine=None):
         ),
     }
     with content:
-        presentation.header()
-        st.title(titles[page][0])
-        st.caption(titles[page][1])
+        presentation.page_header(
+            titles[page][0],
+            titles[page][1],
+            "Both categories" if page == "Model Catalog" else category,
+        )
         statuses = engine.statuses() if category == "Cashew" else []
         if page == "Overview":
             if category != "Cashew":
@@ -404,14 +403,33 @@ def render(engine, metal_engine=None):
         elif page == "Reports":
             source = st.session_state.get("batch_report")
             if source is None:
-                st.info(
-                    "No completed batch report. Run Batch Inspection to create a research report."
-                )
-                st.button(
-                    "Open Batch Inspection",
-                    on_click=presentation.navigate,
-                    args=("Batch inspection",),
-                )
+                with st.container(border=True, key="fv-card-report-empty", gap="small"):
+                    st.subheader("Evidence starts with a completed batch")
+                    st.info(
+                        "No completed batch report. "
+                        "A research report requires a batch run with a verified local model. "
+                        "If model artifacts are unavailable, preview and validation still work, "
+                        "but inference and research report creation are disabled."
+                    )
+                    st.write(
+                        "Review image outcomes, inspect spatial evidence and export a validated "
+                        "research summary. Human observations remain separate from model results."
+                    )
+                    st.button(
+                        "Open Batch Inspection",
+                        type="primary",
+                        on_click=presentation.navigate,
+                        args=("Batch inspection",),
+                    )
+                    st.button(
+                        "Check models in Catalog",
+                        on_click=presentation.navigate,
+                        args=("Model Catalog",),
+                    )
+                    st.caption(
+                        "Reports are session-local. Synthetic Demo has its own validation exports; "
+                        "it does not create a research report."
+                    )
             else:
                 batch_ui.results(source)
                 st.button("Clear report and batch", on_click=batch_ui.clear)
@@ -425,6 +443,10 @@ def render(engine, metal_engine=None):
             inspect(engine, statuses, compare=page == "Compare")
         else:
             research()
+        if page != "Overview":
+            with st.container(key="fv-workspace-boundaries"):
+                st.caption("Research prototype · Local CPU · No cloud inference")
+                st.caption("PCB1: BLOCKED · PCB2: INCONCLUSIVE")
         with st.expander("Research and session boundaries"):
             st.write(
                 "Research demonstration only. Not industrially validated. Do not use outputs "
