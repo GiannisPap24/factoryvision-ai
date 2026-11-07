@@ -136,15 +136,27 @@ Prior spoken observations apply to their recorded UI state and do not certify a
 redesigned state. Screen-reader behavior requires separate verification from
 responsive screenshots and AppTest checks.
 
-Image expansion uses a native `st.dialog` with a stable native button opener.
-Escape and Close dismiss it locally; focus returns after the native closing
-transition. The modal contains the same meaningful image name and caption and
-disables nested fullscreen controls. The original image toolbar is hidden only
-inside the shared image wrapper because its replacement buttons lose focus in
-the pinned Streamlit version. This is an expanded viewport dialog, not browser
-Fullscreen API mode. No injected focus script, model execution, additional
-session-state image copy or export mutation is used. Scoped dialog/toolbar CSS
-hooks must be rechecked after a Streamlit upgrade.
+Image expansion uses native in-page disclosures. The complete fitted image is
+primary; optional magnified detail includes a whole-image context graphic.
+The preview is replaced visually by the complete view while expanded, avoiding
+two consecutive copies of the same primary graphic. Enter or Space on the same
+heading opens or collapses it; Escape is not a close action.
+Tab enters the detail scroll area, arrow keys pan, and Shift+Tab returns to its
+heading. Secondary graphics have distinct role names and retain the original
+caption. Closed content is excluded by the native disclosure semantics.
+Display scaling adds no scientific resolution. Original image objects and the
+existing Streamlit encoding settings are preserved, including native thumbnail
+resizing and AUTO encoding; this is not a claim of lossless transport.
+The stock fullscreen toolbar is hidden within the shared image wrapper. No
+injected focus script, model execution, session-state image copy or export
+mutation is used. Demo image cards stack below 800px; compact secondary
+disclosures and a narrow
+padding budget preserve useful detail width. Collapsed containers still render:
+the four image representations add encoding/DOM work even when hidden.
+Preview visibility and expanded card layout follow only the outer disclosure's
+own open state. Closing it restores the preview even when the inner detail
+remains logically open; reopening retains that native inner state. Scoped
+sizing/toolbar hooks require review after upgrades.
 
 Compare presents complete method panels in selection order, at most two per row,
 stacking below 800px. Diagnostics adapt to their available panel width and retain

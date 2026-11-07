@@ -115,7 +115,8 @@ def test_stopped_batch_keeps_success_evidence_review_and_exports(app, monkeypatc
     assert any("pending records" in i.value for i in at.info)
     bundle = at.session_state["batch_exports"]
     reviews = save(at, scope="batch")
-    next(b for b in at.button if b.key and b.key.startswith("fv-expand-")).click().run()
+    assert any(e.label.endswith("Complete image") for e in at.expander)
+    at.run()
     assert not at.exception and len(calls) == 2
     assert at.session_state["batch_exports"] is bundle
     assert at.session_state["fv_review_batch_bundle"] is reviews

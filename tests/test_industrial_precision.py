@@ -121,7 +121,7 @@ def test_expected_missing_models_are_informational_but_invalid_inputs_remain_err
     assert not at.exception and at.error and not at.image
     at.file_uploader[0].set_value(("synthetic.png", build_demo().images[0], "image/png")).run()
     at.checkbox[0].check().run()
-    assert not at.exception and not at.error and len(at.image) == 1
+    assert not at.exception and not at.error and len(at.image) == 4
     assert at.image[0].proto.imgs[0].alt == "Input image"
     assert all(b.disabled for b in at.button if b.label.startswith("Run "))
     assert "results" not in at.session_state and "metal_results" not in at.session_state
@@ -158,7 +158,7 @@ def test_overview_guides_source_only_start_without_creating_results(source_app, 
     assert any("food safety" in item.value for item in at.markdown)
     assert any("NOT CLEARED" in item.value for item in at.caption)
     assert "synthetic_demo" not in at.session_state
-    assert len(at.image) == 2
+    assert len(at.image) == 8
     button(at, "Open synthetic demo").click().run()
     assert not at.exception and at.selectbox("workspace_page").value == "Synthetic demo"
     assert "synthetic_demo" not in at.session_state

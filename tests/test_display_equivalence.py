@@ -226,10 +226,6 @@ def test_single_inspection_presents_exact_accepted_images(monkeypatch, model_id,
             images.append(image)
             semantics.append((kwargs["caption"], kwargs["alt"]))
 
-        def button(self, *args, **kwargs):
-            # The collapsed presentation does not activate its expanded-image dialog.
-            return False
-
         def __getattr__(self, name):
             return lambda *args, **kwargs: self
 
@@ -266,12 +262,14 @@ def test_single_inspection_presents_exact_accepted_images(monkeypatch, model_id,
     names = ["original", "heatmap", "overlay"]
     if auxiliary == "reconstruction" or (auxiliary == "reference" and module is ui):
         names.append(auxiliary)
-    assert len(images) == len(names)
+    assert len(images) == 4 * len(names)
     assert all(caption and alt and caption != alt for caption, alt in semantics)
-    assert len({alt for _, alt in semantics}) == len(names)
-    for image, name in zip(images, names, strict=True):
-        assert image.tobytes() == expected[name].tobytes()
-        assert image.size == expected[name].size
+    assert len({alt for _, alt in semantics}) == 4 * len(names)
+    for index, name in enumerate(names):
+        for image in images[index * 4 : index * 4 + 4]:
+            assert image.tobytes() == expected[name].tobytes()
+            assert image.size == expected[name].size
+        assert all(image is images[index * 4] for image in images[index * 4 : index * 4 + 4])
 
 
 def test_profile_is_scalar_bounded_and_restores_trace(monkeypatch):

@@ -162,16 +162,8 @@
 .st-key-fv-shell [class*="st-key-fv-card-catalog-"] hr {margin:.35rem 0;}
 .st-key-fv-demo-images img {background:var(--fv-demoBg);max-height:280px;}
 .st-key-fv-shell img {border-radius:6px;object-fit:contain;max-width:100%;}
-/* The stock image fullscreen swaps focused buttons without restoring focus.
-   Only our image wrappers replace that toolbar with a native modal opener. */
+/* Shared image viewers use native in-page disclosure, without modal dismissal. */
 .st-key-fv-shell [class*="st-key-fv-image-"] [data-testid="stElementToolbar"] {display:none;}
-[data-testid="stDialog"]:has(.st-key-fv-expanded-image) {align-items:center;padding:16px;}
-[data-testid="stDialog"]:has(.st-key-fv-expanded-image) > div {width:100%;max-width:1600px;margin:0;}
-[data-testid="stDialog"]:has(.st-key-fv-expanded-image) [role="dialog"] {width:100%;max-height:calc(100dvh - 32px);}
-.st-key-fv-expanded-image img {width:100%;height:calc(100dvh - 240px);min-height:120px;object-fit:contain;background:var(--fv-image);border-radius:6px;}
-.st-key-fv-expanded-image [data-testid="stImageCaption"],.st-key-fv-expanded-image [data-testid="stCaptionContainer"] {opacity:1;color:var(--fv-muted);font-size:.875rem;}
-[data-testid="stDialog"]:has(.st-key-fv-expanded-image) button {min-width:44px;min-height:44px;}
-[data-testid="stDialog"]:has(.st-key-fv-expanded-image) button:focus-visible {outline:3px solid var(--fv-focusLight);outline-offset:2px;}
 .st-key-fv-shell label p {white-space:normal;overflow:visible;text-overflow:clip;}
 .st-key-fv-shell [class*="st-key-fv-table"] {overflow-x:auto;}
 .st-key-fv-shell table {font-size:.9rem;}
@@ -277,7 +269,38 @@
 .st-key-fv-shell button:disabled p {color:inherit;}
 .st-key-fv-shell button[kind="secondary"]:not(:disabled):hover {background:var(--fv-hoverBg);color:var(--fv-hover);border-color:var(--fv-hover);}
 .st-key-fv-shell [role="tab"][aria-selected="true"] {background:var(--fv-selected);color:var(--fv-hover);}
+/* Image roles override preview-only height caps, including narrow layouts. */
+.st-key-fv-shell [class*="st-key-fv-image-"] {min-width:0;}
+.st-key-fv-shell [class*="st-key-fv-image-"] summary {min-height:44px;}
+.st-key-fv-shell [class*="st-key-fv-detail-"] summary {opacity:1;}
+.st-key-fv-shell [class*="st-key-fv-image-"]:has(> [class*="st-key-fv-expand-"] > [data-testid="stExpander"] > details[open]) > [data-testid="stElementContainer"]:has([data-testid="stImage"]) {display:none;}
+.st-key-fv-shell [class*="st-key-fv-image-"] details {background:var(--fv-surfaceSecondary);color:var(--fv-text);border-color:var(--fv-border);}
+.st-key-fv-shell [class*="st-key-fv-image-"] details p {color:var(--fv-text);}
+.st-key-fv-shell [class*="st-key-fv-whole-"] img {width:100%;height:60vh;max-height:720px;min-height:0;object-fit:contain;background:var(--fv-image);}
+.st-key-fv-shell [class*="st-key-fv-detail-layout-"] {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3fr);gap:12px;align-items:start;}
+.st-key-fv-shell [class*="st-key-fv-context-"] img {width:100%;height:144px;max-height:144px;object-fit:contain;background:var(--fv-image);}
+.st-key-fv-shell [class*="st-key-fv-pan-"] {min-width:0;overscroll-behavior:contain;}
+.st-key-fv-shell [class*="st-key-fv-magnified-"] {width:960px;min-width:960px;}
+.st-key-fv-shell [class*="st-key-fv-magnified-"] img {width:960px;max-width:none;height:auto;max-height:none;object-fit:contain;}
+.st-key-fv-sample-strip {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));}
+.st-key-fv-sample-strip > :has([class*="st-key-fv-expand-"] > [data-testid="stExpander"] > details[open]),.st-key-fv-batch-thumbnails > :has([class*="st-key-fv-expand-"] > [data-testid="stExpander"] > details[open]) {grid-column:1/-1;}
+.st-key-fv-inspection-layout:has(.st-key-fv-input-viewer [class*="st-key-fv-expand-"] > [data-testid="stExpander"] > details[open]) {grid-template-columns:minmax(0,1fr);}
+.st-key-fv-comparison-grid > :has([class*="st-key-fv-image-"] > [class*="st-key-fv-expand-"] > [data-testid="stExpander"] > details[open]) {grid-column:1/-1;}
+@media(max-width:800px){
+.st-key-fv-shell [class*="st-key-fv-detail-layout-"] {grid-template-columns:minmax(0,1fr);}
+.st-key-fv-shell [class*="st-key-fv-whole-"] img {height:auto;max-height:60vh;}
+}
 @media(prefers-reduced-motion:reduce){
 .st-key-fv-shell *,.st-key-fv-nav * {animation:none!important;transition:none!important;scroll-behavior:auto!important;}
+}
+
+/* Narrow viewer content gets a deliberate width budget, without forced min-width. */
+@media(max-width:800px){
+.st-key-fv-demo-images [data-testid="stColumn"] {flex:1 1 100%!important;width:100%!important;}
+}
+@media(max-width:600px){
+.st-key-fv-shell [class*="st-key-fv-image-"] [data-testid="stExpanderDetails"] {padding:8px 4px;}
+.st-key-fv-shell [class*="st-key-fv-detail-"] [data-testid="stExpanderDetails"] {padding:8px 0;}
+.st-key-fv-shell [data-testid="stExpanderDetails"]:has(.st-key-fv-batch-thumbnails) {padding:8px 4px;}
 }
 </style>

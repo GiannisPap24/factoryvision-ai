@@ -196,7 +196,9 @@ def test_rerun_notice_precedes_run_and_preserves_explicit_review_lifecycle(
     notice_before_run()
     assert len(at.get("download_button")) == 2
     exports = (review.json_bytes(saved.records), review.csv_bytes(saved.records))
-    next(b for b in at.button if b.key and b.key.startswith("fv-expand-")).click().run()
+    assert any(e.label.endswith("Complete image") for e in at.expander)
+    # Native disclosures are client-only; rerender must preserve saved identity.
+    at.run()
     assert not at.exception and len(calls) == 1
     assert at.session_state["fv_review_single_bundle"] is saved
     at.run()
@@ -378,7 +380,7 @@ def test_comparison_view_changes_only_presentation(app, monkeypatch):
         assert all(
             (result.spatial == before).all() for result, before in zip(results, arrays, strict=True)
         )
-        assert len(at.image) == (2 if label == "Reconstruction / reference" else 3)
+        assert len(at.image) == 4 * (2 if label == "Reconstruction / reference" else 3)
         disclosures = [m.value for m in at.markdown if m.value.startswith("Raw score: ")]
         assert len(disclosures) == len(results)
         for text, result in zip(disclosures, results, strict=True):
@@ -454,7 +456,7 @@ def test_demo_validation_display_and_pending_exports_preserve_contract(source_ap
     button(at, "Generate synthetic demo").click().run()
     assert any(item.value == warning for item in at.warning)
     demo, csv_export, json_export = at.session_state["synthetic_demo"]
-    assert len(at.image) == 2
+    assert len(at.image) == 8
     assert list(at.table[0].value["Validation"]) == ["Valid", "Valid", "Rejected"]
     assert list(at.table[0].value["Score"]) == ["Not computed"] * 3
     assert all(

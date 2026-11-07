@@ -35,26 +35,41 @@ def page_header(title, description, category):
         st.caption(f"{category} · {description}")
 
 
-@st.dialog("Expanded image", width="large", on_dismiss="ignore")
-def _expanded_image(image, caption, alt):
-    # Native modal owns trapping, Escape/Close and delayed focus restoration.
-    # Streamlit disables its image fullscreen toolbar inside dialogs.
-    with st.container(key="fv-expanded-image", gap="small"):
-        st.image(image, caption=caption, alt=alt, width="stretch")
-        st.caption("Press Escape or Close to return to the image control.")
-
-
 def image_view(image, *, caption, alt, key, width="stretch", action=None):
-    """Retain native image semantics with a focus-restoring expanded view."""
-    with st.container(key="fv-image-" + key, gap="xsmall", width=width):
+    """Fit the complete image, with optional detail and persistent visual context."""
+    # Keep the original image object and native encoding contract in every view.
+    # Only the preview has a numeric width; detail magnification is CSS display scaling.
+    with st.container(key="fv-image-" + key, gap="xsmall"):
         st.image(image, caption=caption, alt=alt, width=width)
-        if st.button(
-            action or "Expand: " + alt,
-            key="fv-expand-" + key,
-            help="Open a larger image. Escape or Close returns focus here.",
-            type="tertiary",
+        with st.expander(
+            (action or "Enlarge: " + alt) + " · Complete image", key="fv-expand-" + key
         ):
-            _expanded_image(image, caption, alt)
+            with st.container(key="fv-whole-" + key, gap="xsmall"):
+                st.image(image, caption=caption, alt="Complete view: " + alt, width="stretch")
+            with st.expander("Magnified detail: " + alt, key="fv-detail-" + key, type="compact"):
+                st.caption(
+                    "Display enlargement adds no image information. "
+                    "Tab into detail and use arrow keys to pan; Shift+Tab returns here."
+                )
+                with st.container(horizontal=True, key="fv-detail-layout-" + key):
+                    with st.container(key="fv-context-" + key, gap="xsmall"):
+                        st.caption("Whole-image context")
+                        st.image(
+                            image,
+                            caption=caption,
+                            alt="Context for magnified detail: " + alt,
+                            width="stretch",
+                        )
+                    with (
+                        st.container(key="fv-pan-" + key, height=300),
+                        st.container(key="fv-magnified-" + key),
+                    ):
+                        st.image(
+                            image,
+                            caption=caption,
+                            alt="Magnified detail: " + alt,
+                            width="stretch",
+                        )
 
 
 def input_viewer(image=None, *, refined=False):
@@ -94,8 +109,7 @@ def inspection_layout(compare):
     layout = st.container(horizontal=True, key="fv-inspection-layout", gap="medium")
     viewer = layout.container(key="fv-inspection-evidence", gap="xsmall")
     controls = layout.container(border=True, key="fv-inspection-setup", gap="small")
-    # A transient empty placeholder unmounts the opener during a button rerun,
-    # leaving the native dialog without a connected element to restore focus to.
+    # Keep the viewer in a persistent container across application reruns.
     preview = viewer.container(key="fv-inspection-preview", gap="xsmall")
     return controls, st.container(key="fv-inspection-output"), preview
 
