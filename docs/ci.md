@@ -3,11 +3,20 @@
 **Runtime:** Windows AMD64, Python 3.14.10, uv 0.13.5.
 Owned source is MIT licensed. This source-only release contains no datasets or weights.
 
-Accepted public main: **1,448 passed, 97.61% combined coverage**, at
+Integrated main baseline: `5d28861c9a2ed3c67e3e976b0b2935ab16926ed2`, tree
+`1d91bc1fec581693faabad6202d68c07867a804d`.
+[Run 42331567116](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/42331567116)
+passed **1,803 tests, 13 skipped**, with exact combined coverage
+**9,776 / 10,095 = 96.84001981%**, plus Ruff/format, locked dependencies,
+packaging/privacy and fresh installed-application checks. All 13 skips are optional
+isolated-ONNX cases; this is source-only software acceptance, not trained-model or
+independent scientific validation. The results apply to this exact source baseline.
+
+Historical 5C main: **1,448 passed, 97.61% combined coverage**, at
 `4c3987e669360e36930ffe8d4317dd040bc0f47c` (5C merge, PR #3).
 [Run 40795664976](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976)
 also passed Windows packaging/privacy checks and fresh-install smoke. This is
-baseline evidence, not a CI result for unpublished 5D or launch-readiness changes.
+historical baseline evidence, not acceptance of the later integrated source.
 
 Historical initial publication: **PASSED on 2026-10-26**.
 [Run 40376270944](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
@@ -24,7 +33,8 @@ combines executed statements and branch outcomes:
 
 `(covered statements + covered branch outcomes) / (all statements + all branch outcomes)`.
 
-Both the current **97.61%** and historical **98.09%** are combined totals, not branch-only coverage. The
+The integrated baseline's **96.84001981%** and historical **97.61% / 98.09%**
+are combined totals, not branch-only coverage. The
 configured 95% floor applies to the combined report. Test counts can differ locally
 when Windows does not grant symlink-creation privileges; the skip is reported
 explicitly and must not be counted as a pass. Historical CI links identify the
@@ -55,13 +65,13 @@ and [JSON reporting](https://coverage.readthedocs.io/en/latest/commands/cmd_json
 
 ## Fresh source setup
 
-The launch-readiness candidate constrains its app extra to pandas 3.0.6 and
+The integrated source constrains its app extra to pandas 3.0.6 and
 Streamlit 1.66.1. See the [Windows compatibility rationale](local-demo.md#windows-application-dependency-compatibility),
 including the unresolved earlier import timeout and limits of SAC compatibility
 evidence. Acceptance must use a fresh environment created from the candidate
 lockfile, followed by a fresh installed-wheel smoke. The earlier manually
-overridden experiment and the public-main counts above are separate evidence;
-they do not establish full acceptance of this candidate or validate pandas 3.1.0.
+overridden experiment is historical evidence; it does not validate pandas 3.1.0.
+The current pinned-source acceptance is recorded above, independently of that experiment.
 
 Follow [verified Python and uv setup](local-demo.md#first-installation), including
 the development dependencies. Then run from the source root:

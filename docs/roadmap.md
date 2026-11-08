@@ -2,21 +2,42 @@
 
 Milestone 4E completed source-only publication on 2026-10-26 after owner approval
 and the final security/privacy review. The [initial hosted CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40376270944)
-passed. Bounded Milestone 4F launch work is now authorized; external announcements
+passed. At that historical checkpoint, bounded Milestone 4F launch work was authorized; external announcements
 are pending platform access and destination verification, not claimed published.
 Completion of an engineering milestone does not reverse a scientific integrity gate.
 
-**Current public baseline:** Milestone **5C** plus the source-only Reddit-readiness
-improvements merged through [PR #4](https://github.com/GiannisPap24/factoryvision-ai/pull/4)
-at `8a303e9b9641a6d01379a7d20e02239315acbd2d`.
-Historical [5C main CI](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976)
-recorded **1,448 passed, 97.61% combined coverage**; those counts do not describe
-the later readiness release or this candidate.
-**5D is a local, uncommitted integration candidate**, pending final acceptance and
-owner publication approval. The [5D summary](milestone-5d-integration.md) records
-CPU diagnostics, exact display allocation reduction and synthetic ONNX/DirectML
-feasibility. The GPU feasibility experiment is closed as successful synthetic
-research; production GPU integration is deferred. No trained-model speedup is established.
+**Integrated main baseline:** `5d28861c9a2ed3c67e3e976b0b2935ab16926ed2`,
+source tree `1d91bc1fec581693faabad6202d68c07867a804d`.
+[Main CI 42331567116](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/42331567116)
+passed **1,803 tests, 13 skipped; 96.84001981% combined coverage**, including
+packaging/privacy and fresh installation. These are source-bound software results;
+the optional ONNX skips do not establish trained-model validation.
+
+5C source-only robustness was integrated by [PR #3](https://github.com/GiannisPap24/factoryvision-ai/pull/3)
+at `4c3987e669360e36930ffe8d4317dd040bc0f47c`; its historical
+[main CI](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976)
+recorded **1,448 passed, 97.61% combined coverage**. Later readiness work entered
+through [PR #4](https://github.com/GiannisPap24/factoryvision-ai/pull/4) at
+`8a303e9b9641a6d01379a7d20e02239315acbd2d`.
+**5D engineering is integrated**, through [PR #5](https://github.com/GiannisPap24/factoryvision-ai/pull/5)
+at `684a9932ff0dea1e87c704959cd86c14a3c5b9f9`. The [5D summary](milestone-5d-integration.md#current-integration-status-addendum)
+distinguishes CPU synthetic diagnostics, verified display allocation reduction
+with exact pixel/output equivalence, inconclusive general latency improvement,
+optional random-weight ONNX CPU tooling and closed historical DirectML feasibility.
+Production DirectML integration remains deferred; trained-model runtime parity,
+industrial throughput and production GPU readiness are not established.
+
+The Industrial Precision UI and native in-page viewer entered main through
+[PR #17](https://github.com/GiannisPap24/factoryvision-ai/pull/17); its F5/F6/F7 ancestor
+[PR #16](https://github.com/GiannisPap24/factoryvision-ai/pull/16) was indirectly merged.
+Current-viewer NVDA speech, genuine Chrome 200% zoom and physical touch remain
+**UNVERIFIED** and deferred for research-stage integration only. Four eager image
+encodings per viewer remain a documented tradeoff. This is not WCAG certification
+or industrial readiness, and it does not reopen UI implementation.
+
+Next proposed scientific gate: the [evidence baseline and eligibility dossier](reproduction.md#dataset-eligibility-dossier).
+It records prerequisites, not data-access clearance or permission to execute.
+No eligible independent confirmation dataset is established by the available evidence.
 
 ## Completed research and engineering
 
@@ -131,13 +152,14 @@ paragraphs and protocol reports retain the scope and evidence of their own phase
 
 ## Owner-agreed strategic direction
 
-These milestones are **proposed and separately gated**. Their listing is neither
-execution authorization nor evidence of achieved industrial performance, customer
-adoption or deployment approval.
+The table distinguishes integrated engineering from **proposed, separately gated**
+work. Its listing is neither execution authorization nor evidence of achieved
+industrial performance, customer adoption or deployment approval.
 
 | Milestone | Proposed direction |
 |---|---|
-| 5D | Local integration candidate; synthetic GPU feasibility closed, production GPU integration deferred |
+| 5D | CPU/display/optional ONNX engineering integrated; synthetic GPU feasibility closed, production DirectML integration deferred |
+| 5F-A0 | Documentation-only evidence baseline and dataset eligibility dossier; no execution or access grant |
 | 5E | Camera Inspection; separately approved capture, privacy and inspection scope |
 | 5F-A / 5F-B / 5F-C | Dataset eligibility, independent model validation, then supervised pilot discovery |
 | 6A | Local Inference API |
@@ -154,8 +176,8 @@ training from Human Review, autonomous product rejection or machine control.
 
 | Target milestone / problem | Current status | Proposed remediation | Completion evidence | Required authorization | Stop / blocked condition |
 |---|---|---|---|---|---|
-| **5D — Performance & Runtime Compatibility** | Local CPU/display/random-weight ONNX candidate; DirectML synthetic execution and five-case parity verified, experiment closed. Production GPU integration deferred; real-model performance unverified. P2 deprecated pathlib usage remains. | Profile CPU time and memory, optimize display allocations, verify ONNX export and numerical parity, investigate AMD compatibility and reliable CPU fallback; runtime isolation, resource monitoring and reproducible benchmark methodology. Replace deprecated pathlib usage before future Python compatibility changes. | Repeated workload-matched measurements with uncertainty, equivalence/parity tests, supported-runtime tests, bounded failure/resource evidence and no deprecation regressions. Separate synthetic evidence from trained-model benchmarks. | Separate owner approval for trained models/data, GPU/runtime installation and each implementation scope. | Unclear artifact eligibility, changed scientific semantics, unsupported runtime or need to weaken Windows protections. No speedup claim from synthetic evidence alone. |
-| **5E — Camera & Input Reliability** | Camera workflow and validated OOD detection absent. Category is manual; wrong-category inputs are not reliably detected. P2 accessibility/responsive work remains. | Camera acquisition, focus and quality checks, illumination variation, motion blur/invalid frames, safe input limits and unsupported-image rejection; clear uncertainty/abstention, keyboard/focus/readability/responsive usability and human confirmation before consequential decisions. | Authorized capture tests across acquisition conditions; bounded input rejection; keyboard and narrow-viewport acceptance; independent OOD evaluation before any OOD accuracy claim. | Capture/privacy permissions and scoped UI/input implementation approval. | No consent, unsupported acquisition conditions or uncertainty presented as a reliable defect decision. Basic quality checks are not validated OOD detection. |
+| **5D — Performance & Runtime Compatibility** | Integrated CPU/display/optional random-weight ONNX tooling; historical DirectML parity and feasibility closed. Display allocation reduction verified; general latency improvement inconclusive. Production DirectML deferred; trained-model performance unverified. P2 deprecated pathlib usage remains. | Preserve accepted results; profile only a demonstrated new workload need under a separately approved protocol. Trained-model runtime work requires artifact/data eligibility and full-service parity. Replace deprecated pathlib usage under a separate compatibility scope. | Existing source-hashed allocation/equivalence and synthetic feasibility records; future changes need workload-matched measurements, uncertainty, parity and bounded failure/resource evidence. | Separate owner approval for any code/runtime change, trained artifacts/data access or execution. | Unclear eligibility, changed scientific semantics, unsupported runtime or weakened Windows protections. Synthetic parity is not trained-model acceleration. |
+| **5E — Camera & Input Reliability** | Camera workflow and validated OOD detection absent. Category is manual; wrong-category inputs are not reliably detected. UI modernization is integrated; current-viewer speech, genuine zoom and physical touch remain unverified. | Camera acquisition, focus and quality checks, illumination variation, motion blur/invalid frames, safe input limits and unsupported-image rejection; clear uncertainty/abstention, keyboard/focus/readability/responsive usability and human confirmation before consequential decisions. | Authorized capture tests across acquisition conditions; bounded input rejection; keyboard and narrow-viewport acceptance; independent OOD evaluation before any OOD accuracy claim. | Capture/privacy permissions and scoped UI/input implementation approval. | No consent, unsupported acquisition conditions or uncertainty presented as a reliable defect decision. Basic quality checks are not validated OOD detection. |
 | **5F-A — Dataset Integrity & Scientific Eligibility** | PCB1 **BLOCKED** by source overlap; PCB2 **INCONCLUSIVE**, 56 similarity pairs await independent adjudication; RobustAD target **NOT CLEARED**. | Establish train/validation/test and source/acquisition-group independence; exact/near-duplicate screening; provenance/licensing review, independently acquired evaluation data where necessary and independent human label adjudication. | Documented group-aware split audit, resolved similarity evidence, licensing/provenance records and independent adjudication accepted before evaluation. | Explicit data acquisition/access and independent-adjudication approval. | Any unresolved overlap, missing rights or non-independent labels. Historical observed tests never become new blind evidence. Frozen gates cannot be overridden. |
 | **5F-B — Independent Model Validation** | Cashew AE historical recall **0.52**, **48/100 anomalies missed** at its frozen threshold; official test already observed. MetalParts remains exploratory-only. | False-negative/false-positive analysis; predeclared model selection and evaluation; separate development/calibration, independent held-out testing, pixel localization where applicable, real acquisition robustness, independent OOD evaluation, defensible uncertainty and use-case acceptance thresholds. | Eligible independent data from 5F-A, preregistered protocol, error/localization analyses with uncertainty and independently reviewed acceptance results. | New model/evaluation scope and trained-artifact access approved in advance. | Tuning against the observed Cashew official test, unresolved eligibility or presenting exploratory scores as industrial accuracy. |
 | **5F-C — Supervised Industrial Pilot Discovery** | No validated industrial pilot or customer acquisition claimed; real Cashew development pilot remains **BLOCKED**. | Establish customer/use-case requirements, defect definitions, missed-defect costs, false-alarm tolerance, camera conditions/throughput, data/privacy permissions, human-supervised design, escalation and pilot stop criteria. | Documented use case, appropriate scientific eligibility and independent validation, signed-off permissions and supervised pilot protocol. Evidence collection is separately authorized. | **New owner decision** plus data/customer permissions; discovery alone does not approve a pilot. | Missing eligibility, unacceptable error costs, absent supervision or unclear stop/escalation rules. |
@@ -163,14 +185,15 @@ training from Human Review, autonomous product rejection or machine control.
 | **6B — Industrial Integration Safety** | No industrial camera/controller actuation authorized. | Connection-loss/interruption handling, operator control/manual fallback, auditable commands/outcomes, duplicate-action prevention and separation of research predictions from operational decisions. | Approved integration specification, simulated failure/duplicate-command tests and human-supervised safety acceptance. | Separate owner and equipment-operator approval for each integration. | Unknown command outcome, absent manual fallback or autonomous rejection/machine control outside explicit scope. |
 | **6C — Commercial Readiness** | Not commercially/industrially validated. Third-party redistribution rights are separate from MIT source licensing. | Security/privacy review, runtime/deployment maintenance, monitoring/drift, independent use-case validation, dataset/weight/runtime licensing and redistribution permissions, support/documentation, incident response and operational fallback. | Reviewed technical/scientific/legal evidence and final documented **GO/NO-GO** for the exact deployment/use case. | Separate commercial/deployment approval and required rights/permissions. | Missing independent performance evidence, unresolved licensing/security or inability to support safe operations. Passing software tests is insufficient. |
 | **4F — Community feedback (cross-cutting)** | Initial presentation pending; confirmed external testers are **not yet observed**, not assumed zero. | Track synthetic-demo testers, installation issues, reproducible bugs, usability/documentation feedback and GitHub issue triage using non-sensitive voluntary evidence. | Deduplicated confirmed reports and reproducible resolutions under the [feedback process](community-feedback.md). | Destination/rules review and explicit owner approval before posting or outreach. | Sensitive data, unsupported capability claims or treating stars/views as users or industrial evidence. |
-| **Maintenance — Privacy, documentation and UI** | Known historical public Git author email exposure; historical 5B acceptance, dataset-contract licensing and inference-guide future-work wording needs contextual maintenance. P2 accessibility and pathlib findings remain tracked above. | Review privacy-maintenance options without repeating the address; label historical docs, reconcile current guides; consider a separately scoped industrial-research-workbench UI polish (navy/light surfaces, blue/teal, clear hierarchy/spacing, useful image areas and compact diagnostics). Keep one Streamlit frontend. | Owner-reviewed privacy decision, consistent current docs, accessibility/browser evidence and no invented models, charts, confidence values, histories, accounts or GPU monitoring. | Separate approval for any public-history rewrite or broader redesign; never automatic. | Destructive history change without approval, loss of historical evidence, fabricated features or unnecessary frontend rewrite. |
+| **Maintenance — Privacy, documentation and UI** | Historical public Git author email exposure remains a separate privacy matter. Current evidence/licensing guidance needs chronology reconciliation. UI modernization is integrated; manual accessibility gaps and P2 pathlib maintenance remain. | Complete bounded 5F-A0 documentation clarification using public evidence; preserve historical records and the settled UI. Address manual accessibility or compatibility gaps only under a separately scoped decision. | Consistent source-bound guides, complete prerequisite dossier, unchanged scientific resources and no invented evidence or clearance. | Separate approval for any history/privacy action, code change, manual campaign or publication; no general UI redesign proposed. | Destructive history change, lost evidence, fabricated provenance or promotion of research status without accepted evidence. |
 
-This launch-readiness checkpoint addresses the P2 first-run action and contextual
+The historical launch-readiness checkpoint addressed the P2 first-run action and contextual
 navigation warning only. Cleanup remains intentional: workspace/category changes
 clear current images, results and reviews; only a completed batch and saved reviews
 survive Batch Inspection ↔ Reports. The warning is not a confirmation dialog or
-persistence mechanism. Broader accessibility and visual redesign require their own
-scope. Historical reports, thresholds and nine pinned scientific resources stay intact.
+persistence mechanism. Later UI integration is recorded above; unresolved manual
+accessibility checks retain their stated limits. Historical reports, thresholds and
+nine pinned scientific resources stay intact.
 
 See [publication record](publication.md), [contributing](../CONTRIBUTING.md)
 and [licensing](licensing.md).

@@ -28,7 +28,9 @@ separately prepared, verified research artifacts.
 | Report a bug or suggest an improvement | [Community feedback](community-feedback.md) |
 | Understand local security and privacy boundaries | [Security](../SECURITY.md) |
 | Review licence and asset redistribution boundaries | [Licensing and attribution](licensing.md) |
-| Review completed milestones and future scope | [Roadmap](roadmap.md) |
+| Review the integrated scientific/UI baseline and future gates | [Roadmap](roadmap.md) |
+| Distinguish research evidence from software checks | [Current evidence baseline](reproduction.md#current-scientific-evidence-baseline) |
+| Review prerequisites before proposing data access or evaluation | [Dataset eligibility dossier](reproduction.md#dataset-eligibility-dossier) |
 | Review the publication baseline and update procedure | [Publication record](publication.md) |
 
 ## Research methods and evidence

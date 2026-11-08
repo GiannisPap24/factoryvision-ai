@@ -1,5 +1,8 @@
 # Milestone 5D: local integration candidate
 
+> Historical integration-preparation record. The original text below is preserved;
+> see the [current integration addendum](#current-integration-status-addendum) for later status.
+
 This candidate combines accepted public main `8a303e9b9641a6d01379a7d20e02239315acbd2d`
 with the unchanged 5D checkpoint ancestry ending at
 `f6762f9a4aeab3d2d46044415faa26a9b0121a37`. Merge preparation is local and uncommitted;
@@ -92,3 +95,29 @@ Remaining work is final offline integration acceptance, packaging/privacy and fr
 installed-app verification, followed by owner review for any commit or publication.
 Later real-model parity/performance needs separately approved artifacts, inputs,
 protocol and eligibility. No UI redesign, camera work or Milestone 5E begins here.
+
+## Current integration-status addendum
+
+This addendum records the later public integration without changing the historical
+preparation, numerical results or owner decision above. The 5D integration merge
+`5efd1d27df1ffea6619fdb87cc13b938dc47121a`, followed by exact-coverage/selection
+repair `1c11e755c66ea8f7984a7abb4cd25bad13ad3f40`, entered public main through
+[PR #5](https://github.com/GiannisPap24/factoryvision-ai/pull/5) at
+`684a9932ff0dea1e87c704959cd86c14a3c5b9f9`.
+
+The later integrated main `5d28861c9a2ed3c67e3e976b0b2935ab16926ed2`, tree
+`1d91bc1fec581693faabad6202d68c07867a804d`, passed
+[CI run 42331567116](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/42331567116):
+1,803 passed, 13 optional isolated-ONNX skips, exact combined coverage 96.84001981%,
+with packaging/privacy and fresh installation. These software results do not
+rerun or extend the historical benchmarks; the [CI history](ci.md) retains the
+original rounded-coverage incident and its exact-floor repair.
+
+CPU synthetic tooling, the exact display allocation reduction and optional
+synthetic ONNX CPU probe are integrated. The display allocation reduction is
+verified, while a general latency improvement is not established. Random-weight
+ONNX parity and historical DirectML feasibility do not establish trained-model
+runtime parity, industrial throughput or production GPU readiness. Production
+DirectML integration remains deferred; no new GPU benchmark is proposed here.
+The [current evidence baseline and dossier](reproduction.md#current-scientific-evidence-baseline)
+separate implementation, historical findings and future scientific eligibility.

@@ -94,7 +94,14 @@ Human reviews and notes also stay in the current session. Save a decision explic
 
 ## Tests and CI
 
-The [accepted public main CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976), at merge commit `4c3987e669360e36930ffe8d4317dd040bc0f47c` for [PR #3](https://github.com/GiannisPap24/factoryvision-ai/pull/3), passed **1,448 tests with 97.61% combined statement and branch coverage**, plus Windows packaging/privacy checks and fresh-install smoke. This evidence applies to that baseline, not subsequent unpublished changes. The badge links to current main status. Coverage combines statements and branch outcomes; it is not branch-only coverage. See [coverage interpretation](docs/ci.md#interpreting-coverage).
+The historical [5C public main CI run](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/40795664976), at merge commit `4c3987e669360e36930ffe8d4317dd040bc0f47c` for [PR #3](https://github.com/GiannisPap24/factoryvision-ai/pull/3), passed **1,448 tests with 97.61% combined statement and branch coverage**, plus Windows packaging/privacy checks and fresh-install smoke. This evidence applies only to that historical baseline. The badge links to current main status. Coverage combines statements and branch outcomes; it is not branch-only coverage. See [coverage interpretation](docs/ci.md#interpreting-coverage).
+
+The integrated main baseline `5d28861c9a2ed3c67e3e976b0b2935ab16926ed2`
+(tree `1d91bc1fec581693faabad6202d68c07867a804d`) passed
+[main CI run 42331567116](https://github.com/GiannisPap24/factoryvision-ai/actions/runs/42331567116):
+**1,803 passed, 13 skipped; 96.84001981% combined coverage**. Packaging, privacy and
+fresh installation passed. The skips are optional isolated-ONNX cases, not completed
+real-model validation. These results belong to that exact source, not future changes.
 
 After the installation above (including development dependencies), run:
 
@@ -102,7 +109,15 @@ After the installation above (including development dependencies), run:
 .venv-31410/Scripts/python.exe scripts/ci_check.py --uv .tools/uv-0.13.5/uv.exe
 ```
 
-Default tests use fabricated data and require no private assets. Older counts in the [5A verification record](docs/milestone-5a-human-review.md) describe historical acceptance stages. **5C is merged; 5D is ongoing local, unpublished work.** Public main has no completed ONNX or GPU integration. See the [roadmap and acceptance gates](docs/roadmap.md) and [CI details](docs/ci.md).
+Default tests use fabricated data and require no private assets. Older counts in the [5A verification record](docs/milestone-5a-human-review.md) describe historical acceptance stages. **5C synthetic robustness and 5D CPU/display/optional synthetic ONNX tooling are integrated.**
+The display allocation reduction is verified; a general latency improvement is not
+established. Historical random-weight ONNX/DirectML feasibility is not trained-model
+parity or production GPU readiness; production DirectML integration remains deferred.
+The Industrial Precision UI and native in-page viewer are integrated. Current-viewer
+NVDA speech, genuine Chrome 200% zoom and physical touch remain unverified; four eager
+image encodings per viewer remain documented. Research-stage integration does not
+claim WCAG certification or industrial readiness. See the [current status and gates](docs/roadmap.md),
+[CI evidence](docs/ci.md) and [dataset eligibility dossier](docs/reproduction.md#dataset-eligibility-dossier).
 
 ## Research results and limits
 
