@@ -129,11 +129,13 @@ test run, with independence and distribution limitations described in the
 [Model Card](model-card.md). Feature/student official Cashew defect metrics are not
 established; artificial development probes cannot substitute for real defects.
 
-A separately authorized 3B could add bounded result export, camera-interface design,
-better accessibility/interaction checks and an independently collected demonstration
-set with acquisition provenance. Any new category, training, threshold tuning or
-accuracy benchmark requires separate authorization and a valid integrity protocol.
-Unresolved PCB2 adjudication cannot be replaced by application demonstrations.
+The earlier 3B future-work description preceded the now-integrated bounded
+[research exports](reporting.md) and [Industrial Precision interface](interface.md).
+Camera work remains separately proposed; current-viewer NVDA speech, genuine
+Chrome 200% zoom and physical touch remain unverified. New data access, categories,
+training, threshold changes or accuracy benchmarks require separate authorization
+and the [scientific eligibility gates](reproduction.md#dataset-eligibility-dossier).
+Application demonstrations cannot replace independent data or PCB2 adjudication.
 
 ## Experimental MetalParts (Milestone 3E)
 

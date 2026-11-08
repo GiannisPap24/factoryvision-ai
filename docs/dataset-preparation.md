@@ -86,6 +86,17 @@ A four-image 256x256 batch used 4,194,404 bytes of returned tensors. One standal
 
 Visual Anomaly (VisA), by Yang Zou, Jongheon Jeong, Latha Pemula, Dongqing Zhang and Onkar Dabeer, was accessed on 24 October 2026 from the AWS registry. Cite SPot-the-Difference Self-Supervised Pre-training for Anomaly Detection and Segmentation, ECCV 2022 / arXiv:2207.14315. Data uses [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); preserve applicable notices, attribution, source/license links and descriptions of changes. The research code's license is separate. Original license/NOTICE files are retained locally. This repository distributes neither real images nor source annotation CSVs. Public project licensing remains undecided.
 
+### Subsequent publication and eligibility context
+
+The licensing statement above records the Milestone 1B context. Later publication
+adopted [MIT](../LICENSE) for FactoryVision-owned code and original covered synthetic
+material; VisA data, third-party weights and other assets retain separate terms
+([licensing inventory](licensing.md)). Public availability is not a new rights or
+scientific eligibility clearance. Historical acquisition/screening and the later
+addenda below do not prove physical-item or acquisition independence. The official
+Cashew test is now observed; see the [current prerequisite dossier](reproduction.md#dataset-eligibility-dossier)
+before proposing any new access, development or independent confirmation.
+
 ## Subsequent Milestone 2A gate
 
 The original preparation record above describes Milestone 1B. Milestone 2A rechecked all image/mask records against it, then added a documented near-duplicate screen without changing membership. It flagged 7,946 of 114,581 cross-partition pairs and visually reviewed the 24 closest thumbnail pairs. No confirmed duplicate was established in that subset; remaining candidates and physical-item identity are still unresolved. See [training.md](training.md) for screening thresholds, preserved reports and the limited basis for proceeding with training feasibility. The accepted split and source data are unchanged.

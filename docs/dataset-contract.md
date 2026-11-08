@@ -63,7 +63,13 @@ Optional filesystem checking resolves the chosen root and every file reference. 
 
 tests/fixtures/synthetic-manifest.json contains ten fabricated normal training records, one fabricated test normal and one fabricated test anomaly. Paths identify nonexistent synthetic images unless a test creates placeholder bytes in its temporary directory. Those placeholders are deliberately not image files.
 
-Synthetic manifests use factoryvision-synthetic / synthetic-v1 and a local URN. LicenseRef-FactoryVision-Synthetic is an internal provenance marker, not a standardized license grant. The owner has not selected a public source-code/fixture license; do not infer redistribution permission from the marker.
+Synthetic manifests use factoryvision-synthetic / synthetic-v1 and a local URN. LicenseRef-FactoryVision-Synthetic is an internal provenance marker, not a standardized license grant. At the original contract checkpoint the public source/fixture license had not been selected.
+
+Subsequent publication adopted [MIT](../LICENSE) for FactoryVision-owned code and
+original synthetic material covered by that grant. It does not relicense third-party
+datasets, pretrained weights or restricted research artifacts. The marker alone
+confers no redistribution permission; consult the [licensing boundaries](licensing.md)
+and [eligibility dossier](reproduction.md#dataset-eligibility-dossier).
 
 VisA data is CC BY 4.0. Preserve attribution, the source/license links, applicable notices and modifications; do not imply endorsement. VisA code has a separate license. Cite the VisA paper by Zou, Jeong, Pemula, Zhang and Dabeer, ECCV 2022. Record actual image acquisition date in the later ingestion record. No real dataset is distributed in this project. [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 
